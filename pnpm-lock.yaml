@@ -961,6 +961,9 @@ importers:
       '@ledgerhq/hw-transport-vault':
         specifier: workspace:^
         version: link:../../libs/ledgerjs/packages/hw-transport-vault
+      '@ledgerhq/ledger-auth':
+        specifier: workspace:^
+        version: link:../../libs/ledger-auth
       '@ledgerhq/ledger-key-ring-protocol':
         specifier: workspace:^
         version: link:../../libs/ledger-key-ring-protocol
@@ -1701,6 +1704,9 @@ importers:
       '@ledgerhq/icons-ui':
         specifier: workspace:^
         version: link:../../libs/ui/packages/icons
+      '@ledgerhq/ledger-auth':
+        specifier: workspace:^
+        version: link:../../libs/ledger-auth
       '@ledgerhq/ledger-key-ring-protocol':
         specifier: workspace:^
         version: link:../../libs/ledger-key-ring-protocol
