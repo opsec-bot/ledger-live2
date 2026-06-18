@@ -1,19 +1,24 @@
-import axios from "axios";
-
-import { getSwapAPIBaseURL } from "../../../../exchange/swap";
+import { swapQuotesApi } from "../state-manager/api";
+import { getSwapQuotesDispatch } from "../state-manager/store";
 import { ProviderErrorCodes } from "../types";
 import { fetchQuotes } from "./fetchQuotes";
 
-jest.mock("axios");
-
-jest.mock("../../../../exchange/swap", () => ({
-  getSwapAPIBaseURL: jest.fn(),
+jest.mock("../state-manager/store", () => ({
+  getSwapQuotesDispatch: jest.fn(),
 }));
 
-const axiosGetMock = jest.mocked(axios.get);
-const axiosIsAxiosErrorMock = jest.mocked(axios.isAxiosError);
-const axiosIsCancelMock = jest.mocked(axios.isCancel);
-const getSwapAPIBaseURLMock = jest.mocked(getSwapAPIBaseURL);
+jest.mock("../state-manager/api", () => ({
+  swapQuotesApi: {
+    endpoints: {
+      fetchQuotes: {
+        initiate: jest.fn(),
+      },
+    },
+  },
+}));
+
+const getSwapQuotesDispatchMock = jest.mocked(getSwapQuotesDispatch);
+const initiateMock = jest.mocked(swapQuotesApi.endpoints.fetchQuotes.initiate);
 
 function makeArgs(): Parameters<typeof fetchQuotes>[0] {
   return {
@@ -31,62 +36,47 @@ function makeArgs(): Parameters<typeof fetchQuotes>[0] {
 }
 
 describe("fetchQuotes", () => {
+  let dispatch: jest.Mock;
+
   beforeEach(() => {
     jest.clearAllMocks();
-    getSwapAPIBaseURLMock.mockReturnValue("https://swap.test");
-    axiosIsAxiosErrorMock.mockReturnValue(false);
-    axiosIsCancelMock.mockReturnValue(false);
+    dispatch = jest.fn();
+    getSwapQuotesDispatchMock.mockReturnValue(dispatch);
+    // The thunk returned by `initiate` is opaque to `fetchQuotes`; only the
+    // dispatched result matters, so return a marker we can assert against.
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+    initiateMock.mockImplementation(((arg: unknown) => ({ arg })) as never);
   });
 
-  it("splits successful quote rows from provider error rows", async () => {
-    const rawQuote = {
-      provider: "lifi",
-      providerType: "DEX",
-      amountFrom: 1,
-      amountTo: 0.99,
-      exchangeRate: 0.99,
-      slippage: 1,
-      type: "float",
-      networkFees: { currency: "ethereum" },
-      tags: { isRegistrationRequired: false, isTokenApprovalRequired: false },
-      key: "lifi-key",
-      liquiditySource: "AMM",
-    };
-    const providerError = {
-      code: ProviderErrorCodes.AMOUNT_OFF_LIMITS,
-      type: "float",
-      provider: "okx",
-      message: "amount out of range",
-      parameter: { minAmount: "200000000" },
-    };
-    axiosGetMock.mockResolvedValue({ data: [rawQuote, providerError] });
+  it("returns the quotes split by the endpoint", async () => {
+    const rawQuotes = [{ provider: "lifi", key: "lifi-key" }];
+    const providerErrors = [
+      {
+        code: ProviderErrorCodes.AMOUNT_OFF_LIMITS,
+        provider: "okx",
+        message: "amount out of range",
+      },
+    ];
+    dispatch.mockResolvedValue({ data: { rawQuotes, providerErrors } });
 
     const result = await fetchQuotes(makeArgs(), "usd");
 
-    expect(result).toEqual({
-      rawQuotes: [rawQuote],
-      providerErrors: [providerError],
-    });
-    expect(axiosGetMock).toHaveBeenCalledWith(
-      "https://swap.test/quote",
+    expect(result).toEqual({ rawQuotes, providerErrors });
+    expect(initiateMock).toHaveBeenCalledWith(
       expect.objectContaining({
-        headers: expect.objectContaining({ Accept: "application/json" }),
-        params: expect.any(URLSearchParams),
+        providers: ["lifi", "okx"],
+        counterValueCurrency: "usd",
+        quotesInput: expect.objectContaining({
+          sendCurrencyId: "bitcoin",
+          receiveCurrencyId: "ethereum",
+        }),
       }),
+      { forceRefetch: true, subscribe: false },
     );
-    const requestParams = axiosGetMock.mock.calls[0][1]?.params;
-    expect(requestParams).toBeInstanceOf(URLSearchParams);
-    if (!(requestParams instanceof URLSearchParams)) {
-      throw new Error("Expected request params to be URLSearchParams");
-    }
-    expect(requestParams.get("from")).toBe("bitcoin");
-    expect(requestParams.get("to")).toBe("ethereum");
   });
 
-  it("returns an empty result when the quote HTTP response is not OK", async () => {
-    const httpError = { response: { status: 500 } };
-    axiosGetMock.mockRejectedValue(httpError);
-    axiosIsAxiosErrorMock.mockImplementation(error => error === httpError);
+  it("returns an empty result when the endpoint yields no data", async () => {
+    dispatch.mockResolvedValue({ data: { rawQuotes: [], providerErrors: [] } });
 
     await expect(fetchQuotes(makeArgs(), "usd")).resolves.toEqual({
       rawQuotes: [],
@@ -94,19 +84,25 @@ describe("fetchQuotes", () => {
     });
   });
 
-  it("rethrows cancelled requests", async () => {
-    const cancelError = { message: "cancelled" };
-    axiosGetMock.mockRejectedValue(cancelError);
-    axiosIsCancelMock.mockImplementation(error => error === cancelError);
+  it("rethrows transport errors surfaced by the endpoint", async () => {
+    const error = { status: "FETCH_ERROR", error: "network down" };
+    dispatch.mockResolvedValue({ error });
 
-    await expect(fetchQuotes(makeArgs(), "usd")).rejects.toBe(cancelError);
+    await expect(fetchQuotes(makeArgs(), "usd")).rejects.toBe(error);
   });
 
-  it("rethrows network failures without an HTTP response", async () => {
-    const networkError = { request: {} };
-    axiosGetMock.mockRejectedValue(networkError);
-    axiosIsAxiosErrorMock.mockImplementation(error => error === networkError);
+  it("flattens caller-supplied headers before dispatching", async () => {
+    dispatch.mockResolvedValue({ data: { rawQuotes: [], providerErrors: [] } });
+    const args: Parameters<typeof fetchQuotes>[0] = {
+      ...makeArgs(),
+      headers: [["x-foo", "bar"]],
+    };
 
-    await expect(fetchQuotes(makeArgs(), "usd")).rejects.toBe(networkError);
+    await fetchQuotes(args, "usd");
+
+    expect(initiateMock).toHaveBeenCalledWith(
+      expect.objectContaining({ customHeaders: { "x-foo": "bar" } }),
+      { forceRefetch: true, subscribe: false },
+    );
   });
 });

@@ -21,7 +21,7 @@ import { registerTransportModules } from "~/renderer/live-common-setup";
 import { getLocalStorageEnvs } from "~/renderer/experimental";
 import "~/renderer/i18n/init";
 import { hydrateCurrency } from "~/renderer/bridge/cache";
-import { setupCryptoAssetsStore } from "~/config/bridge-setup";
+import { setupCryptoAssetsStore, setupSwapQuotesStore } from "~/config/bridge-setup";
 import { findCryptoCurrencyById } from "@domain/entity-currency-crypto";
 import { restoreTokensToCache, parsePersistedCAL } from "@domain/api-currency-token";
 import { currencyFiatApi } from "@domain/api-currency-fiat";
@@ -136,6 +136,7 @@ async function init() {
   setupListeners(store.dispatch);
   setupRecentAddressesStore(store);
   setupCryptoAssetsStore(store);
+  setupSwapQuotesStore(store);
   dispatch(currencyFiatApi.endpoints.getSupportedFiats.initiate(undefined, { subscribe: false }));
 
   // Feature flags: install the LiveConfig provider (serves non-feature `config_*` keys) and

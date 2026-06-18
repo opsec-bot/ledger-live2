@@ -8,7 +8,7 @@ import reducers from "~/reducers";
 import { rebootMiddleware } from "~/middleware/rebootMiddleware";
 import { rozeniteDevToolsEnhancer } from "@rozenite/redux-devtools-plugin";
 import { applyLlmRTKApiMiddlewares } from "~/context/rtkQueryApi";
-import { setupCryptoAssetsStore } from "~/config/bridge-setup";
+import { setupCryptoAssetsStore, setupSwapQuotesStore } from "~/config/bridge-setup";
 import { setupRecentAddressesStore } from "LLM/storage/recentAddresses";
 import { createIdentitiesSyncMiddleware, pushDevicesApiExtra } from "@domain/api-push-devices";
 import { State } from "~/reducers/types";
@@ -100,3 +100,4 @@ setupListeners(store.dispatch, (dispatch, { onOnline, onOffline }) => {
 });
 setupRecentAddressesStore(store);
 setupCryptoAssetsStore(store);
+setupSwapQuotesStore(store);
