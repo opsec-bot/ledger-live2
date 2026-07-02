@@ -134,6 +134,7 @@ function mapSwapOperation(
     ? swapOperation.finalAmount
     : swapOperation.toAmount;
   const createdAt = getOperationCreatedAt(swapOperation.operation.date);
+  const extra = getOperationExtra(swapOperation.operation);
 
   return {
     fromAccountId: swapOperation.fromAccount.id,
@@ -143,6 +144,7 @@ function mapSwapOperation(
     feesAmount: swapOperation.operation.fee?.toFixed(),
     operationHash: swapOperation.operation.hash,
     createdAt,
+    ...(extra && { operationExtra: extra }),
   };
 }
 
@@ -152,4 +154,13 @@ function getOperationCreatedAt(
   if (operationDate instanceof Date) return operationDate.getTime();
   if (typeof operationDate === "number") return operationDate;
   return undefined;
+}
+
+function getOperationExtra(
+  operation: MappedSwapOperation["operation"],
+): Record<string, unknown> | undefined {
+  if (!operation.extra) return undefined;
+  if (typeof operation.extra !== "object") return undefined;
+  if (Array.isArray(operation.extra)) return undefined;
+  return { ...operation.extra };
 }

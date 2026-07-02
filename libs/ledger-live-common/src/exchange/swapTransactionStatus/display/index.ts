@@ -168,12 +168,14 @@ export function getSwapTransactionStatusExplorerUrl({
   provider,
   swapId,
   operationHash,
+  operationExtra,
   fromCurrency,
   getTransactionExplorer,
 }: {
   provider: string | undefined;
   swapId: string;
   operationHash: string | undefined;
+  operationExtra?: Record<string, unknown>;
   fromCurrency: CryptoOrTokenCurrency | undefined;
   getTransactionExplorer?: SwapTransactionStatusTransactionExplorerBuilder;
 }): string | undefined {
@@ -194,7 +196,12 @@ export function getSwapTransactionStatusExplorerUrl({
   }
 
   if (!mainCurrency || !operationHash) return undefined;
-  return getCurrencyTransactionExplorerUrl(mainCurrency, operationHash, getTransactionExplorer);
+  return getCurrencyTransactionExplorerUrl(
+    mainCurrency,
+    operationHash,
+    getTransactionExplorer,
+    operationExtra,
+  );
 }
 
 export function formatSwapTransactionStatusCreatedAt(timestamp: number, locale: string): string {
@@ -405,6 +412,7 @@ export function useSwapTransactionStatusDisplayViewModel({
     provider,
     swapId: params.swapId,
     operationHash: details?.operationHash,
+    operationExtra: details?.operationExtra,
     fromCurrency: sendCurrency,
     getTransactionExplorer,
   });
@@ -445,9 +453,10 @@ function getCurrencyTransactionExplorerUrl(
   mainCurrency: CryptoCurrency,
   operationHash: string,
   getTransactionExplorer: SwapTransactionStatusTransactionExplorerBuilder | undefined,
+  operationExtra?: Record<string, unknown>,
 ): string | undefined {
   const explorerView = getDefaultExplorerView(mainCurrency);
-  const operation = { hash: operationHash, extra: {} } as Operation;
+  const operation = { hash: operationHash, extra: operationExtra ?? {} } as Operation;
 
   return (
     getTransactionExplorer?.(explorerView, operation) ??

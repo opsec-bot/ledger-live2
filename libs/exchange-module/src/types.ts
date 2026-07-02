@@ -179,6 +179,7 @@ export type GetTransactionStatusResponse = {
   receivedAmount?: string;
   feesAmount?: string;
   operationHash?: string;
+  operationExtra?: Record<string, unknown>;
   createdAt?: number;
   providerRequired?: boolean;
 };

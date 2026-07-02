@@ -113,6 +113,32 @@ describe("getTransactionStatus", () => {
     });
   });
 
+  it("includes operationExtra from the operation extra field", async () => {
+    mockedFetchTransactionSwapStatus.mockResolvedValueOnce(undefined);
+    mockedGetCompleteSwapHistory.mockResolvedValueOnce([
+      {
+        day: new Date(),
+        data: [
+          makeSwapOperation({
+            operation: makeOperation({ extra: { consensusTimestamp: "1782988745.579372438" } }),
+          }),
+        ],
+      },
+    ]);
+
+    const result = await getTransactionStatus(
+      { swapId: "swap-1" },
+      { accounts: [makeAccount("from")] },
+    );
+
+    expect(result).toEqual(
+      expect.objectContaining({
+        operationHash: "0xhash",
+        operationExtra: { consensusTimestamp: "1782988745.579372438" },
+      }),
+    );
+  });
+
   it("uses provider fallback when swap history cannot resolve the swap", async () => {
     mockedGetCompleteSwapHistory.mockResolvedValueOnce([]);
     mockedFetchTransactionSwapStatus.mockResolvedValueOnce({

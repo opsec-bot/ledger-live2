@@ -233,6 +233,22 @@ describe("getSwapTransactionStatusExplorerUrl", () => {
     ).toBe("https://tonviewer.com/transaction/by-msg-hash/ton-hash-1");
   });
 
+  it("should pass operationExtra to the family transaction explorer via operation.extra", () => {
+    expect(
+      getSwapTransactionStatusExplorerUrl({
+        provider: "changelly_v2",
+        swapId: "swap-1",
+        operationHash: "base64-hash",
+        operationExtra: { consensusTimestamp: "1782988745.579372438" },
+        fromCurrency: bitcoin,
+        getTransactionExplorer: (_explorerView, operation) => {
+          const extra = operation.extra as Record<string, unknown>;
+          return `https://hashscan.io/mainnet/transaction/${extra.consensusTimestamp ?? operation.hash}`;
+        },
+      }),
+    ).toBe("https://hashscan.io/mainnet/transaction/1782988745.579372438");
+  });
+
   it("should not build provider hash URLs when the operation hash is missing", () => {
     expect(
       getSwapTransactionStatusExplorerUrl({
