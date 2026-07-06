@@ -71,6 +71,10 @@ const SWAP_REVIEW_TRANSACTION_MAX_ATTEMPTS = Math.ceil(
   SWAP_REVIEW_TRANSACTION_TIMEOUT_MS / SCREEN_POLL_INTERVAL_MS,
 );
 
+export const SLOW_SEND_REVIEW_TRANSACTION_MAX_ATTEMPTS = Math.ceil(
+  SWAP_REVIEW_TRANSACTION_TIMEOUT_MS / SCREEN_POLL_INTERVAL_MS,
+);
+
 export type Spec = {
   currency?: CryptoCurrency;
   appQuery: {
@@ -968,11 +972,14 @@ export async function signSendTransaction(tx: Transaction) {
   }
 }
 
-export async function getSendEvents(tx: Transaction): Promise<string[]> {
+export async function getSendEvents(
+  tx: Transaction,
+  verifyMaxAttempts?: number,
+): Promise<string[]> {
   const { sendVerifyLabel, sendConfirmLabel } = getDeviceLabels(
     tx.accountToDebit.currency.speculosApp,
   );
-  await waitFor(sendVerifyLabel);
+  await waitFor(sendVerifyLabel, verifyMaxAttempts);
   return await pressUntilTextFound(sendConfirmLabel);
 }
 
