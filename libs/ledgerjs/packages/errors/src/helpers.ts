@@ -209,3 +209,19 @@ function destroyCircular(from: To, seen: Array<To>): To {
   }
   return to;
 }
+
+export function extractErrorContext(error: Error): Record<string, unknown> {
+  const sanitizedError = destroyCircular(error, []);
+  const context: Record<string, unknown> = {};
+
+  Object.keys(sanitizedError)
+    .filter(key => {
+      const value = sanitizedError[key];
+      return value !== null && value !== undefined && value !== "[Circular]";
+    })
+    .forEach(key => {
+      context[key] = sanitizedError[key];
+    });
+
+  return context;
+}
