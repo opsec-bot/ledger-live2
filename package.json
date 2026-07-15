@@ -313,6 +313,11 @@
       "react-native-worklets@0.8.1": "patches/react-native-worklets@0.8.1.patch"
     },
     "packageExtensions": {
+      "@ledgerhq/device-transport-kit-mockserver": {
+        "dependencies": {
+          "@ledgerhq/device-mockserver-client": "0.0.0-develop-20260629003450"
+        }
+      },
       "detox-allure2-adapter": {
         "dependencies": {
           "tslib": "*"

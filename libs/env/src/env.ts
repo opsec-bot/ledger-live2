@@ -681,6 +681,11 @@ const envDefinitions = {
     parser: stringParser,
     desc: "if defined, overrides the os and version. format: os@version. Example: Windows_NT@6.1.7601",
   },
+  MOCK_SERVER_TRANSPORT: {
+    def: false,
+    parser: boolParser,
+    desc: "enable the Device Management Kit mock server transport (connects to a local device mock server instead of a physical device)",
+  },
   MOCK_NO_BYPASS: {
     def: false,
     parser: boolParser,

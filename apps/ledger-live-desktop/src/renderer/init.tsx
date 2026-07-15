@@ -15,6 +15,7 @@ import { reload, getKey } from "~/renderer/storage";
 import { hardReset } from "~/renderer/reset";
 import "~/renderer/styles/global";
 import { registerTransportModules } from "~/renderer/live-common-setup";
+import { bootstrapMockServerTransport } from "~/renderer/mockServerTransport";
 import { getLocalStorageEnvs } from "~/renderer/experimental";
 import "~/renderer/i18n/init";
 import { hydrateCurrency } from "~/renderer/bridge/cache";
@@ -349,6 +350,9 @@ async function init() {
   }
 
   backfillOnboardingDate(store);
+
+  // Seed the mock server session/device before the DMK is built (if enabled).
+  await bootstrapMockServerTransport();
 
   r(<ReactRoot store={store} language={language} initialCountervalues={initialCountervalues} />);
 
