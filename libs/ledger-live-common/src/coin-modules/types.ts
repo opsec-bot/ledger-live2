@@ -1,3 +1,4 @@
+import type BigNumber from "bignumber.js";
 import type {
   Account,
   AccountBridge,
@@ -138,6 +139,11 @@ export type CoinModuleLoader<
   family: string;
   /** Currencies this loader supports. */
   supportedCoins: CryptoCurrencyId[];
+  /**
+   * Override the spendableBalance projected to WalletAPI consumers (e.g. swap live apps).
+   * Return undefined to fall back to account.spendableBalance.
+   */
+  getSpendableBalance?: (account: AccountLike) => BigNumber | undefined;
   loadSetup: () => Promise<FamilySetup<T, A, U, O, R>>;
   loadTransaction: () => Promise<TransactionModule<T, U, A, TRaw, URaw>>;
   loadDeviceTxConfig?: () => Promise<DeviceTransactionConfigFn<T, any, A>>;

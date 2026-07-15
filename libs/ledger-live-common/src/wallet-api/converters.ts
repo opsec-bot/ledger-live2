@@ -2,7 +2,10 @@ import { Account, AccountLike } from "@ledgerhq/types-live";
 import { getCryptoCurrencyById } from "@ledgerhq/cryptoassets";
 import { v5 as uuidv5 } from "uuid";
 import { WalletState, accountNameWithDefaultSelector } from "@ledgerhq/live-wallet/store";
-import { loadWalletApiAdapterForFamily } from "../coin-modules/registry";
+import {
+  loadWalletApiAdapterForFamily,
+  getSpendableBalanceForFamily,
+} from "../coin-modules/registry";
 import type { Transaction } from "../coin-modules/transaction-types";
 import { isTokenAccount } from "../account";
 import {
@@ -45,6 +48,9 @@ export function accountToWalletAPIAccount(
     uuidToAccountId.set(parentWalletApiId, parentAccount.id);
 
     const parentAccountName = accountNameWithDefaultSelector(walletState, parentAccount);
+    const spendableBalance =
+      getSpendableBalanceForFamily(parentAccount.currency.family)?.(account) ??
+      account.spendableBalance;
 
     return {
       id: walletApiId,
@@ -55,10 +61,12 @@ export function accountToWalletAPIAccount(
       lastSyncDate: parentAccount.lastSyncDate,
       name: `${parentAccountName} (${account.token.ticker})`,
       currency: account.token.id,
-      spendableBalance: account.spendableBalance,
+      spendableBalance,
     };
   }
   const name = accountNameWithDefaultSelector(walletState, account);
+  const spendableBalance =
+    getSpendableBalanceForFamily(account.currency.family)?.(account) ?? account.spendableBalance;
 
   return {
     id: walletApiId,
@@ -66,7 +74,7 @@ export function accountToWalletAPIAccount(
     address: account.freshAddress,
     currency: account.currency.id,
     balance: account.balance,
-    spendableBalance: account.spendableBalance,
+    spendableBalance,
     blockHeight: account.blockHeight,
     lastSyncDate: account.lastSyncDate,
   };

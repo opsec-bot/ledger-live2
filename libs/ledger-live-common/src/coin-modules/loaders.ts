@@ -1,9 +1,11 @@
 import type { CoinModuleLoader, FamilySetup, ValidateAddressFn } from "./types";
+import { getSpendableBalance as aleoGetSpendableBalance } from "../families/aleo/spendableBalance";
 
 export const coinModuleLoaders: CoinModuleLoader[] = [
   {
     family: "aleo",
     supportedCoins: ["aleo", "aleo_testnet"],
+    getSpendableBalance: aleoGetSpendableBalance,
     loadSetup: () => import("../families/aleo/setup"),
     loadTransaction: () => import("@ledgerhq/coin-aleo/transaction").then(m => m.default),
     loadDeviceTxConfig: () =>

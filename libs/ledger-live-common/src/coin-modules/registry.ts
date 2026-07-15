@@ -1,8 +1,8 @@
 import { CurrencyNotSupported } from "@ledgerhq/errors";
 import { getCryptoCurrencyById } from "@ledgerhq/cryptoassets";
 import type { CryptoCurrency, CryptoCurrencyId } from "@ledgerhq/types-cryptoassets";
-import type { CoinModuleLoader, MockAccountModule } from "./types";
 import type { AccountBridgeExtensions } from "@ledgerhq/types-live";
+import type { CoinModuleLoader, MockAccountModule } from "./types";
 
 const loaders = new Map<string, CoinModuleLoader>();
 
@@ -175,3 +175,9 @@ const cachedLoadBridgeExtensions = makeLoaderCache(family =>
 export const loadBridgeExtensionsForFamily = async (
   family: string,
 ): Promise<AccountBridgeExtensions> => (await cachedLoadBridgeExtensions(family)) ?? {};
+
+export function getSpendableBalanceForFamily(
+  family: string,
+): CoinModuleLoader["getSpendableBalance"] {
+  return loaders.get(family)?.getSpendableBalance;
+}
