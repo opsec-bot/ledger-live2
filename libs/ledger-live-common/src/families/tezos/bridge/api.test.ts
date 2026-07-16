@@ -1,6 +1,20 @@
+import { getCryptoCurrencyById } from "@ledgerhq/cryptoassets/index";
 import { setCryptoAssetsStore } from "@ledgerhq/cryptoassets/state";
 import type { TokenCurrency } from "@ledgerhq/types-cryptoassets";
-import { computeIntentType, getAssetFromToken, getTokenFromAsset } from "./api";
+import {
+  computeIntentType,
+  getAccountReadiness,
+  getAssetFromToken,
+  getTokenFromAsset,
+} from "./api";
+
+const getAccountInfoMock = jest.fn();
+jest.mock("@ledgerhq/coin-tezos/api/index", () => ({
+  createApi: () => ({ getAccountInfo: getAccountInfoMock }),
+}));
+jest.mock("../../../config", () => ({
+  getCurrencyConfiguration: () => ({}),
+}));
 
 beforeAll(() => {
   const mockStore: Parameters<typeof setCryptoAssetsStore>[0] = {
@@ -191,5 +205,28 @@ describe("generic-coin-framework Tezos token", () => {
       const resolved = await getTokenFromAsset(asset);
       expect(resolved?.id).toBe(token.id);
     });
+  });
+});
+
+describe("getAccountReadiness", () => {
+  const currency = getCryptoCurrencyById("tezos");
+
+  afterEach(() => {
+    getAccountInfoMock.mockReset();
+  });
+
+  it("is ready when the account is revealed", async () => {
+    getAccountInfoMock.mockResolvedValueOnce({ type: "tezos", revealed: true });
+    await expect(getAccountReadiness(currency, "tz1revealed")).resolves.toEqual({ ready: true });
+    expect(getAccountInfoMock).toHaveBeenCalledWith("tz1revealed");
+  });
+
+  it("is not ready with reason 'unrevealed' when the account is not revealed", async () => {
+    getAccountInfoMock.mockResolvedValueOnce({ type: "tezos", revealed: false });
+    await expect(getAccountReadiness(currency, "tz1unrevealed")).resolves.toEqual({
+      ready: false,
+      reason: "unrevealed",
+    });
+    expect(getAccountInfoMock).toHaveBeenCalledWith("tz1unrevealed");
   });
 });
