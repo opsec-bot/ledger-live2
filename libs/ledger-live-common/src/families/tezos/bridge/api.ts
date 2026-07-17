@@ -1,5 +1,5 @@
 import { createApi as createTezosApi } from "@ledgerhq/coin-tezos/api/index";
-import { TezosCoinConfig } from "@ledgerhq/coin-tezos/config";
+import type { TezosCoinConfig } from "@ledgerhq/coin-tezos/config";
 import type { AssetInfo } from "@ledgerhq/coin-module-framework/api/types";
 import type { CryptoCurrency, TokenCurrency } from "@ledgerhq/types-cryptoassets";
 import type { AccountReadiness } from "@ledgerhq/types-live";
