@@ -17,7 +17,11 @@ export const FAMILIES_MAPPING_LL_TO_WAPI = reverseRecord(FAMILIES_MAPPING_WAPI_T
  * This is not robust, we should have an explicit adapter between the wallet API currencies (families) and live currencies (families)
  * For example here, the `ethereum` family on `wallet-api` should be mapped to the `evm` family on LL
  */
-export const WALLET_API_FAMILIES = [...FAMILIES, ...Object.values(FAMILIES_MAPPING_WAPI_TO_LL)];
+export const WALLET_API_FAMILIES = [
+  "aleo",
+  ...FAMILIES,
+  ...Object.values(FAMILIES_MAPPING_WAPI_TO_LL),
+];
 
 export const WALLET_API_VERSION = "2.0.0";
 

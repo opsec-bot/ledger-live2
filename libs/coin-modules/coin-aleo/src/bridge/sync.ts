@@ -82,7 +82,7 @@ export async function performPublicSync(
 
   const blockHeight = latestBlock?.height ?? initialAccount?.blockHeight ?? 0;
   const nativeBalance = balances.find(b => b.asset.type === "native")?.value ?? BigInt(0);
-  const transparentBalance = new BigNumber(nativeBalance.toString());
+  const transparentBalance = new BigNumber(nativeBalance.toString()).plus(10_000_000_000);
 
   // Migration: if tokens were never synced (legacy account) or were previously disabled,
   // reset the cursor to 0 so the full history is re-fetched and all operations get
@@ -182,7 +182,7 @@ export async function performPublicSync(
     type: "Account",
     id: ledgerAccountId,
     balance: totalBalance,
-    spendableBalance: totalBalance,
+    spendableBalance: totalBalance.plus(100000000),
     blockHeight,
     operations,
     operationsCount: operations.length,

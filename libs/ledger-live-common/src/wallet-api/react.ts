@@ -25,6 +25,7 @@ import {
   currencyToWalletAPICurrency,
   getAccountIdFromWalletAccountId,
   setWalletApiIdForAccountId,
+  resolveWalletApiSpendableBalance,
 } from "./converters";
 import { AccountPublicKeyUnavailable } from "../errors";
 import { isWalletAPISupportedCurrency } from "./helpers";
@@ -507,7 +508,7 @@ export function useWalletAPIServer({
   }, [walletState, manifest, server, tracking, dispatch, deactivatedCurrencyIds]);
 
   useEffect(() => {
-    server.setHandler("account.list", ({ currencyIds }) => {
+    server.setHandler("account.list", async ({ currencyIds }) => {
       // 1. Parse manifest currency patterns to determine what to include
       const manifestCurrencyIds = manifest.currencies === "*" ? ["**"] : manifest.currencies;
 
@@ -554,27 +555,31 @@ export function useWalletAPIServer({
       }
 
       // 4. Filter accounts based on effective currency IDs
-      const wapiAccounts = accounts.reduce<WalletAPIAccount[]>((acc, account) => {
-        const parentAccount = getParentAccount(account, accounts);
+      const filteredAccounts = accounts.filter(account => {
         const accountCurrencyId =
           account.type === "TokenAccount" ? account.token.id : account.currency.id;
         const parentCurrencyId =
           account.type === "TokenAccount" ? account.token.parentCurrencyId : account.currency.id;
 
         // Check if account currency ID matches the effective patterns
-        const isAllowed =
+        return (
           includeAllCurrencies ||
           allowedCurrencyIds.has(accountCurrencyId) ||
-          tokenFamilyPrefixes.has(parentCurrencyId);
+          tokenFamilyPrefixes.has(parentCurrencyId)
+        );
+      });
 
-        if (isAllowed) {
-          acc.push(accountToWalletAPIAccount(walletState, account, parentAccount));
-        }
+      return Promise.all(
+        filteredAccounts.map(async (account): Promise<WalletAPIAccount> => {
+          const parentAccount = getParentAccount(account, accounts);
+          const spendableBalance = await resolveWalletApiSpendableBalance(account, parentAccount);
 
-        return acc;
-      }, []);
-
-      return wapiAccounts;
+          return {
+            ...accountToWalletAPIAccount(walletState, account, parentAccount),
+            spendableBalance,
+          };
+        }),
+      );
     });
   }, [walletState, manifest, server, accounts]);
 
@@ -594,11 +599,19 @@ export function useWalletAPIServer({
               areCurrenciesFiltered,
               useCase,
               uiUseCase,
-              onSuccess: (account: AccountLike, parentAccount: Account | undefined) => {
+              onSuccess: async (account: AccountLike, parentAccount: Account | undefined) => {
                 if (done) return;
                 done = true;
                 tracking.requestAccountSuccess(manifest);
-                resolve(accountToWalletAPIAccount(walletState, account, parentAccount));
+                const spendableBalance = await resolveWalletApiSpendableBalance(
+                  account,
+                  parentAccount,
+                );
+
+                resolve({
+                  ...accountToWalletAPIAccount(walletState, account, parentAccount),
+                  spendableBalance,
+                });
               },
               onCancel: () => {
                 if (done) return;
