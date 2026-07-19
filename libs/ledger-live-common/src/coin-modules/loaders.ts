@@ -137,6 +137,13 @@ export const coinModuleLoaders: CoinModuleLoader[] = [
     loadMockBridge: () => import("../families/cosmos/bridge/mock").then(m => m.default),
     loadMockAccount: () => import("@ledgerhq/coin-cosmos/mock").then(m => m.default),
     loadBridgeExtensions: () => import("../families/cosmos/bridgeExtensions").then(m => m.default),
+    loadLocalApi: () =>
+      import("../families/cosmos/coinModuleApi").then(m => m.createLocalCosmosApi),
+    loadValidateAddress: () =>
+      import("@ledgerhq/coin-cosmos/logic/validateAddress").then(
+        ({ validateAddress }): ValidateAddressFn => validateAddress,
+      ),
+    loadBridgeApi: () => import("../families/cosmos/bridge/api").then(m => m.default),
   },
   {
     family: "evm",

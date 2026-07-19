@@ -1,4 +1,7 @@
-FROM --platform=linux/amd64 babylonlabs/babylond:v4.3.0
+# No --platform pin: this image is multi-arch, so it runs native arm64
+# on Apple Silicon and amd64 on CI. (gaiad stays amd64-pinned — that
+# upstream image is amd64-only)
+FROM babylonlabs/babylond:v4.3.0
 
 USER root
 

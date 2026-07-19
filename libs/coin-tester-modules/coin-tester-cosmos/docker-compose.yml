@@ -1,6 +1,6 @@
 services:
   babylond:
-    platform: linux/amd64
+    # No platform pin: multi-arch image → native arm64 locally (macOS), amd64 on CI.
     image: coin-tester-babylond:latest
     build:
       context: .
