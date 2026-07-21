@@ -8,9 +8,23 @@ import { LockedDeviceError, UserRefusedOnDevice } from "@ledgerhq/errors";
 import bs58 from "bs58";
 import { of, throwError } from "rxjs";
 
+jest.mock("@ledgerhq/context-module", () => ({
+  ContextModuleBuilder: jest.fn().mockImplementation(() => ({
+    setChain: jest.fn().mockReturnThis(),
+    setCalConfig: jest.fn().mockReturnThis(),
+    build: jest.fn().mockReturnValue({}),
+  })),
+  ContextModuleChainID: { Solana: "solana" },
+}));
+
+jest.mock("@ledgerhq/live-env", () => ({
+  getEnv: jest.fn().mockReturnValue("https://global.api.prd.ledger.com/cal"),
+}));
+
 // Mock the SignerSolanaBuilder to avoid actual builder logic
 jest.mock("@ledgerhq/device-signer-kit-solana", () => ({
   SignerSolanaBuilder: jest.fn().mockImplementation(() => ({
+    withContextModule: jest.fn().mockReturnThis(),
     build: () => ({}),
   })),
   SignMessageVersion: { Raw: "raw", Legacy: "legacy", V0: "v0", V1: "v1" },

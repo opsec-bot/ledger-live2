@@ -1,5 +1,7 @@
 import { lastValueFrom } from "rxjs";
 import type { ConcordiumSigner, ConcordiumNetwork } from "@ledgerhq/coin-concordium/types";
+import { ContextModuleBuilder, ContextModuleChainID } from "@ledgerhq/context-module";
+import { getEnv } from "@ledgerhq/live-env";
 import {
   serializeTransaction,
   serializeCredentialDeploymentValues,
@@ -41,7 +43,16 @@ export class DmkSignerConcordium implements ConcordiumSigner {
   private readonly signer: SignerConcordium;
 
   constructor(dmk: DeviceManagementKit, sessionId: string) {
-    this.signer = new SignerConcordiumBuilder({ dmk, sessionId }).build();
+    const originToken = "1e55ba3959f4543af24809d9066a2120bd2ac9246e626e26a1ff77eb109ca0e5"; // gitleaks:allow
+    const calUrl = getEnv("CAL_SERVICE_URL");
+    const calMode = calUrl.includes("ledger-test") || calUrl.includes(".stg.") ? "test" : "prod";
+    const contextModule = new ContextModuleBuilder({ originToken })
+      .setChain(ContextModuleChainID.Concordium)
+      .setCalConfig({ url: calUrl, mode: calMode, branch: "main" })
+      .build();
+    this.signer = new SignerConcordiumBuilder({ dmk, sessionId })
+      .withContextModule(contextModule)
+      .build();
   }
 
   async getPublicKey(path: string, confirm = false): Promise<string> {

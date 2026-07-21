@@ -26,6 +26,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@ledgerhq/coin-concordium": "workspace:^",
+    "@ledgerhq/live-env": "workspace:^",
     "@ledgerhq/concordium-core": "workspace:^",
     "@ledgerhq/context-module": "catalog:",
     "@ledgerhq/device-management-kit": "catalog:",

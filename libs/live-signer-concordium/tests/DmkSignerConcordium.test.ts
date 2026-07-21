@@ -12,6 +12,19 @@ import type { Transaction, CredentialDeploymentTransaction } from "@ledgerhq/con
 import { of } from "rxjs";
 import { DmkSignerConcordium } from "../src/DmkSignerConcordium";
 
+jest.mock("@ledgerhq/context-module", () => ({
+  ContextModuleBuilder: jest.fn().mockImplementation(() => ({
+    setChain: jest.fn().mockReturnThis(),
+    setCalConfig: jest.fn().mockReturnThis(),
+    build: jest.fn().mockReturnValue({}),
+  })),
+  ContextModuleChainID: { Concordium: "concordium" },
+}));
+
+jest.mock("@ledgerhq/live-env", () => ({
+  getEnv: jest.fn().mockReturnValue("https://global.api.prd.ledger.com/cal"),
+}));
+
 jest.mock("@ledgerhq/device-signer-kit-concordium", () => {
   return {
     SignerConcordiumBuilder: jest.fn(),
@@ -37,6 +50,7 @@ describe("DmkSignerConcordium", () => {
     jest.clearAllMocks();
     jest.mocked(SignerConcordiumBuilder).mockImplementation(() => {
       return {
+        withContextModule: jest.fn().mockReturnThis(),
         build: () => mockSignerConcordium,
       } as unknown as SignerConcordiumBuilder;
     });
