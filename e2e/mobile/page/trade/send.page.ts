@@ -1,5 +1,6 @@
 import { Step } from "jest-allure2-reporter/api";
 import { currencyParam, openDeeplink } from "../../helpers/commonHelpers";
+import { Account } from "@ledgerhq/live-e2e-shared/enum/Account";
 
 export default class SendPage {
   baseLink = "send";
@@ -36,6 +37,14 @@ export default class SendPage {
   async navigateToSendScreen(accountName: string) {
     await app.account.openViaDeeplink();
     await app.account.goToAccountByName(accountName);
+    await app.account.tapSend();
+  }
+
+  @Step("Navigate to token send screen")
+  async navigateToTokenSendScreen(parentAccountName: string, tokenAccount: Account) {
+    await app.account.openViaDeeplink();
+    await app.account.goToAccountByName(parentAccountName);
+    await app.account.navigateToTokenInAccount(tokenAccount);
     await app.account.tapSend();
   }
 
