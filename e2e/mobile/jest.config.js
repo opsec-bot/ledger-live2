@@ -113,6 +113,7 @@ const config = {
   testTimeout: 300_000,
   reporters: [
     "detox/runners/jest/reporter",
+    "@ledgerhq/test-quarantine/reporters/detox-flake-reporter",
     ["jest-allure2-reporter", jestAllure2ReporterOptions],
     ...(process.env.CI ? [["github-actions", { silent: false }]] : []),
   ],
