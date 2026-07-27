@@ -374,6 +374,7 @@ export class TokenAccount extends Account {
     Account.ETH_2.accountPath,
     TokenType.ERC20,
     Account.ETH_2,
+    "speculos-qaa.eth",
   );
 
   static readonly ETH_USDT_3 = new TokenAccount(
