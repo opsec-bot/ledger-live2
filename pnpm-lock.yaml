@@ -63,6 +63,9 @@ catalogs:
     '@ledgerhq/device-transport-kit-web-hid':
       specifier: 1.2.4
       version: 1.2.4
+    '@ledgerhq/logs':
+      specifier: 6.17.0
+      version: 6.17.0
     '@ledgerhq/lumen-design-core':
       specifier: 0.1.23
       version: 0.1.23
@@ -728,8 +731,8 @@ importers:
         specifier: workspace:^
         version: link:../../libs/live-dmk-speculos
       '@ledgerhq/logs':
-        specifier: workspace:^
-        version: link:../../libs/ledgerjs/packages/logs
+        specifier: 'catalog:'
+        version: 6.17.0
       '@ledgerhq/types-cryptoassets':
         specifier: workspace:^
         version: link:../../libs/ledgerjs/packages/types-cryptoassets
@@ -998,8 +1001,8 @@ importers:
         specifier: workspace:^
         version: link:../../libs/live-wallet
       '@ledgerhq/logs':
-        specifier: workspace:^
-        version: link:../../libs/ledgerjs/packages/logs
+        specifier: 'catalog:'
+        version: 6.17.0
       '@ledgerhq/lumen-design-core':
         specifier: 'catalog:'
         version: 0.1.23
@@ -1741,8 +1744,8 @@ importers:
         specifier: workspace:^
         version: link:../../libs/live-wallet
       '@ledgerhq/logs':
-        specifier: workspace:^
-        version: link:../../libs/ledgerjs/packages/logs
+        specifier: 'catalog:'
+        version: 6.17.0
       '@ledgerhq/lumen-design-core':
         specifier: 'catalog:'
         version: 0.1.23
@@ -2441,8 +2444,8 @@ importers:
         specifier: workspace:^
         version: link:../../libs/live-wallet
       '@ledgerhq/logs':
-        specifier: workspace:^
-        version: link:../../libs/ledgerjs/packages/logs
+        specifier: 'catalog:'
+        version: 6.17.0
       '@ledgerhq/types-cryptoassets':
         specifier: workspace:^
         version: link:../../libs/ledgerjs/packages/types-cryptoassets
@@ -2633,8 +2636,8 @@ importers:
         specifier: workspace:^
         version: link:../../libs/live-wallet
       '@ledgerhq/logs':
-        specifier: workspace:^
-        version: link:../../libs/ledgerjs/packages/logs
+        specifier: 'catalog:'
+        version: 6.17.0
       '@ledgerhq/lumen-design-core':
         specifier: 'catalog:'
         version: 0.1.23
@@ -3900,8 +3903,8 @@ importers:
         specifier: workspace:^
         version: link:../../libs/live-wallet
       '@ledgerhq/logs':
-        specifier: workspace:^
-        version: link:../../libs/ledgerjs/packages/logs
+        specifier: 'catalog:'
+        version: 6.17.0
       '@ledgerhq/types-devices':
         specifier: workspace:^
         version: link:../../libs/ledgerjs/packages/types-devices
@@ -3980,8 +3983,8 @@ importers:
   e2e/mobile:
     dependencies:
       '@ledgerhq/logs':
-        specifier: workspace:^
-        version: link:../../libs/ledgerjs/packages/logs
+        specifier: 'catalog:'
+        version: 6.17.0
       invariant:
         specifier: 2.2.4
         version: 2.2.4
@@ -4951,8 +4954,8 @@ importers:
         specifier: workspace:^
         version: link:../../promise
       '@ledgerhq/logs':
-        specifier: workspace:^
-        version: link:../../ledgerjs/packages/logs
+        specifier: 'catalog:'
+        version: 6.17.0
       '@ledgerhq/types-live':
         specifier: workspace:^
         version: link:../../ledgerjs/packages/types-live
@@ -5106,8 +5109,8 @@ importers:
         specifier: workspace:^
         version: link:../../live-network
       '@ledgerhq/logs':
-        specifier: workspace:^
-        version: link:../../ledgerjs/packages/logs
+        specifier: 'catalog:'
+        version: 6.17.0
       '@ledgerhq/types-live':
         specifier: workspace:^
         version: link:../../ledgerjs/packages/types-live
@@ -5197,8 +5200,8 @@ importers:
         specifier: workspace:^
         version: link:../../live-signer-zcash
       '@ledgerhq/logs':
-        specifier: workspace:^
-        version: link:../../ledgerjs/packages/logs
+        specifier: 'catalog:'
+        version: 6.17.0
       '@ledgerhq/psbtv2':
         specifier: workspace:^
         version: link:../../psbtv2
@@ -5351,8 +5354,8 @@ importers:
         specifier: workspace:^
         version: link:../../live-network
       '@ledgerhq/logs':
-        specifier: workspace:^
-        version: link:../../ledgerjs/packages/logs
+        specifier: 'catalog:'
+        version: 6.17.0
       '@ledgerhq/types-live':
         specifier: workspace:^
         version: link:../../ledgerjs/packages/types-live
@@ -5427,8 +5430,8 @@ importers:
         specifier: workspace:^
         version: link:../../live-network
       '@ledgerhq/logs':
-        specifier: workspace:^
-        version: link:../../ledgerjs/packages/logs
+        specifier: 'catalog:'
+        version: 6.17.0
       '@ledgerhq/types-live':
         specifier: workspace:^
         version: link:../../ledgerjs/packages/types-live
@@ -5509,8 +5512,8 @@ importers:
         specifier: workspace:^
         version: link:../../live-network
       '@ledgerhq/logs':
-        specifier: workspace:^
-        version: link:../../ledgerjs/packages/logs
+        specifier: 'catalog:'
+        version: 6.17.0
       '@ledgerhq/types-live':
         specifier: workspace:^
         version: link:../../ledgerjs/packages/types-live
@@ -5606,8 +5609,8 @@ importers:
         specifier: workspace:^
         version: link:../../promise
       '@ledgerhq/logs':
-        specifier: workspace:^
-        version: link:../../ledgerjs/packages/logs
+        specifier: 'catalog:'
+        version: 6.17.0
       '@ledgerhq/types-live':
         specifier: workspace:^
         version: link:../../ledgerjs/packages/types-live
@@ -5706,8 +5709,8 @@ importers:
         specifier: workspace:^
         version: link:../../promise
       '@ledgerhq/logs':
-        specifier: workspace:^
-        version: link:../../ledgerjs/packages/logs
+        specifier: 'catalog:'
+        version: 6.17.0
       '@ledgerhq/types-live':
         specifier: workspace:^
         version: link:../../ledgerjs/packages/types-live
@@ -5800,8 +5803,8 @@ importers:
         specifier: workspace:^
         version: link:../../live-network
       '@ledgerhq/logs':
-        specifier: workspace:^
-        version: link:../../ledgerjs/packages/logs
+        specifier: 'catalog:'
+        version: 6.17.0
       '@ledgerhq/types-live':
         specifier: workspace:^
         version: link:../../ledgerjs/packages/types-live
@@ -5897,8 +5900,8 @@ importers:
         specifier: workspace:^
         version: link:../../promise
       '@ledgerhq/logs':
-        specifier: workspace:^
-        version: link:../../ledgerjs/packages/logs
+        specifier: 'catalog:'
+        version: 6.17.0
       axios:
         specifier: 'catalog:'
         version: 1.13.5
@@ -5985,8 +5988,8 @@ importers:
         specifier: workspace:^
         version: link:../../live-network
       '@ledgerhq/logs':
-        specifier: workspace:^
-        version: link:../../ledgerjs/packages/logs
+        specifier: 'catalog:'
+        version: 6.17.0
       '@ledgerhq/types-live':
         specifier: workspace:^
         version: link:../../ledgerjs/packages/types-live
@@ -6082,8 +6085,8 @@ importers:
         specifier: workspace:^
         version: link:../../promise
       '@ledgerhq/logs':
-        specifier: workspace:^
-        version: link:../../ledgerjs/packages/logs
+        specifier: 'catalog:'
+        version: 6.17.0
       '@ledgerhq/types-live':
         specifier: workspace:^
         version: link:../../ledgerjs/packages/types-live
@@ -6164,8 +6167,8 @@ importers:
         specifier: workspace:^
         version: link:../../promise
       '@ledgerhq/logs':
-        specifier: workspace:^
-        version: link:../../ledgerjs/packages/logs
+        specifier: 'catalog:'
+        version: 6.17.0
       '@ledgerhq/types-live':
         specifier: workspace:^
         version: link:../../ledgerjs/packages/types-live
@@ -6243,8 +6246,8 @@ importers:
         specifier: workspace:^
         version: link:../../ledger-wallet-framework
       '@ledgerhq/logs':
-        specifier: workspace:^
-        version: link:../../ledgerjs/packages/logs
+        specifier: 'catalog:'
+        version: 6.17.0
       '@ledgerhq/types-live':
         specifier: workspace:^
         version: link:../../ledgerjs/packages/types-live
@@ -6331,8 +6334,8 @@ importers:
         specifier: workspace:^
         version: link:../../promise
       '@ledgerhq/logs':
-        specifier: workspace:^
-        version: link:../../ledgerjs/packages/logs
+        specifier: 'catalog:'
+        version: 6.17.0
       '@ledgerhq/types-live':
         specifier: workspace:^
         version: link:../../ledgerjs/packages/types-live
@@ -6431,8 +6434,8 @@ importers:
         specifier: workspace:^
         version: link:../../live-network
       '@ledgerhq/logs':
-        specifier: workspace:^
-        version: link:../../ledgerjs/packages/logs
+        specifier: 'catalog:'
+        version: 6.17.0
       '@ledgerhq/types-live':
         specifier: workspace:^
         version: link:../../ledgerjs/packages/types-live
@@ -6592,8 +6595,8 @@ importers:
         specifier: workspace:^
         version: link:../../promise
       '@ledgerhq/logs':
-        specifier: workspace:^
-        version: link:../../ledgerjs/packages/logs
+        specifier: 'catalog:'
+        version: 6.17.0
       '@ledgerhq/types-live':
         specifier: workspace:^
         version: link:../../ledgerjs/packages/types-live
@@ -6677,8 +6680,8 @@ importers:
         specifier: workspace:^
         version: link:../../live-network
       '@ledgerhq/logs':
-        specifier: workspace:^
-        version: link:../../ledgerjs/packages/logs
+        specifier: 'catalog:'
+        version: 6.17.0
       '@ledgerhq/types-live':
         specifier: workspace:^
         version: link:../../ledgerjs/packages/types-live
@@ -6741,8 +6744,8 @@ importers:
         specifier: workspace:^
         version: link:../../live-network
       '@ledgerhq/logs':
-        specifier: workspace:^
-        version: link:../../ledgerjs/packages/logs
+        specifier: 'catalog:'
+        version: 6.17.0
       '@ledgerhq/types-live':
         specifier: workspace:^
         version: link:../../ledgerjs/packages/types-live
@@ -6853,8 +6856,8 @@ importers:
         specifier: workspace:^
         version: link:../../live-network
       '@ledgerhq/logs':
-        specifier: workspace:^
-        version: link:../../ledgerjs/packages/logs
+        specifier: 'catalog:'
+        version: 6.17.0
       '@ledgerhq/types-live':
         specifier: workspace:^
         version: link:../../ledgerjs/packages/types-live
@@ -6956,8 +6959,8 @@ importers:
         specifier: workspace:^
         version: link:../../live-network
       '@ledgerhq/logs':
-        specifier: workspace:^
-        version: link:../../ledgerjs/packages/logs
+        specifier: 'catalog:'
+        version: 6.17.0
       '@ledgerhq/types-live':
         specifier: workspace:^
         version: link:../../ledgerjs/packages/types-live
@@ -7059,8 +7062,8 @@ importers:
         specifier: workspace:^
         version: link:../../promise
       '@ledgerhq/logs':
-        specifier: workspace:^
-        version: link:../../ledgerjs/packages/logs
+        specifier: 'catalog:'
+        version: 6.17.0
       '@ledgerhq/types-live':
         specifier: workspace:^
         version: link:../../ledgerjs/packages/types-live
@@ -7138,8 +7141,8 @@ importers:
         specifier: workspace:^
         version: link:../../live-network
       '@ledgerhq/logs':
-        specifier: workspace:^
-        version: link:../../ledgerjs/packages/logs
+        specifier: 'catalog:'
+        version: 6.17.0
       '@taquito/ledger-signer':
         specifier: ^23.0.0-RC.0
         version: 23.0.0-beta.1
@@ -7214,8 +7217,8 @@ importers:
         specifier: workspace:^
         version: link:../../live-network
       '@ledgerhq/logs':
-        specifier: workspace:^
-        version: link:../../ledgerjs/packages/logs
+        specifier: 'catalog:'
+        version: 6.17.0
       '@ledgerhq/types-live':
         specifier: workspace:^
         version: link:../../ledgerjs/packages/types-live
@@ -7296,8 +7299,8 @@ importers:
         specifier: workspace:^
         version: link:../../promise
       '@ledgerhq/logs':
-        specifier: workspace:^
-        version: link:../../ledgerjs/packages/logs
+        specifier: 'catalog:'
+        version: 6.17.0
       '@ledgerhq/types-live':
         specifier: workspace:^
         version: link:../../ledgerjs/packages/types-live
@@ -8021,7 +8024,7 @@ importers:
     dependencies:
       '@ledgerhq/coin-stellar':
         specifier: 'catalog:'
-        version: 6.26.4(@ledgerhq/errors@libs+ledgerjs+packages+errors)(@ledgerhq/live-network@libs+live-network)(@ledgerhq/logs@libs+ledgerjs+packages+logs)
+        version: 6.26.4(@ledgerhq/errors@libs+ledgerjs+packages+errors)(@ledgerhq/live-network@libs+live-network)(@ledgerhq/logs@6.17.0)
       '@ledgerhq/coin-tester':
         specifier: workspace:^
         version: link:../../coin-tester
@@ -8041,8 +8044,8 @@ importers:
         specifier: workspace:^
         version: link:../../live-network
       '@ledgerhq/logs':
-        specifier: workspace:^
-        version: link:../../ledgerjs/packages/logs
+        specifier: 'catalog:'
+        version: 6.17.0
       '@ledgerhq/types-live':
         specifier: workspace:^
         version: link:../../ledgerjs/packages/types-live
@@ -8267,7 +8270,7 @@ importers:
         version: link:../../coin-tester
       '@ledgerhq/coin-xrp':
         specifier: 'catalog:'
-        version: 7.25.2(@ledgerhq/errors@libs+ledgerjs+packages+errors)(@ledgerhq/live-network@libs+live-network)(@ledgerhq/logs@libs+ledgerjs+packages+logs)
+        version: 7.25.2(@ledgerhq/errors@libs+ledgerjs+packages+errors)(@ledgerhq/live-network@libs+live-network)(@ledgerhq/logs@6.17.0)
       '@ledgerhq/errors':
         specifier: workspace:^
         version: link:../../ledgerjs/packages/errors
@@ -8284,8 +8287,8 @@ importers:
         specifier: workspace:^
         version: link:../../live-network
       '@ledgerhq/logs':
-        specifier: workspace:^
-        version: link:../../ledgerjs/packages/logs
+        specifier: 'catalog:'
+        version: 6.17.0
       '@ledgerhq/types-live':
         specifier: workspace:^
         version: link:../../ledgerjs/packages/types-live
@@ -8404,8 +8407,8 @@ importers:
         specifier: workspace:^
         version: link:../live-network
       '@ledgerhq/logs':
-        specifier: workspace:^
-        version: link:../ledgerjs/packages/logs
+        specifier: 'catalog:'
+        version: 6.17.0
       '@ledgerhq/types-live':
         specifier: workspace:^
         version: link:../ledgerjs/packages/types-live
@@ -8456,8 +8459,8 @@ importers:
   libs/device-intent:
     dependencies:
       '@ledgerhq/logs':
-        specifier: workspace:^
-        version: link:../ledgerjs/packages/logs
+        specifier: 'catalog:'
+        version: 6.17.0
       uuid:
         specifier: ^9.0.0
         version: 9.0.1
@@ -8596,8 +8599,8 @@ importers:
         specifier: workspace:^
         version: link:../ledgerjs/packages/errors
       '@ledgerhq/logs':
-        specifier: workspace:^
-        version: link:../ledgerjs/packages/logs
+        specifier: 'catalog:'
+        version: 6.17.0
       '@ledgerhq/types-live':
         specifier: workspace:^
         version: link:../ledgerjs/packages/types-live
@@ -8813,9 +8816,6 @@ importers:
       '@ledgerhq/live-env':
         specifier: workspace:*
         version: link:../env
-      '@ledgerhq/logs':
-        specifier: workspace:*
-        version: link:../ledgerjs/packages/logs
       '@noble/curves':
         specifier: ^1.9.7
         version: 1.9.7
@@ -8909,8 +8909,8 @@ importers:
         specifier: workspace:*
         version: link:../live-network
       '@ledgerhq/logs':
-        specifier: workspace:*
-        version: link:../ledgerjs/packages/logs
+        specifier: 'catalog:'
+        version: 6.17.0
       '@ledgerhq/speculos-transport':
         specifier: workspace:*
         version: link:../speculos-transport
@@ -9052,7 +9052,7 @@ importers:
         version: link:../coin-modules/coin-hedera
       '@ledgerhq/coin-hypercore':
         specifier: 'catalog:'
-        version: 0.4.3(@ledgerhq/errors@libs+ledgerjs+packages+errors)(@ledgerhq/live-network@libs+live-network)(@ledgerhq/logs@libs+ledgerjs+packages+logs)
+        version: 0.4.3(@ledgerhq/errors@libs+ledgerjs+packages+errors)(@ledgerhq/live-network@libs+live-network)(@ledgerhq/logs@6.17.0)
       '@ledgerhq/coin-icon':
         specifier: workspace:^
         version: link:../coin-modules/coin-icon
@@ -9085,7 +9085,7 @@ importers:
         version: link:../coin-modules/coin-stacks
       '@ledgerhq/coin-stellar':
         specifier: 'catalog:'
-        version: 6.26.4(@ledgerhq/errors@libs+ledgerjs+packages+errors)(@ledgerhq/live-network@libs+live-network)(@ledgerhq/logs@libs+ledgerjs+packages+logs)
+        version: 6.26.4(@ledgerhq/errors@libs+ledgerjs+packages+errors)(@ledgerhq/live-network@libs+live-network)(@ledgerhq/logs@6.17.0)
       '@ledgerhq/coin-sui':
         specifier: workspace:^
         version: link:../coin-modules/coin-sui
@@ -9103,7 +9103,7 @@ importers:
         version: link:../coin-modules/coin-vechain
       '@ledgerhq/coin-xrp':
         specifier: 'catalog:'
-        version: 7.25.2(@ledgerhq/errors@libs+ledgerjs+packages+errors)(@ledgerhq/live-network@libs+live-network)(@ledgerhq/logs@libs+ledgerjs+packages+logs)
+        version: 7.25.2(@ledgerhq/errors@libs+ledgerjs+packages+errors)(@ledgerhq/live-network@libs+live-network)(@ledgerhq/logs@6.17.0)
       '@ledgerhq/context-module':
         specifier: 2.3.1
         version: 2.3.1(@ledgerhq/device-management-kit@1.7.1(rxjs@7.8.2))
@@ -9255,8 +9255,8 @@ importers:
         specifier: workspace:^
         version: link:../live-wallet
       '@ledgerhq/logs':
-        specifier: workspace:^
-        version: link:../ledgerjs/packages/logs
+        specifier: 'catalog:'
+        version: 6.17.0
       '@ledgerhq/speculos-transport':
         specifier: workspace:^
         version: link:../speculos-transport
@@ -9709,8 +9709,8 @@ importers:
         specifier: workspace:^
         version: link:../live-network
       '@ledgerhq/logs':
-        specifier: workspace:^
-        version: link:../ledgerjs/packages/logs
+        specifier: 'catalog:'
+        version: 6.17.0
       '@ledgerhq/types-live':
         specifier: workspace:^
         version: link:../ledgerjs/packages/types-live
@@ -9824,6 +9824,86 @@ importers:
       jest:
         specifier: 'catalog:'
         version: 30.2.0(@types/node@24.12.0)
+
+  libs/ledgerjs/packages/cryptoassets:
+    dependencies:
+      '@ledgerhq/errors':
+        specifier: workspace:^
+        version: link:../errors
+      '@ledgerhq/live-env':
+        specifier: workspace:^
+        version: link:../../../env
+      '@ledgerhq/logs':
+        specifier: 'catalog:'
+        version: 6.17.0
+      '@ledgerhq/types-live':
+        specifier: workspace:^
+        version: link:../types-live
+      '@reduxjs/toolkit':
+        specifier: 'catalog:'
+        version: 2.11.2(react-redux@9.2.0(@types/react@19.0.14)(react@19.1.4))(react@19.1.4)
+      lodash:
+        specifier: ^4.17.21
+        version: 4.17.21
+      zod:
+        specifier: 'catalog:'
+        version: 4.3.6
+    devDependencies:
+      '@domain/entity-currency-crypto':
+        specifier: workspace:^
+        version: link:../../../../domain/entity/currency-crypto
+      '@domain/entity-currency-fiat':
+        specifier: workspace:^
+        version: link:../../../../domain/entity/currency-fiat
+      '@ledgerhq/types-cryptoassets':
+        specifier: workspace:^
+        version: link:../types-cryptoassets
+      '@swc/core':
+        specifier: 'catalog:'
+        version: 1.15.11
+      '@swc/jest':
+        specifier: 'catalog:'
+        version: 0.2.39(@swc/core@1.15.11)
+      '@testing-library/dom':
+        specifier: 'catalog:'
+        version: 10.4.1
+      '@testing-library/react':
+        specifier: 'catalog:'
+        version: 16.3.1(@testing-library/dom@10.4.1)(@types/react@19.0.14)(react-dom@19.1.4(react@19.1.4))(react@19.1.4)
+      '@types/jest':
+        specifier: 'catalog:'
+        version: 30.0.0
+      '@types/node':
+        specifier: 'catalog:'
+        version: 24.12.0
+      '@types/react':
+        specifier: 'catalog:'
+        version: 19.0.14
+      jest:
+        specifier: 'catalog:'
+        version: 30.2.0(@types/node@24.12.0)(ts-node@10.9.2(@swc/core@1.15.11)(@types/node@24.12.0)(@typescript/typescript6@6.0.2)(source-map-support@0.5.21))
+      jest-environment-jsdom:
+        specifier: 'catalog:'
+        version: 30.2.0
+      react:
+        specifier: 19.1.4
+        version: 19.1.4
+      react-dom:
+        specifier: 19.1.4
+        version: 19.1.4(react@19.1.4)
+      react-redux:
+        specifier: 'catalog:'
+        version: 9.2.0(@types/react@19.0.14)(react@19.1.4)
+      rimraf:
+        specifier: ^4.4.1
+        version: 4.4.1
+      source-map-support:
+        specifier: ^0.5.21
+        version: 0.5.21
+      ts-node:
+        specifier: ^10.7.0
+        version: 10.9.2(@swc/core@1.15.11)(@types/node@24.12.0)(@typescript/typescript6@6.0.2)(source-map-support@0.5.21)
+
 
   libs/ledgerjs/packages/devices:
     dependencies:
@@ -9996,8 +10076,8 @@ importers:
         specifier: workspace:*
         version: link:../hw-transport
       '@ledgerhq/logs':
-        specifier: workspace:^
-        version: link:../logs
+        specifier: 'catalog:'
+        version: 6.17.0
       '@ledgerhq/psbtv2':
         specifier: workspace:^
         version: link:../../../psbtv2
@@ -10237,8 +10317,8 @@ importers:
         specifier: workspace:^
         version: link:../hw-transport-mocker
       '@ledgerhq/logs':
-        specifier: workspace:^
-        version: link:../logs
+        specifier: 'catalog:'
+        version: 6.17.0
       '@ledgerhq/types-live':
         specifier: workspace:^
         version: link:../types-live
@@ -10908,8 +10988,8 @@ importers:
         specifier: workspace:^
         version: link:../hw-transport-mocker
       '@ledgerhq/logs':
-        specifier: workspace:^
-        version: link:../logs
+        specifier: 'catalog:'
+        version: 6.17.0
       '@vechain/sdk-core':
         specifier: 2.0.0
         version: 2.0.0(@typescript/typescript6@6.0.2)
@@ -11022,8 +11102,8 @@ importers:
         specifier: workspace:^
         version: link:../errors
       '@ledgerhq/logs':
-        specifier: workspace:^
-        version: link:../logs
+        specifier: 'catalog:'
+        version: 6.17.0
       events:
         specifier: ^3.3.0
         version: 3.3.0
@@ -11065,8 +11145,8 @@ importers:
         specifier: workspace:*
         version: link:../hw-transport
       '@ledgerhq/logs':
-        specifier: workspace:^
-        version: link:../logs
+        specifier: 'catalog:'
+        version: 6.17.0
       axios:
         specifier: 'catalog:'
         version: 1.13.5
@@ -11108,8 +11188,8 @@ importers:
         specifier: workspace:*
         version: link:../hw-transport
       '@ledgerhq/logs':
-        specifier: workspace:^
-        version: link:../logs
+        specifier: 'catalog:'
+        version: 6.17.0
       rxjs:
         specifier: 'catalog:'
         version: 7.8.2
@@ -11151,8 +11231,8 @@ importers:
         specifier: workspace:*
         version: link:../hw-transport
       '@ledgerhq/logs':
-        specifier: workspace:^
-        version: link:../logs
+        specifier: 'catalog:'
+        version: 6.17.0
       rxjs:
         specifier: 'catalog:'
         version: 7.8.2
@@ -11194,8 +11274,8 @@ importers:
         specifier: workspace:*
         version: link:../hw-transport
       '@ledgerhq/logs':
-        specifier: workspace:^
-        version: link:../logs
+        specifier: 'catalog:'
+        version: 6.17.0
       axios:
         specifier: 'catalog:'
         version: 1.13.5
@@ -11240,38 +11320,8 @@ importers:
         specifier: workspace:^
         version: link:../hw-transport-http
       '@ledgerhq/logs':
-        specifier: workspace:^
-        version: link:../logs
-    devDependencies:
-      '@swc/core':
         specifier: 'catalog:'
-        version: 1.15.11
-      '@swc/jest':
-        specifier: 'catalog:'
-        version: 0.2.39(@swc/core@1.15.11)
-      '@types/jest':
-        specifier: 'catalog:'
-        version: 30.0.0
-      '@types/node':
-        specifier: 'catalog:'
-        version: 24.12.0
-      documentation:
-        specifier: 14.0.2
-        version: 14.0.2
-      jest:
-        specifier: 'catalog:'
-        version: 30.2.0(@types/node@24.12.0)(ts-node@10.9.2(@swc/core@1.15.11)(@types/node@24.12.0)(@typescript/typescript6@6.0.2)(source-map-support@0.5.21))
-      rimraf:
-        specifier: ^4.4.1
-        version: 4.4.1
-      source-map-support:
-        specifier: ^0.5.21
-        version: 0.5.21
-      ts-node:
-        specifier: ^10.4.0
-        version: 10.9.2(@swc/core@1.15.11)(@types/node@24.12.0)(@typescript/typescript6@6.0.2)(source-map-support@0.5.21)
-
-  libs/ledgerjs/packages/logs:
+        version: 6.17.0
     devDependencies:
       '@swc/core':
         specifier: 'catalog:'
@@ -11447,8 +11497,8 @@ importers:
         specifier: workspace:*
         version: link:../promise
       '@ledgerhq/logs':
-        specifier: workspace:*
-        version: link:../ledgerjs/packages/logs
+        specifier: 'catalog:'
+        version: 6.17.0
       '@ledgerhq/types-cryptoassets':
         specifier: workspace:*
         version: link:../ledgerjs/packages/types-cryptoassets
@@ -11582,8 +11632,8 @@ importers:
         specifier: workspace:^
         version: link:../live-dmk-shared
       '@ledgerhq/logs':
-        specifier: workspace:^
-        version: link:../ledgerjs/packages/logs
+        specifier: 'catalog:'
+        version: 6.17.0
       '@ledgerhq/types-devices':
         specifier: workspace:^
         version: link:../ledgerjs/packages/types-devices
@@ -11652,8 +11702,8 @@ importers:
         specifier: workspace:^
         version: link:../live-dmk-shared
       '@ledgerhq/logs':
-        specifier: workspace:^
-        version: link:../ledgerjs/packages/logs
+        specifier: 'catalog:'
+        version: 6.17.0
       '@ledgerhq/types-devices':
         specifier: workspace:^
         version: link:../ledgerjs/packages/types-devices
@@ -11722,8 +11772,8 @@ importers:
         specifier: workspace:*
         version: link:../ledgerjs/packages/hw-transport
       '@ledgerhq/logs':
-        specifier: workspace:^
-        version: link:../ledgerjs/packages/logs
+        specifier: 'catalog:'
+        version: 6.17.0
       '@ledgerhq/types-devices':
         specifier: workspace:^
         version: link:../ledgerjs/packages/types-devices
@@ -11798,8 +11848,8 @@ importers:
         specifier: workspace:*
         version: link:../ledgerjs/packages/hw-transport
       '@ledgerhq/logs':
-        specifier: workspace:^
-        version: link:../ledgerjs/packages/logs
+        specifier: 'catalog:'
+        version: 6.17.0
       '@ledgerhq/speculos-device-controller':
         specifier: 'catalog:'
         version: 0.3.0(@ledgerhq/device-management-kit@1.7.1(rxjs@7.8.2))
@@ -11871,8 +11921,8 @@ importers:
         specifier: workspace:^
         version: link:../live-signer-evm
       '@ledgerhq/logs':
-        specifier: workspace:^
-        version: link:../ledgerjs/packages/logs
+        specifier: 'catalog:'
+        version: 6.17.0
       '@ledgerhq/speculos-device-controller':
         specifier: 'catalog:'
         version: 0.3.0(@ledgerhq/device-management-kit@1.7.1(rxjs@7.8.2))
@@ -12003,8 +12053,8 @@ importers:
         specifier: workspace:^
         version: link:../promise
       '@ledgerhq/logs':
-        specifier: workspace:^
-        version: link:../ledgerjs/packages/logs
+        specifier: 'catalog:'
+        version: 6.17.0
       lru-cache:
         specifier: ^7.14.1
         version: 7.18.3
@@ -12517,8 +12567,8 @@ importers:
         specifier: workspace:*
         version: link:../promise
       '@ledgerhq/logs':
-        specifier: workspace:*
-        version: link:../ledgerjs/packages/logs
+        specifier: 'catalog:'
+        version: 6.17.0
       '@ledgerhq/types-cryptoassets':
         specifier: workspace:*
         version: link:../ledgerjs/packages/types-cryptoassets
@@ -12593,8 +12643,8 @@ importers:
   libs/promise:
     dependencies:
       '@ledgerhq/logs':
-        specifier: workspace:^
-        version: link:../ledgerjs/packages/logs
+        specifier: 'catalog:'
+        version: 6.17.0
     devDependencies:
       '@swc/core':
         specifier: 'catalog:'
@@ -12667,8 +12717,8 @@ importers:
         specifier: workspace:*
         version: link:../promise
       '@ledgerhq/logs':
-        specifier: workspace:*
-        version: link:../ledgerjs/packages/logs
+        specifier: 'catalog:'
+        version: 6.17.0
       '@shared/env':
         specifier: workspace:*
         version: link:../../shared/env
@@ -13432,8 +13482,8 @@ importers:
         specifier: workspace:^
         version: link:../live-network
       '@ledgerhq/logs':
-        specifier: workspace:^
-        version: link:../ledgerjs/packages/logs
+        specifier: 'catalog:'
+        version: 6.17.0
       '@noble/curves':
         specifier: ^1.9.7
         version: 1.9.7
@@ -18425,6 +18475,9 @@ packages:
 
   '@ledgerhq/logs@6.16.0':
     resolution: {integrity: sha512-v/PLfb1dq1En35kkpbfRWp8jLYgbPUXxGhmd4pmvPSIe0nRGkNTomsZASmWQAv6pRonVGqHIBVlte7j1MBbOww==}
+
+  '@ledgerhq/logs@6.17.0':
+    resolution: {integrity: sha512-FyCMEuRJYFBs7/vUDOXLogiMoROAbSjsjk4xCKwqeJz8VfxVNKprnW8svYq65/+3DU2Wa3dUL3Scf45n4vAmxw==}
 
   '@ledgerhq/lumen-design-core@0.1.23':
     resolution: {integrity: sha512-DZ164hzEnHlxSu775g1OHWATxqCGSWSbsBIvGIJkvxjqSWo5iKyiHR4G3pNmcYPnfzNXeQJ8LMcQaAwZ1g8ZoA==}
@@ -46234,12 +46287,12 @@ snapshots:
 
   '@kwsites/promise-deferred@1.1.1': {}
 
-  '@ledgerhq/coin-hypercore@0.4.3(@ledgerhq/errors@libs+ledgerjs+packages+errors)(@ledgerhq/live-network@libs+live-network)(@ledgerhq/logs@libs+ledgerjs+packages+logs)':
+  '@ledgerhq/coin-hypercore@0.4.3(@ledgerhq/errors@libs+ledgerjs+packages+errors)(@ledgerhq/live-network@libs+live-network)(@ledgerhq/logs@6.17.0)':
     dependencies:
       '@ledgerhq/coin-module-framework': 4.0.2(@ledgerhq/errors@libs+ledgerjs+packages+errors)
       '@ledgerhq/errors': link:libs/ledgerjs/packages/errors
       '@ledgerhq/live-network': link:libs/live-network
-      '@ledgerhq/logs': link:libs/ledgerjs/packages/logs
+      '@ledgerhq/logs': 6.17.0
 
   '@ledgerhq/coin-module-framework@4.0.0(@ledgerhq/errors@libs+ledgerjs+packages+errors)':
     dependencies:
@@ -46255,22 +46308,22 @@ snapshots:
       '@ledgerhq/errors': link:libs/ledgerjs/packages/errors
       bignumber.js: 9.1.2
 
-  '@ledgerhq/coin-stellar@6.26.4(@ledgerhq/errors@libs+ledgerjs+packages+errors)(@ledgerhq/live-network@libs+live-network)(@ledgerhq/logs@libs+ledgerjs+packages+logs)':
+  '@ledgerhq/coin-stellar@6.26.4(@ledgerhq/errors@libs+ledgerjs+packages+errors)(@ledgerhq/live-network@libs+live-network)(@ledgerhq/logs@6.17.0)':
     dependencies:
       '@exodus/patch-broken-hermes-typed-arrays': 1.0.0-alpha.1(patch_hash=7deb6c5bd39ee007fca03da7609b2e0dee99dbb9962c3c8715edfd026da0a732)
       '@ledgerhq/coin-module-framework': 4.0.2(@ledgerhq/errors@libs+ledgerjs+packages+errors)
       '@ledgerhq/errors': link:libs/ledgerjs/packages/errors
       '@ledgerhq/live-network': link:libs/live-network
-      '@ledgerhq/logs': link:libs/ledgerjs/packages/logs
+      '@ledgerhq/logs': 6.17.0
       '@stellar/stellar-sdk': 14.0.0
       bignumber.js: 9.1.2
 
-  '@ledgerhq/coin-xrp@7.25.2(@ledgerhq/errors@libs+ledgerjs+packages+errors)(@ledgerhq/live-network@libs+live-network)(@ledgerhq/logs@libs+ledgerjs+packages+logs)':
+  '@ledgerhq/coin-xrp@7.25.2(@ledgerhq/errors@libs+ledgerjs+packages+errors)(@ledgerhq/live-network@libs+live-network)(@ledgerhq/logs@6.17.0)':
     dependencies:
       '@ledgerhq/coin-module-framework': 4.0.0(@ledgerhq/errors@libs+ledgerjs+packages+errors)
       '@ledgerhq/errors': link:libs/ledgerjs/packages/errors
       '@ledgerhq/live-network': link:libs/live-network
-      '@ledgerhq/logs': link:libs/ledgerjs/packages/logs
+      '@ledgerhq/logs': 6.17.0
       bignumber.js: 9.1.2
       invariant: 2.2.4
       ripple-address-codec: 5.0.0
@@ -46573,6 +46626,8 @@ snapshots:
   '@ledgerhq/logs@6.12.0': {}
 
   '@ledgerhq/logs@6.16.0': {}
+
+  '@ledgerhq/logs@6.17.0': {}
 
   '@ledgerhq/lumen-design-core@0.1.23':
     dependencies:

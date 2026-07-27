@@ -74,7 +74,7 @@
   },
   "dependencies": {
     "@ledgerhq/errors": "workspace:^",
-    "@ledgerhq/logs": "workspace:^",
+    "@ledgerhq/logs": "catalog:",
     "@ledgerhq/types-live": "workspace:^",
     "axios": "catalog:",
     "eip55": "^2.1.1",

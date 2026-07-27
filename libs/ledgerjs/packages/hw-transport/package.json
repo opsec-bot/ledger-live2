@@ -27,7 +27,7 @@
   "dependencies": {
     "@ledgerhq/devices": "workspace:*",
     "@ledgerhq/errors": "workspace:^",
-    "@ledgerhq/logs": "workspace:^",
+    "@ledgerhq/logs": "catalog:",
     "events": "^3.3.0"
   },
   "scripts": {

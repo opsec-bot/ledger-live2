@@ -95,7 +95,7 @@
     "@ledgerhq/live-env": "workspace:^",
     "@ledgerhq/live-currency-format": "workspace:^",
     "@ledgerhq/live-network": "workspace:^",
-    "@ledgerhq/logs": "workspace:^",
+    "@ledgerhq/logs": "catalog:",
     "@ledgerhq/types-live": "workspace:^",
     "axios": "catalog:",
     "bignumber.js": "^9.1.2",

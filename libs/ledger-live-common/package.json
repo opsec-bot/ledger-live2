@@ -352,7 +352,7 @@
     "@ledgerhq/live-signer-hyperliquid": "workspace:^",
     "@ledgerhq/live-signer-solana": "workspace:^",
     "@ledgerhq/live-wallet": "workspace:^",
-    "@ledgerhq/logs": "workspace:^",
+    "@ledgerhq/logs": "catalog:",
     "@ledgerhq/speculos-transport": "workspace:^",
     "@ledgerhq/wallet-api-acre-module": "workspace:^",
     "@ledgerhq/wallet-api-client": "^1.15.2",

@@ -126,7 +126,7 @@
     },
     "./libs/hw-ledger-key-ring-protocol": {
       "entry": ["src/index.ts"],
-      "ignoreDependencies": ["@ledgerhq/logs", "@ledgerhq/live-env"]
+      "ignoreDependencies": ["@ledgerhq/live-env"]
     },
     "./libs/promise": {
       "entry": ["src/index.ts"]
