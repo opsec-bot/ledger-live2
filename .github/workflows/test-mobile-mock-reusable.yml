@@ -106,6 +106,7 @@ on:
 
 permissions:
   contents: read
+  id-token: write
 
 env:
   SHOULD_UPLOAD: ${{ (github.event_name == 'push' && contains(fromJson('["develop", "main"]'), github.ref_name)) }}
