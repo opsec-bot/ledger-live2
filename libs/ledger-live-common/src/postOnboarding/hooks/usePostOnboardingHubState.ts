@@ -8,7 +8,7 @@ import { usePostOnboardingContext } from "./usePostOnboardingContext";
 
 const getIsFeatureEnabled = (
   action: PostOnboardingAction | undefined,
-  getFeature: (id: FeatureId) => Feature | null,
+  getFeature: (id: string) => Feature | null,
 ) => {
   if (!action) return false;
   if (!action.featureFlagId) return true;
@@ -32,7 +32,10 @@ export function usePostOnboardingHubState(): PostOnboardingHubState {
   const postOnboardingContext = usePostOnboardingContext();
   const { getPostOnboardingAction } = postOnboardingContext;
   const flags = useFeatureFlags();
-  const getFeature = useCallback((id: FeatureId): Feature | null => flags[id] ?? null, [flags]);
+  const getFeature = useCallback(
+    (id: string): Feature | null => flags[id as FeatureId] ?? null,
+    [flags],
+  );
   return useMemo(() => {
     if (!getPostOnboardingAction)
       return {

@@ -12,7 +12,7 @@ import {
 } from "../mock";
 import { renderHook } from "@testing-library/react";
 import { DeviceModelId } from "@ledgerhq/types-devices";
-import { PostOnboardingActionId } from "@ledgerhq/types-live";
+import { PostOnboardingAction, PostOnboardingActionId } from "@ledgerhq/types-live";
 import { usePostOnboardingHubState } from "./usePostOnboardingHubState";
 
 jest.mock("react-redux", () => ({
@@ -135,6 +135,29 @@ describe("usePostOnboardingHubState", () => {
     expect(actionsState.find(action => action.featureFlagId === mockedFeatureIdToTest)).toBe(
       undefined,
     );
+    expect(lastActionCompleted).toBe(null);
+  });
+
+  it("should not return actions whose feature flag has been removed", () => {
+    mockedHubStateSelector.mockReturnValue(stateAllNotCompleted);
+    mockedUseFeatureFlags.mockReturnValue({} as Features);
+    mockedUsePostOnboardingContext.mockReturnValue({
+      getPostOnboardingActionsForDevice: () => [],
+      navigateToPostOnboardingHub: () => {},
+      getPostOnboardingAction: actionId =>
+        ({
+          ...getPostOnboardingAction(actionId),
+          featureFlagId: "llmNanoSUpsellBanners",
+        }) satisfies PostOnboardingAction,
+    });
+
+    const {
+      result: {
+        current: { actionsState, lastActionCompleted },
+      },
+    } = renderHook(() => usePostOnboardingHubState());
+
+    expect(actionsState).toEqual([]);
     expect(lastActionCompleted).toBe(null);
   });
 

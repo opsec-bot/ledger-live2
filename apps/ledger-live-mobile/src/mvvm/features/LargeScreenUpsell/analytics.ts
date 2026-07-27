@@ -1,14 +1,10 @@
 import { DeviceModelId } from "@ledgerhq/types-devices";
 import { screen, track } from "~/analytics";
+import type { LargeScreenUpsellNanoDeviceModelId } from "./hooks/useLargeScreenUpsellEligibility";
 
 export const LARGE_SCREEN_UPSELL_MODAL_PAGE_NAME = "Modal - Upgrade";
 
 export type LargeScreenUpsellDismissMethod = "close button" | "outside tap";
-
-export type LargeScreenUpsellNanoDeviceModelId =
-  | DeviceModelId.nanoS
-  | DeviceModelId.nanoSP
-  | DeviceModelId.nanoX;
 
 export type LargeScreenUpsellDeviceModelAnalyticsValue = "lns" | "lnsp" | "lnx";
 

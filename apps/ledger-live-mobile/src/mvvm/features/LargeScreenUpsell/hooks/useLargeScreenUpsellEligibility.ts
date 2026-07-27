@@ -11,9 +11,11 @@ const NANO_DEVICE_MODEL_IDS = [
   DeviceModelId.nanoX,
 ] as const;
 
-type NanoDeviceModelId = (typeof NANO_DEVICE_MODEL_IDS)[number];
+export type LargeScreenUpsellNanoDeviceModelId = (typeof NANO_DEVICE_MODEL_IDS)[number];
 
-type CooldownDays = { default: number } & Partial<Record<NanoDeviceModelId, number>>;
+type CooldownDays = { default: number } & Partial<
+  Record<LargeScreenUpsellNanoDeviceModelId, number>
+>;
 
 export type LargeScreenUpsellIneligibilityReason =
   | "feature_disabled"
@@ -23,22 +25,29 @@ export type LargeScreenUpsellIneligibilityReason =
   | "cooldown";
 
 export type LargeScreenUpsellEligibility =
-  | { isEligible: true; deviceModelId: NanoDeviceModelId; cooldownDays: number }
+  | {
+      isEligible: true;
+      deviceModelId: LargeScreenUpsellNanoDeviceModelId;
+      cooldownDays: number;
+    }
   | { isEligible: false; reason: Exclude<LargeScreenUpsellIneligibilityReason, "cooldown"> }
   | {
       isEligible: false;
       reason: "cooldown";
-      deviceModelId: NanoDeviceModelId;
+      deviceModelId: LargeScreenUpsellNanoDeviceModelId;
       cooldownDays: number;
     };
 
-function resolveCooldownDays(cooldownDays: CooldownDays, deviceModelId: NanoDeviceModelId): number {
+function resolveCooldownDays(
+  cooldownDays: CooldownDays,
+  deviceModelId: LargeScreenUpsellNanoDeviceModelId,
+): number {
   return cooldownDays[deviceModelId] ?? cooldownDays.default;
 }
 
 function getSeenNanoDeviceModelIds(
   knownDeviceModelIds: Record<DeviceModelId, boolean>,
-): NanoDeviceModelId[] {
+): LargeScreenUpsellNanoDeviceModelId[] {
   return NANO_DEVICE_MODEL_IDS.filter(deviceModelId => knownDeviceModelIds[deviceModelId]);
 }
 
@@ -47,9 +56,9 @@ function hasSeenTouchscreenDevice(knownDeviceModelIds: Record<DeviceModelId, boo
 }
 
 function selectCooldownDeviceModelId(
-  deviceModelIds: NanoDeviceModelId[],
+  deviceModelIds: LargeScreenUpsellNanoDeviceModelId[],
   cooldownDays: CooldownDays,
-): NanoDeviceModelId {
+): LargeScreenUpsellNanoDeviceModelId {
   const [firstDeviceModelId, ...restDeviceModelIds] = deviceModelIds;
 
   return restDeviceModelIds.reduce((selectedDeviceModelId, deviceModelId) => {

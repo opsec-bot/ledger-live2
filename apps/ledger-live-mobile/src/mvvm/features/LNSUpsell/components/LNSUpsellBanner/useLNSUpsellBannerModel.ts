@@ -1,4 +1,5 @@
 import { Image, Linking } from "react-native";
+import { toLargeScreenUpsellDeviceModelAnalyticsValue } from "LLM/features/LargeScreenUpsell";
 import { track } from "~/analytics";
 import type { LNSBannerLocation, LNSBannerModel } from "../../types";
 import { useLNSUpsellBannerState } from "../../hooks/useLNSUpsellBannerState";
@@ -9,25 +10,29 @@ const lnsUpsellFallbackImageUri = Image.resolveAssetSource(
 ).uri;
 
 export function useLNSUpsellBannerModel(location: LNSBannerLocation): LNSBannerModel {
-  const { isShown, params, tracking } = useLNSUpsellBannerState(location);
-
-  const discount = params?.["%"];
-  const ctaLink = params?.link;
-  const img = params?.img;
+  const { isShown, ctaLink, deviceModelId, tracking } = useLNSUpsellBannerState(location);
   const analyticsPage = AnalyticsPageMap[location];
-
-  const imageUrl = typeof img === "string" && img.length > 0 ? img : lnsUpsellFallbackImageUri;
+  const deviceModel = deviceModelId
+    ? toLargeScreenUpsellDeviceModelAnalyticsValue(deviceModelId)
+    : undefined;
 
   const handleCTAPress = () => {
     track("button_clicked", {
       button: "Level up wallet",
+      ...(deviceModel ? { deviceModel } : {}),
       link: ctaLink,
       page: analyticsPage,
     });
     if (ctaLink) Linking.openURL(ctaLink);
   };
 
-  return { location, isShown, discount, tracking, handleCTAPress, imageUrl };
+  return {
+    location,
+    isShown,
+    tracking,
+    handleCTAPress,
+    imageUrl: lnsUpsellFallbackImageUri,
+  };
 }
 
 const AnalyticsPageMap = {
