@@ -14,6 +14,8 @@ import { sentryLogsSelector } from "~/renderer/reducers/settings";
 import { initDatadog, setTags, isDatadogAvailable } from "~/datadog/renderer";
 import { initDatadogLogs } from "~/datadog/logs";
 import { setTransactionObserver } from "@ledgerhq/live-common/transaction/observer";
+import { toSegmentTrackEvent } from "@ledgerhq/live-common/transaction/segmentEvent";
+import { track } from "~/renderer/analytics/segment";
 
 const MAX_KEYLEN = 32;
 
@@ -49,6 +51,15 @@ export const ConnectEnvsToDatadog = () => {
   useEffect(() => {
     ipcRenderer.send("lldDatadogChanged", lldDatadog?.enabled === true);
   }, [lldDatadog?.enabled]);
+
+  // Forward every transaction (sign/broadcast) log event to Segment/Mixpanel. Additive — the
+  // Datadog path (useBroadcast → broadcastLogger) is untouched. `track` self-gates on consent.
+  useEffect(() => {
+    return setTransactionObserver(event => {
+      const mapped = toSegmentTrackEvent(event);
+      if (mapped) track(mapped.event, mapped.properties);
+    });
+  }, []);
 
   // Dev-only: log every transaction (sign/broadcast) log event emitted by the bridge seam,
   // so wide sign/broadcast observability can be verified locally (all staking routes/coins).
