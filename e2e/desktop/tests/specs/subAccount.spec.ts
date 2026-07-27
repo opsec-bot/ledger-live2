@@ -217,7 +217,7 @@ for (const token of subAccounts) {
 
         await app.mainNavigation.openTargetFromMainNavigation("accounts");
         await app.accounts.navigateToAccountByName(getParentAccountName(token.account));
-        await app.account.expectTokenToBePresent(token.account, 90_000);
+        await app.account.expectTokenToBePresent(token.account);
       },
     );
   });
