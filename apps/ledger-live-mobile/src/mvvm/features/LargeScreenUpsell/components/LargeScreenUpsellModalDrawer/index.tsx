@@ -1,10 +1,30 @@
+import type { BottomSheetBackgroundProps } from "@gorhom/bottom-sheet";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Box, BottomSheetHeader, BottomSheetView } from "@ledgerhq/lumen-ui-rnative";
-import { Platform } from "react-native";
+import { Platform, StyleSheet } from "react-native";
+import Animated from "react-native-reanimated";
 import type { FeatureIntroViewModel } from "LLM/components/FeatureIntroLayout/types";
 import QueuedDrawerBottomSheet from "LLM/components/QueuedDrawer/QueuedDrawerBottomSheet";
 import { LargeScreenUpsellModalContent } from "../LargeScreenUpsellModalContent";
 import type { LargeScreenUpsellDismissMethod } from "../../analytics";
+
+const LARGE_SCREEN_UPSELL_MODAL_BACKGROUND_COLOR = "#101010";
+
+const styles = StyleSheet.create({
+  background: {
+    backgroundColor: LARGE_SCREEN_UPSELL_MODAL_BACKGROUND_COLOR,
+  },
+});
+
+function LargeScreenUpsellModalBackground({ style }: BottomSheetBackgroundProps) {
+  return (
+    <Animated.View
+      pointerEvents="none"
+      style={[style, styles.background]}
+      testID="large-screen-upsell-modal-background"
+    />
+  );
+}
 
 type LargeScreenUpsellModalDrawerProps = Readonly<{
   isOpen: boolean;
@@ -84,6 +104,7 @@ export function LargeScreenUpsellModalDrawer({
       onBackdropPress={handleBackdropPress}
       onModalHide={handleModalHide}
       enableDynamicSizing
+      backgroundComponent={LargeScreenUpsellModalBackground}
     >
       {shouldRenderContent ? (
         <BottomSheetView

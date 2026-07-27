@@ -1,9 +1,11 @@
 import React from "react";
 import { render, screen } from "@tests/test-renderer";
+import type { BottomSheetBackgroundProps } from "@gorhom/bottom-sheet";
 import {
   GenericAwarenessModalLayout,
   type GenericAwarenessModalFeatureIntro,
 } from "@ledgerhq/live-common/genericAwarenessModal";
+import type { BottomSheetProps } from "@ledgerhq/lumen-ui-rnative";
 import type { FeatureIntroViewModel } from "LLM/components/FeatureIntroLayout/types";
 import type { LargeScreenUpsellDismissMethod } from "../../../analytics";
 import { LargeScreenUpsellModalDrawer } from "..";
@@ -13,6 +15,7 @@ type MockQueuedDrawerBottomSheetProps = Readonly<{
   onClose?: () => void;
   onHeaderClosePressed?: () => void;
   onBackdropPress?: () => void;
+  backgroundComponent?: BottomSheetProps["backgroundComponent"];
 }>;
 
 let capturedDrawerProps: MockQueuedDrawerBottomSheetProps | null = null;
@@ -22,9 +25,16 @@ jest.mock("LLM/components/QueuedDrawer/QueuedDrawerBottomSheet", () => ({
   default: (props: MockQueuedDrawerBottomSheetProps) => {
     const React = require("react");
     const { BottomSheet } = jest.requireActual("@ledgerhq/lumen-ui-rnative");
+    const BackgroundComponent = props.backgroundComponent;
+    const backgroundProps = { style: {} } as BottomSheetBackgroundProps;
 
     capturedDrawerProps = props;
-    return React.createElement(BottomSheet, { snapPoints: ["70%", "90%"] }, props.children);
+    return React.createElement(
+      React.Fragment,
+      null,
+      BackgroundComponent ? React.createElement(BackgroundComponent, backgroundProps) : null,
+      React.createElement(BottomSheet, { snapPoints: ["70%", "90%"] }, props.children),
+    );
   },
 }));
 
@@ -92,6 +102,14 @@ describe("LargeScreenUpsellModalDrawer", () => {
     renderLargeScreenUpsellModalDrawer(true);
 
     expect(screen.getByTestId("large-screen-upsell-modal-drawer")).toBeOnTheScreen();
+  });
+
+  it("should use the Figma background color", () => {
+    renderLargeScreenUpsellModalDrawer(true);
+
+    expect(screen.getByTestId("large-screen-upsell-modal-background")).toHaveStyle({
+      backgroundColor: "#101010",
+    });
   });
 
   it("should ignore close signals before the drawer has opened", () => {

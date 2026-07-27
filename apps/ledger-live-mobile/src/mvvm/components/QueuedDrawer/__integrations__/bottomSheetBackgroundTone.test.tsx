@@ -1,3 +1,4 @@
+import type { BottomSheetBackgroundProps } from "@gorhom/bottom-sheet";
 import React from "react";
 import { Text } from "react-native";
 import { render, screen } from "@tests/test-renderer";
@@ -7,12 +8,9 @@ import QueuedDrawerBottomSheet from "../QueuedDrawerBottomSheet";
 import QueuedDrawersContextProvider from "../QueuedDrawersContextProvider";
 
 const statusGradientTones = ["error", "info", "success"] as const;
-type MockBottomSheetBackgroundProps = {
-  style?: object;
-};
 
 const mockBottomSheetProps: Array<{
-  backgroundComponent?: React.FC<MockBottomSheetBackgroundProps> | null;
+  backgroundComponent?: React.FC<BottomSheetBackgroundProps> | null;
 }> = [];
 
 jest.mock("@ledgerhq/lumen-ui-rnative", () => {
@@ -25,11 +23,11 @@ jest.mock("@ledgerhq/lumen-ui-rnative", () => {
       backgroundComponent: BackgroundComponent,
       children,
     }: {
-      backgroundComponent?: React.FC<MockBottomSheetBackgroundProps> | null;
+      backgroundComponent?: React.FC<BottomSheetBackgroundProps> | null;
       children: React.ReactNode;
     }) => {
       mockBottomSheetProps.push({ backgroundComponent: BackgroundComponent });
-      const backgroundProps: MockBottomSheetBackgroundProps = { style: {} };
+      const backgroundProps = { style: {} } as BottomSheetBackgroundProps;
 
       return (
         <View testID="mock-bottom-sheet">
@@ -53,6 +51,10 @@ function renderQueuedDrawerBottomSheet(children: React.ReactNode) {
     </QueuedDrawersContextProvider>,
   );
 }
+
+const ProvidedBackground: React.FC<BottomSheetBackgroundProps> = ({ style }) => {
+  return <Text style={style}>Provided background</Text>;
+};
 
 function BackgroundToneRequester({ tone }: { tone?: BottomSheetBackgroundTone }) {
   useBottomSheetBackgroundTone(tone);
@@ -84,6 +86,21 @@ describe("QueuedDrawerBottomSheet background tone integration", () => {
         expect(screen.getByTestId(`bottom-sheet-status-gradient-${tone}`)).toBeVisible();
       },
     );
+
+    it("GIVEN a provided background WHEN content requests a tone THEN the provided background takes precedence", () => {
+      render(
+        <QueuedDrawersContextProvider>
+          <QueuedDrawerBottomSheet backgroundComponent={ProvidedBackground}>
+            <BackgroundToneRequester tone="success" />
+          </QueuedDrawerBottomSheet>
+        </QueuedDrawersContextProvider>,
+      );
+
+      const lastProps = mockBottomSheetProps[mockBottomSheetProps.length - 1];
+      expect(lastProps.backgroundComponent).toBe(ProvidedBackground);
+      expect(screen.getByText("Provided background")).toBeVisible();
+      expectNoStatusGradient();
+    });
   });
 
   describe("undefined tone requests", () => {
