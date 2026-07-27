@@ -22,6 +22,8 @@ export const beforeAllFunction = async (
   transaction: TransactionType,
   options?: SendTestOptions,
 ) => {
+  const parentAccountToCredit = transaction.accountToCredit.parentAccount;
+
   await app.init({
     speculosApp: transaction.accountToDebit.currency.speculosApp,
     ...(options?.userdata !== undefined ? { userdata: options.userdata } : {}),
@@ -34,9 +36,25 @@ export const beforeAllFunction = async (
           transaction.accountToDebit,
           options?.liveDataOptions,
         )(userdataPath);
-        transaction.accountToCredit.address = await getAccountAddress(transaction.accountToCredit);
-        transaction.recipientAddress = transaction.accountToCredit.address;
+        if (!parentAccountToCredit) {
+          transaction.accountToCredit.address = await getAccountAddress(
+            transaction.accountToCredit,
+          );
+          transaction.recipientAddress = transaction.accountToCredit.address;
+        }
       },
+      ...(parentAccountToCredit
+        ? [
+            async (userdataPath?: string) => {
+              await liveDataCommand(transaction.accountToCredit)(userdataPath);
+              parentAccountToCredit.address = await getAccountAddress(parentAccountToCredit);
+              transaction.accountToCredit.address = await getAccountAddress(
+                transaction.accountToCredit,
+              );
+              transaction.recipientAddress = transaction.accountToCredit.address;
+            },
+          ]
+        : []),
     ],
   });
 
