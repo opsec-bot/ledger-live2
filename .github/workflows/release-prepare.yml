@@ -28,10 +28,10 @@ jobs:
           token: ${{ steps.generate-token.outputs.token }}
 
       - name: Setup git user
-        uses: LedgerHQ/ledger-live/tools/actions/composites/setup-git-user@develop
+        uses: LedgerHQ/ledger-live/tools/actions/composites/setup-git-user@ci/workflows-zizmor-actionlint
 
       - name: Setup the caches
-        uses: LedgerHQ/ledger-live/tools/actions/composites/setup-caches@develop
+        uses: LedgerHQ/ledger-live/tools/actions/composites/setup-caches@ci/workflows-zizmor-actionlint
         id: setup-caches
         with:
           use-mise: true
@@ -74,7 +74,7 @@ jobs:
           git fetch origin develop main
 
       - name: Merge into main
-        uses: LedgerHQ/ledger-live/tools/actions/composites/merge-branch@develop
+        uses: LedgerHQ/ledger-live/tools/actions/composites/merge-branch@ci/workflows-zizmor-actionlint
         with:
           base-branch: "main"
           head-branch: "${{ inputs.ref }}"
@@ -94,7 +94,7 @@ jobs:
   release-final:
     name: "Prepare Release > Publish packages and apps"
     needs: prepare-release
-    uses: LedgerHQ/ledger-live/.github/workflows/release-final.yml@develop
+    uses: LedgerHQ/ledger-live/.github/workflows/release-final.yml@ci/workflows-zizmor-actionlint
     with:
       ref: main
       caller: release-prepare

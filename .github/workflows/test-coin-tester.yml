@@ -46,7 +46,7 @@ jobs:
         run: git checkout $GITHUB_SHA
 
       - name: Run live-common-affected
-        uses: LedgerHQ/ledger-live/tools/actions/live-common-affected@develop
+        uses: LedgerHQ/ledger-live/tools/actions/live-common-affected@ci/workflows-zizmor-actionlint
         id: affected
         with:
           ref: ${{ github.event_name == 'pull_request' && format('origin/{0}', github.event.pull_request.base.ref) || 'HEAD^' }}
@@ -125,7 +125,7 @@ jobs:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
 
       - name: Setup the caches
-        uses: LedgerHQ/ledger-live/tools/actions/composites/setup-caches@develop
+        uses: LedgerHQ/ledger-live/tools/actions/composites/setup-caches@ci/workflows-zizmor-actionlint
         with:
           use-mise: true
           gh-token: ${{ secrets.GITHUB_TOKEN }}
@@ -154,9 +154,9 @@ jobs:
           registry: ${{ vars.ARTIFACTORY_URL }}
 
       - name: Setup environment
-        uses: LedgerHQ/ledger-live/tools/actions/composites/setup-coin-tester-env@develop
+        uses: LedgerHQ/ledger-live/tools/actions/composites/setup-coin-tester-env@ci/workflows-zizmor-actionlint
 
       - name: Run Coin Tester
-        uses: LedgerHQ/ledger-live/tools/actions/composites/run-coin-tester@develop
+        uses: LedgerHQ/ledger-live/tools/actions/composites/run-coin-tester@ci/workflows-zizmor-actionlint
         with:
           chain: ${{ matrix.chain }}

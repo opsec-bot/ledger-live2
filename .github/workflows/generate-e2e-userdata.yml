@@ -59,7 +59,7 @@ jobs:
           persist-credentials: false
 
       - name: Setup the caches
-        uses: LedgerHQ/ledger-live/tools/actions/composites/setup-caches@develop
+        uses: LedgerHQ/ledger-live/tools/actions/composites/setup-caches@ci/workflows-zizmor-actionlint
         id: setup-caches
         with:
           use-mise: true
@@ -80,7 +80,7 @@ jobs:
         run: pnpm i --filter="live-cli..." --filter="ledger-live-desktop-e2e-tests..." --filter="ledger-live" --no-frozen-lockfile --unsafe-perm --ignore-scripts
 
       - name: Setup Speculos image and Coin Apps
-        uses: LedgerHQ/ledger-live/tools/actions/composites/setup-speculos_image@develop
+        uses: LedgerHQ/ledger-live/tools/actions/composites/setup-speculos_image@ci/workflows-zizmor-actionlint
         timeout-minutes: 20
         with:
           coinapps_path: ${{ env.COINAPPS }}
@@ -89,7 +89,7 @@ jobs:
           bot_key: ${{ secrets.GH_BOT_PRIVATE_KEY }}
 
       - name: Build CLI and e2e shared lib
-        uses: LedgerHQ/ledger-live/tools/actions/composites/nx-step@develop
+        uses: LedgerHQ/ledger-live/tools/actions/composites/nx-step@ci/workflows-zizmor-actionlint
         with:
           command: pnpm exec nx run-many -t build --projects=@ledgerhq/live-cli,@ledgerhq/live-e2e-shared
           disable_cache: false
@@ -194,7 +194,7 @@ jobs:
           persist-credentials: false
 
       - name: Setup the caches
-        uses: LedgerHQ/ledger-live/tools/actions/composites/setup-caches@develop
+        uses: LedgerHQ/ledger-live/tools/actions/composites/setup-caches@ci/workflows-zizmor-actionlint
         id: setup-caches
         with:
           use-mise: true
@@ -216,7 +216,7 @@ jobs:
         run: pnpm i --filter="live-cli..." --filter="ledger-live-desktop-e2e-tests..." --filter="ledger-live" --no-frozen-lockfile --unsafe-perm --ignore-scripts
 
       - name: Setup Speculos image and Coin Apps
-        uses: LedgerHQ/ledger-live/tools/actions/composites/setup-speculos_image@develop
+        uses: LedgerHQ/ledger-live/tools/actions/composites/setup-speculos_image@ci/workflows-zizmor-actionlint
         timeout-minutes: 20
         with:
           coinapps_path: ${{ env.COINAPPS }}
@@ -225,7 +225,7 @@ jobs:
           bot_key: ${{ secrets.GH_BOT_PRIVATE_KEY }}
 
       - name: Build CLI and e2e shared lib
-        uses: LedgerHQ/ledger-live/tools/actions/composites/nx-step@develop
+        uses: LedgerHQ/ledger-live/tools/actions/composites/nx-step@ci/workflows-zizmor-actionlint
         with:
           command: pnpm exec nx run-many -t build --projects=@ledgerhq/live-cli,@ledgerhq/live-e2e-shared
           disable_cache: false
