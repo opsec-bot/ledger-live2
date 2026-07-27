@@ -26,7 +26,7 @@ import { counterValueCurrencySelector, orderAccountsSelector } from "../reducers
 import { clearBridgeCache } from "../bridge/cache";
 import { flushAll } from "../components/DBSave";
 import { LiveConfig } from "@ledgerhq/live-config/LiveConfig";
-import { walletSelector } from "~/reducers/wallet";
+import { walletSelector, toLiveWalletState } from "~/reducers/wallet";
 import { useFeature } from "@features/platform-feature-flags";
 
 const extraSessionTrackingPairsChanges: BehaviorSubject<TrackingPair[]> = new BehaviorSubject<
@@ -64,7 +64,7 @@ export function useSortAccountsComparator() {
   const accounts = useSelector(orderAccountsSelector);
   const calc = useCalculateCountervalueCallback();
   const walletState = useSelector(walletSelector);
-  return sortAccountsComparatorFromOrder(accounts, walletState, calc);
+  return sortAccountsComparatorFromOrder(accounts, toLiveWalletState(walletState), calc);
 }
 export function useFlattenSortAccounts(options?: FlattenAccountsOptions) {
   const accounts = useSelector(accountsSelector);

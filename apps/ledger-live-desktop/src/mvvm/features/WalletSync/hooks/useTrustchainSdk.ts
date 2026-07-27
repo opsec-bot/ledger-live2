@@ -2,10 +2,10 @@ import { useMemo } from "react";
 import { getEnv } from "@shared/env";
 import { getSdk } from "@ledgerhq/ledger-key-ring-protocol/index";
 import { withDevice } from "@ledgerhq/live-common/hw/deviceAccess";
-import { trustchainLifecycle } from "@ledgerhq/live-wallet/walletsync/index";
+import { trustchainLifecycle } from "@features/platform-wallet-sync";
 import { useStore } from "LLD/hooks/redux";
 import { walletSelector } from "~/renderer/reducers/wallet";
-import { walletSyncStateSelector } from "@ledgerhq/live-wallet/store";
+import { walletSyncStateSelector } from "@domain/entity-wallet-sync";
 import { TrustchainSDK } from "@ledgerhq/ledger-key-ring-protocol/types";
 import { useFeature } from "@features/platform-feature-flags";
 import getWalletSyncEnvironmentParams from "@ledgerhq/live-common/walletSync/getEnvironmentParams";
@@ -31,7 +31,8 @@ export function useTrustchainSdk() {
     () =>
       trustchainLifecycle({
         cloudSyncApiBaseUrl,
-        getCurrentWSState: () => walletSyncStateSelector(walletSelector(store.getState())),
+        getCurrentWSState: () =>
+          walletSyncStateSelector(walletSelector(store.getState()).walletSync),
       }),
     [cloudSyncApiBaseUrl, store],
   );

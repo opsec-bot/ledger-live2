@@ -111,8 +111,7 @@
     },
     "./libs/live-wallet": {
       "entry": [
-        "src/walletsync/index.ts",
-        "src/cloudsync/index.ts",
+        "src/walletsync/modules/accounts.ts",
         "src/liveqr/cross.ts",
         "src/liveqr/importAccounts.ts",
         "src/ordering.ts",
@@ -120,6 +119,27 @@
         "src/store.ts",
         "src/accountName.ts"
       ]
+    },
+    "./shared/cloud-sync": {
+      "entry": ["src/index.ts"]
+    },
+    "./shared/wallet-sync": {
+      "entry": ["src/index.ts"]
+    },
+    "./domain/entity/account-name": {
+      "entry": ["src/index.ts"]
+    },
+    "./domain/entity/recent-addresses": {
+      "entry": ["src/index.ts"]
+    },
+    "./domain/entity/starred-account": {
+      "entry": ["src/index.ts"]
+    },
+    "./domain/entity/wallet-sync": {
+      "entry": ["src/index.ts"]
+    },
+    "./features/platform/wallet-sync": {
+      "entry": ["src/index.ts"]
     },
     "./libs/ledger-key-ring-protocol": {
       "entry": ["src/index.ts", "src/store.ts", "src/qrcode/index.ts"]

@@ -13,7 +13,7 @@ import {
   accountUserDataExportSelector,
   walletStateExportShouldDiffer,
   exportWalletState,
-} from "@ledgerhq/live-wallet/store";
+} from "~/renderer/reducers/wallet";
 import {
   trustchainStoreActionTypePrefix,
   trustchainStoreSelector,

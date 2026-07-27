@@ -12,7 +12,7 @@ import {
 } from "@ledgerhq/ledger-wallet-framework/account/helpers";
 import { accountToWalletAPIAccount } from "@ledgerhq/live-common/wallet-api/converters";
 import { NavigatorName, ScreenName } from "~/const";
-import { WalletState } from "@ledgerhq/live-wallet/store";
+import { WalletState, toLiveWalletState } from "~/reducers/wallet";
 import { deriveAccountIdForManifest } from "@ledgerhq/live-common/wallet-api/utils/deriveAccountIdForManifest";
 import { useVersionedStakePrograms } from "./useVersionedStakePrograms";
 
@@ -114,9 +114,10 @@ export function useStake() {
       parentAccount?: Account,
       cryptoAssetId?: string,
     ) => {
-      const walletApiAccount = accountToWalletAPIAccount(walletState, account, parentAccount);
+      const liveWalletState = toLiveWalletState(walletState);
+      const walletApiAccount = accountToWalletAPIAccount(liveWalletState, account, parentAccount);
       const parentWalletApiAccountId = parentAccount
-        ? accountToWalletAPIAccount(walletState, parentAccount)?.id
+        ? accountToWalletAPIAccount(liveWalletState, parentAccount)?.id
         : null;
 
       if (getAccountSpendableBalance(account).isZero()) {

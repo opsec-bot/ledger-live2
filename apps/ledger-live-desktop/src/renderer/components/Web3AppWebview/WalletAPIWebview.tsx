@@ -21,7 +21,7 @@ import { track } from "~/renderer/analytics/segment";
 import { OperationDetails } from "~/renderer/drawers/OperationDetails";
 import { setDrawer } from "~/renderer/drawers/Provider";
 import { mevProtectionSelector, shareAnalyticsSelector } from "~/renderer/reducers/settings";
-import { walletSelector } from "~/renderer/reducers/wallet";
+import { walletSelector, toLiveWalletState } from "~/renderer/reducers/wallet";
 import { getStoreValue, setStoreValue } from "~/renderer/store";
 import { updateAccountWithUpdater } from "~/renderer/actions/accounts";
 import { openModal } from "~/renderer/actions/modals";
@@ -330,9 +330,11 @@ function useWebView(
   }, []);
 
   const walletState = useSelector(walletSelector);
+  // Compatibility adapter: live-common's useWalletAPIServer expects the old flat WalletState shape
+  const walletStateForAPI = useMemo(() => toLiveWalletState(walletState), [walletState]);
 
   const { widgetLoaded, onLoad, onReload, onMessage, server } = useWalletAPIServer({
-    walletState,
+    walletState: walletStateForAPI,
     manifest,
     accounts,
     tracking,

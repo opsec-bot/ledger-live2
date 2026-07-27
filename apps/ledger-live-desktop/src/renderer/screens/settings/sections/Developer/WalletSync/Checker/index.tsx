@@ -32,13 +32,13 @@ export function CheckerLedgerSync() {
     },
     {
       key: t("settings.developer.debugWalletSync.modal.check.trustchain.cloudSyncVersion"),
-      value: "v" + String(walletState.walletSyncState.version),
+      value: "v" + String(walletState.walletSync.walletSyncState.version),
       copy: true,
       tiny: false,
     },
     {
       key: t("settings.developer.debugWalletSync.modal.check.trustchain.uniported"),
-      value: String(walletState.nonImportedAccountInfos.length),
+      value: String(walletState.walletSync.nonImportedAccountInfos.length),
       copy: true,
       tiny: false,
     },

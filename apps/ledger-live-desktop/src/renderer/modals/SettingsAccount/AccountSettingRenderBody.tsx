@@ -4,7 +4,10 @@ import { useDispatch } from "LLD/hooks/redux";
 import { Trans, useTranslation } from "react-i18next";
 import type { Account } from "@ledgerhq/types-live";
 import { validateNameEdition } from "@ledgerhq/live-wallet/accountName";
-import { setAccountName as actionSetAccountName } from "@ledgerhq/live-wallet/store";
+import {
+  setAccountName as actionSetAccountName,
+  useMaybeAccountName,
+} from "~/renderer/reducers/wallet";
 import { AccountNameRequiredError } from "@ledgerhq/errors";
 import { getEnv } from "@shared/env";
 import { urls } from "~/config/urls";
@@ -20,7 +23,6 @@ import ConfirmModal from "~/renderer/modals/ConfirmModal";
 import Space from "~/renderer/components/Space";
 import Button from "~/renderer/components/Button";
 import { getTagDerivationMode } from "@ledgerhq/ledger-wallet-framework/derivation";
-import { useMaybeAccountName } from "~/renderer/reducers/wallet";
 
 type Props = {
   onClose?: () => void;

@@ -87,9 +87,14 @@
     "@datadog/mobile-react-navigation": "2.8.2",
     "@domain/api-pay-card": "workspace:^",
     "@domain/api-currency-token": "workspace:^",
+    "@shared/cloud-sync": "workspace:^",
+    "@domain/entity-account-name": "workspace:^",
     "@domain/entity-currency-crypto": "workspace:*",
+    "@domain/entity-recent-addresses": "workspace:^",
+    "@domain/entity-starred-account": "workspace:^",
     "@features/flow-card": "workspace:^",
     "@features/flow-contacts": "workspace:^",
+    "@features/platform-wallet-sync": "workspace:^",
     "@features/platform-currencies": "workspace:^",
     "@devtools/shell": "workspace:^",
     "@devtools/bindings": "workspace:^",
@@ -181,6 +186,7 @@
     "@segment/analytics-react-native": "2.21.4",
     "@segment/sovran-react-native": "1.1.3",
     "@shared/feature-flags": "workspace:*",
+    "@shared/wallet-sync": "workspace:^",
     "@shopify/flash-list": "2.2.0",
     "@tanstack/react-query": "5.28.9",
     "@ungap/structured-clone": "1.3.1",
@@ -267,7 +273,8 @@
     "styled-system": "catalog:",
     "stylis": "catalog:",
     "text-encoding-polyfill": "0.6.7",
-    "uuid": "8.3.2"
+    "uuid": "8.3.2",
+    "@domain/entity-wallet-sync": "workspace:^"
   },
   "devDependencies": {
     "@babel/core": "7.28.5",

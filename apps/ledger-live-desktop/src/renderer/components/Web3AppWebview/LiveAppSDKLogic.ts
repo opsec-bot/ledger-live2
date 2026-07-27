@@ -17,7 +17,7 @@ import { updateAccountWithUpdater } from "../../actions/accounts";
 import { OperationDetails } from "~/renderer/drawers/OperationDetails";
 import { setDrawer } from "~/renderer/drawers/Provider";
 import { track } from "~/renderer/analytics/segment";
-import { WalletState } from "@ledgerhq/live-wallet/store";
+import { WalletState, toLiveWalletState } from "~/renderer/reducers/wallet";
 import { AssetAndAccountResult } from "LLD/features/ModularDialog/Web3AppWebview/AssetAndAccountDrawer";
 
 const trackingLiveAppSDKLogic = trackingWrapper(track);
@@ -63,7 +63,9 @@ export const requestAccountLogic = async (
 
   const { account, parentAccount } = await openAssetAndAccountSelector(currencyIds);
 
-  return serializePlatformAccount(accountToPlatformAccount(walletState, account, parentAccount));
+  return serializePlatformAccount(
+    accountToPlatformAccount(toLiveWalletState(walletState), account, parentAccount),
+  );
 };
 
 export const broadcastTransactionLogic = (

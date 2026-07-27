@@ -1,8 +1,10 @@
 import timemachine from "timemachine";
 import { of, throwError } from "rxjs";
 import { Account } from "@ledgerhq/types-live";
-import manager, { NonImportedAccountInfo } from "../../modules/accounts";
-import { WalletSyncDataManagerResolutionContext } from "../../types";
+import manager, {
+  NonImportedAccountInfo,
+  WalletSyncDataManagerResolutionContext,
+} from "../../modules/accounts";
 import { genAccount } from "@ledgerhq/ledger-wallet-framework/mocks/account";
 import { accountDataToAccount } from "../../../liveqr/cross";
 

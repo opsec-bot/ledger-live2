@@ -28,7 +28,7 @@ import { useInternalAppIds } from "@ledgerhq/live-common/hooks/useInternalAppIds
 import { useFeature } from "@features/platform-feature-flags";
 import { useLocalLiveAppManifest } from "@ledgerhq/live-common/wallet-api/LocalLiveAppProvider/index";
 import { useProviderInterstitalEnabled } from "@ledgerhq/live-common/hooks/useShowProviderLoadingTransition";
-import { walletSelector } from "~/renderer/reducers/wallet";
+import { walletSelector, toLiveWalletState } from "~/renderer/reducers/wallet";
 import { useDiscreetMode } from "~/renderer/components/Discreet";
 import { NetworkErrorScreen } from "~/renderer/components/Web3AppWebview/NetworkError";
 import { ProviderInterstitial } from "LLD/components/ProviderInterstitial";
@@ -91,7 +91,11 @@ const LiveAppExchange = ({ appId }: { appId: string }) => {
         const parentAccount = isTokenAccount(account)
           ? getParentAccount(account, accounts)
           : undefined;
-        urlParams.account = accountToWalletAPIAccount(walletState, account, parentAccount).id;
+        urlParams.account = accountToWalletAPIAccount(
+          toLiveWalletState(walletState),
+          account,
+          parentAccount,
+        ).id;
       }
     }
     return urlParams;

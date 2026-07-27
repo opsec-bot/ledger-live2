@@ -42,7 +42,7 @@ import {
 } from "../../e2e/webviewNetworkLogCapture";
 import { webviewLogStore } from "../../e2e/webviewLogStore";
 import { currentRouteNameRef } from "../../analytics/screenRefs";
-import { walletSelector } from "~/reducers/wallet";
+import { walletSelector, toLiveWalletState } from "~/reducers/wallet";
 import {
   CacheMode,
   ShouldStartLoadRequest,
@@ -175,13 +175,14 @@ export function useWebView(
   }, [webviewRef]);
 
   const walletState = useSelector(walletSelector);
+  const walletStateForAPI = useMemo(() => toLiveWalletState(walletState), [walletState]);
 
   const {
     onMessage: onMessageRaw,
     onLoadError,
     server,
   } = useWalletAPIServer({
-    walletState,
+    walletState: walletStateForAPI,
     manifest: manifest satisfies AppManifest,
     accounts,
     tracking,

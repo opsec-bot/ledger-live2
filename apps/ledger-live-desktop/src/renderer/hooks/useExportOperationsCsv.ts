@@ -8,7 +8,7 @@ import { accountsOpToCSV } from "@ledgerhq/live-common/csvExport";
 import type { Account } from "@ledgerhq/types-live";
 import logger from "~/renderer/logger";
 import { counterValueCurrencySelector } from "~/renderer/reducers/settings";
-import { walletSelector } from "~/renderer/reducers/wallet";
+import { walletSelector, toLiveWalletState } from "~/renderer/reducers/wallet";
 import { useTechnicalDateFn } from "~/renderer/hooks/useDateFormatter";
 
 async function saveOperationsToFile(
@@ -85,7 +85,7 @@ export function useExportOperationsCsv({
           accounts.filter(a => checkedIds.includes(a.id)),
           countervalueCurrency,
           countervalueState,
-          walletState,
+          toLiveWalletState(walletState),
         );
         const ok = await saveOperationsToFile(path, csv);
         if (ok) {

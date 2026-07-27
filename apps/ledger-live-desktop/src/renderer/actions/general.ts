@@ -28,7 +28,7 @@ import {
   getOrderAccounts,
   userThemeSelector,
 } from "~/renderer/reducers/settings";
-import { walletSelector } from "../reducers/wallet";
+import { walletSelector, toLiveWalletState } from "../reducers/wallet";
 import { countervaluesActions } from "./countervalues";
 import { selectExtraTrackingPairs } from "~/renderer/reducers/countervaluesExtraTracking";
 
@@ -63,7 +63,7 @@ export function useSortAccountsComparator() {
   const orderAccounts = useSelector(getOrderAccounts);
   const calc = useCalculateCountervalueCallback();
   const walletState = useSelector(walletSelector);
-  return sortAccountsComparatorFromOrder(orderAccounts, walletState, calc);
+  return sortAccountsComparatorFromOrder(orderAccounts, toLiveWalletState(walletState), calc);
 }
 export function useFlattenSortAccounts(options?: FlattenAccountsOptions) {
   const accounts = useSelector(accountsSelector);

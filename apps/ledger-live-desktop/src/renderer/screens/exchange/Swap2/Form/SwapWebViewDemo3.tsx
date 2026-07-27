@@ -50,7 +50,7 @@ import {
   lastSeenDeviceSelector,
   shareAnalyticsSelector,
 } from "~/renderer/reducers/settings";
-import { walletSelector } from "~/renderer/reducers/wallet";
+import { walletSelector, toLiveWalletState } from "~/renderer/reducers/wallet";
 import {
   transformToBigNumbers,
   useGetSwapTrackingProperties,
@@ -156,6 +156,7 @@ const SwapWebView = ({
 }: SwapWebProps) => {
   const { theme } = useTheme();
   const walletState = useSelector(walletSelector);
+  const liveWalletState = useMemo(() => toLiveWalletState(walletState), [walletState]);
   const dispatch = useDispatch();
   const redirectToHistory = useRedirectToSwapHistory();
   const webviewAPIRef = useRef<WebviewAPI>(null);
@@ -486,14 +487,14 @@ const SwapWebView = ({
     // Recompute wallet-API ids when possible; otherwise keep raw deeplink ids.
     const fromAccountIdForUrl = resolvedDefaultFromAccount
       ? accountToWalletAPIAccount(
-          walletState,
+          liveWalletState,
           resolvedDefaultFromAccount,
           resolvedDefaultFromParentAccount,
         ).id
       : rawFromAccountId;
     const toAccountIdForUrl = resolvedDefaultToAccount
       ? accountToWalletAPIAccount(
-          walletState,
+          liveWalletState,
           resolvedDefaultToAccount,
           resolvedDefaultToParentAccount,
         ).id
@@ -544,7 +545,7 @@ const SwapWebView = ({
     resolvedDefaultToAccount,
     resolvedDefaultToParentAccount,
     state,
-    walletState,
+    liveWalletState,
   ]);
 
   const onSwapWebviewError = (error?: SwapLiveError) => {

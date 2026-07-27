@@ -1,0 +1,24 @@
+{
+  "name": "@shared/wallet-sync",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Shared WalletSync module interface types (ctx-free)",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./package.json": "./package.json"
+  },
+  "sideEffects": false,
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "unimported": "pnpm knip --directory ../.. -W shared/wallet-sync"
+  },
+  "dependencies": {
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "typescript": "catalog:"
+  }
+}

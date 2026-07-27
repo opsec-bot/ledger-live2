@@ -40,7 +40,7 @@ import { WebviewAPI, WebviewProps } from "./types";
 import { useWebviewState } from "./helpers";
 import { currentRouteNameRef } from "~/renderer/analytics/screenRefs";
 import { mevProtectionSelector } from "~/renderer/reducers/settings";
-import { walletSelector } from "~/renderer/reducers/wallet";
+import { walletSelector, toLiveWalletState } from "~/renderer/reducers/wallet";
 import { HOOKS_TRACKING_LOCATIONS } from "~/renderer/analytics/hooks/variables";
 import { setFlowValue, setSourceValue } from "~/renderer/reducers/modularDialog";
 import { useOpenAssetAndAccount } from "LLD/features/ModularDialog/Web3AppWebview/AssetAndAccountDrawer";
@@ -98,7 +98,8 @@ export const PlatformAPIWebview = forwardRef<WebviewAPI, WebviewProps>(
     const [widgetLoaded, setWidgetLoaded] = useState(false);
 
     const walletState = useSelector(walletSelector);
-    const listAccounts = useListPlatformAccounts(walletState, accounts);
+    const liveWalletState = useMemo(() => toLiveWalletState(walletState), [walletState]);
+    const listAccounts = useListPlatformAccounts(liveWalletState, accounts);
     const { deactivatedCurrencyIds: _deactivatedCurrencyIds } = useFeatureFlaggedCurrencies(
       !!useEnv("MOCK"),
     );
@@ -146,7 +147,7 @@ export const PlatformAPIWebview = forwardRef<WebviewAPI, WebviewProps>(
     const receiveOnAccount = useCallback(
       ({ accountId }: { accountId: string }) =>
         receiveOnAccountLogic(
-          walletState,
+          liveWalletState,
           { manifest, accounts, tracking },
           accountId,
           (account, parentAccount, accountAddress) => {
@@ -174,7 +175,7 @@ export const PlatformAPIWebview = forwardRef<WebviewAPI, WebviewProps>(
             );
           },
         ),
-      [walletState, manifest, accounts, dispatch, tracking],
+      [liveWalletState, manifest, accounts, dispatch, tracking],
     );
 
     const signTransaction = useCallback(

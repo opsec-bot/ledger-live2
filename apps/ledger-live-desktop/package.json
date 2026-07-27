@@ -66,6 +66,8 @@
     "@datadog/browser-rum": "6.30.1",
     "@domain/api-pay-card": "workspace:^",
     "@domain/api-currency-token": "workspace:^",
+    "@shared/cloud-sync": "workspace:^",
+    "@domain/entity-account-name": "workspace:^",
     "@domain/entity-contact": "workspace:*",
     "@domain/entity-currency-crypto": "workspace:*",
     "@domain/entity-large-screen-upsell-modal": "workspace:*",
@@ -78,6 +80,7 @@
     "@features/platform-currencies": "workspace:^",
     "@features/platform-feature-flags": "workspace:^",
     "@features/platform-style": "workspace:^",
+    "@features/platform-wallet-sync": "workspace:^",
     "@ledgerhq/asset-aggregation": "workspace:^",
     "@ledgerhq/asset-detail": "workspace:^",
     "@domain/api-push-devices": "workspace:*",
@@ -97,6 +100,8 @@
     "@domain/entity-pay-card": "workspace:^",
     "@domain/api-market-sentiment": "workspace:^",
     "@domain/entity-market-sentiment": "workspace:^",
+    "@domain/entity-recent-addresses": "workspace:^",
+    "@domain/entity-starred-account": "workspace:^",
     "@domain/api-altcoins-sentiment": "workspace:^",
     "@features/flow-fear-and-greed": "workspace:^",
     "@ledgerhq/crypto-icons": "catalog:",
@@ -146,6 +151,7 @@
     "@segment/analytics-next": "1.81.1",
     "@sentry/electron": "5.2.0",
     "@shared/feature-flags": "workspace:*",
+    "@shared/wallet-sync": "workspace:^",
     "@tanstack/react-query": "5.28.9",
     "@tanstack/react-query-devtools": "5.28.14",
     "@tanstack/react-table": "catalog:",
@@ -212,7 +218,8 @@
     "winston-transport": "4.7.0",
     "write-file-atomic": "5.0.1",
     "ws": "catalog:",
-    "xstate": "catalog:"
+    "xstate": "catalog:",
+    "@domain/entity-wallet-sync": "workspace:^"
   },
   "devDependencies": {
     "@electron/notarize": "3.1.1",

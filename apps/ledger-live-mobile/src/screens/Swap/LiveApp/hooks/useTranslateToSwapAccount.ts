@@ -3,7 +3,7 @@ import { useMemo } from "react";
 
 import * as walletApi from "@ledgerhq/live-common/wallet-api/converters";
 import { getAccountCurrency } from "@ledgerhq/ledger-wallet-framework/account/helpers";
-import { walletSelector } from "~/reducers/wallet";
+import { walletSelector, toLiveWalletState } from "~/reducers/wallet";
 import { isTokenCurrency } from "@ledgerhq/live-common/currencies/helpers";
 
 import { DefaultAccountSwapParamList } from "../../types";
@@ -50,7 +50,7 @@ export const useTranslateToSwapAccount = (
 
     if (defaultAccount) {
       newParams.toAccountId = walletApi.accountToWalletAPIAccount(
-        walletState,
+        toLiveWalletState(walletState),
         defaultAccount,
         params?.defaultParentAccount,
       ).id;

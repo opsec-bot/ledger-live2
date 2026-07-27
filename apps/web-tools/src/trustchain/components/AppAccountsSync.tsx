@@ -3,7 +3,7 @@ import { Observable, concat, defer, find, from, ignoreElements, mergeMap, tap } 
 import { Button } from "@ledgerhq/lumen-ui-react";
 import { MemberCredentials, Trustchain } from "@ledgerhq/ledger-key-ring-protocol/types";
 import { useTrustchainSDK } from "../context";
-import { CloudSyncSDK } from "@ledgerhq/live-wallet/cloudsync/index";
+import { CloudSyncSDK } from "@shared/cloud-sync";
 import {
   WalletState,
   handlers as walletHandlers,
@@ -11,17 +11,26 @@ import {
   setAccountName as setAccountNameAction,
   WSState,
   setAccountNames,
-  walletSyncUpdate,
   walletSyncStateSelector,
 } from "@ledgerhq/live-wallet/store";
-import walletsync, {
-  liveSlug,
-  DistantState,
-  walletSyncWatchLoop,
+import { liveSlug } from "./walletSync";
+import liveWalletAccountsModule, {
+  bindCtx as bindLiveWalletAccountsCtx,
+  type NonImportedAccountInfo,
+} from "@ledgerhq/live-wallet/walletsync/modules/accounts";
+import { createAggregator } from "@shared/wallet-sync";
+import {
+  createWalletSyncWatchLoop,
   makeSaveNewUpdate,
-  LocalState,
   makeLocalIncrementalUpdate,
-} from "@ledgerhq/live-wallet/walletsync/index";
+} from "@features/platform-wallet-sync";
+import {
+  recentAddressesSyncModule,
+  type RecentAddressesState,
+} from "@domain/entity-recent-addresses";
+import { accountNamesSyncModule } from "@domain/entity-account-name";
+import { TrustchainOutdated, TrustchainEjected } from "@ledgerhq/ledger-key-ring-protocol/errors";
+import { WalletSyncOutdated } from "@shared/cloud-sync";
 import { getAccountBridge, getCurrencyBridge } from "@ledgerhq/live-common/bridge/index";
 import { getAccountCurrency } from "@ledgerhq/ledger-wallet-framework/account/helpers";
 import { Account, BridgeCacheSystem, ScanAccountEvent } from "@ledgerhq/types-live";
@@ -99,8 +108,26 @@ export default function AppAccountsSync({
     [bridgeCache],
   );
 
+  const accountsSyncModule = useMemo(() => bindLiveWalletAccountsCtx(ctx), [ctx]);
+
+  const walletsync = useMemo(
+    () =>
+      createAggregator({
+        accounts: accountsSyncModule,
+        accountNames: accountNamesSyncModule,
+        recentAddresses: recentAddressesSyncModule,
+      }),
+    [accountsSyncModule],
+  );
+
+  type AggLocalState = {
+    accounts: { list: Account[]; nonImportedAccountInfos: NonImportedAccountInfo[] };
+    accountNames: Map<string, string>;
+    recentAddresses: RecentAddressesState;
+  };
+
   const saveUpdate = useCallback(
-    async (data: DistantState | null, version: number, newLocalState: LocalState | null) => {
+    async (data: unknown, version: number, newLocalState: AggLocalState | null) => {
       setState(s => {
         let walletState = s.walletState;
         if (newLocalState) {
@@ -109,10 +136,9 @@ export default function AppAccountsSync({
             setAccountNames(newLocalState.accountNames),
           );
         }
-        walletState = walletHandlers.WALLET_SYNC_UPDATE(
-          walletState,
-          walletSyncUpdate(data, version),
-        );
+        walletState = walletHandlers.WALLET_SYNC_UPDATE(walletState, {
+          payload: { data: data as WSState["data"], version },
+        });
         if (newLocalState) {
           return {
             accounts: newLocalState.accounts.list,
@@ -132,14 +158,14 @@ export default function AppAccountsSync({
   const saveNewUpdate = useMemo(
     () =>
       makeSaveNewUpdate({
-        ctx,
+        walletsync,
         getState,
         latestDistantStateSelector,
         latestDistantVersionSelector,
         localStateSelector,
         saveUpdate,
       }),
-    [ctx, getState, saveUpdate],
+    [walletsync, getState, saveUpdate],
   );
 
   const onTrustchainRefreshNeeded = useCallback(
@@ -166,7 +192,7 @@ export default function AppAccountsSync({
         getCurrentVersion,
         saveNewUpdate,
       }),
-    [trustchainSdk, getCurrentVersion, saveNewUpdate],
+    [walletsync, trustchainSdk, getCurrentVersion, saveNewUpdate],
   );
 
   const [visualPending, setVisualPending] = useState(true);
@@ -178,14 +204,15 @@ export default function AppAccountsSync({
 
   useEffect(() => {
     const localIncrementUpdate = makeLocalIncrementalUpdate({
-      ctx,
+      walletsync,
       getState,
       latestWalletStateSelector,
       localStateSelector,
       saveUpdate,
     });
 
-    const { unsubscribe, onUserRefreshIntent } = walletSyncWatchLoop({
+    const { unsubscribe, onUserRefreshIntent } = createWalletSyncWatchLoop({
+      walletsync,
       watchConfig,
       walletSyncSdk,
       localIncrementUpdate,
@@ -196,6 +223,10 @@ export default function AppAccountsSync({
       localStateSelector,
       latestDistantStateSelector,
       onTrustchainRefreshNeeded,
+      isTrustchainRefreshError: e =>
+        e instanceof TrustchainEjected ||
+        e instanceof TrustchainOutdated ||
+        e instanceof WalletSyncOutdated,
       onError: e => setError(e && e instanceof Error ? e : new Error(String(e))),
       onStartPolling: () => {
         setError(null);
@@ -206,14 +237,13 @@ export default function AppAccountsSync({
 
     return unsubscribe;
   }, [
-    trustchainSdk,
+    walletsync,
     walletSyncSdk,
     trustchain,
     memberCredentials,
     onTrustchainRefreshNeeded,
     getState,
     saveUpdate,
-    ctx,
     watchConfig,
   ]);
 

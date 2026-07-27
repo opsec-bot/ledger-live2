@@ -21,8 +21,35 @@
  * an exponential backoff strategy to avoid excessive retry attempts.
  */
 import { Account, AccountBridge, BridgeCacheSystem, TransactionCommon } from "@ledgerhq/types-live";
-import { WalletSyncDataManager, WalletSyncDataManagerResolutionContext } from "../types";
-import { z } from "zod";
+import type {
+  WalletSyncDataManager as CtxFreeWalletSyncDataManager,
+  UpdateDiff,
+  DistantDiff,
+} from "@shared/wallet-sync";
+import { z, ZodType } from "zod";
+
+export type WalletSyncDataManagerResolutionContext = {
+  getAccountBridge: <T extends TransactionCommon>(
+    account: Account,
+  ) => AccountBridge<T> | Promise<AccountBridge<T>>;
+  bridgeCache: BridgeCacheSystem;
+  blacklistedTokenIds?: string[];
+};
+
+interface WalletSyncDataManager<LocalState, Update, Schema extends ZodType> {
+  schema: Schema;
+  diffLocalToDistant: (
+    localData: LocalState,
+    latestState: z.infer<Schema> | null,
+  ) => DistantDiff<z.infer<Schema>>;
+  resolveIncrementalUpdate: (
+    ctx: WalletSyncDataManagerResolutionContext,
+    localData: LocalState,
+    latestState: z.infer<Schema> | null,
+    incomingState: z.infer<Schema> | null,
+  ) => Promise<UpdateDiff<Update>>;
+  applyUpdate: (localData: LocalState, update: Update) => LocalState;
+}
 import { accountDataToAccount } from "../../liveqr/cross";
 import { Observable, firstValueFrom, reduce } from "rxjs";
 import { promiseAllBatched } from "@ledgerhq/live-promise";
@@ -342,6 +369,23 @@ export function shouldRetryImportAccount(elapsedMs: number, attempts: number) {
   // Clamp the wait time to the maximum value
   waitTime = Math.min(waitTime, maxWaitTime);
   return elapsedMs > waitTime;
+}
+
+export function bindCtx(
+  ctx: WalletSyncDataManagerResolutionContext,
+): CtxFreeWalletSyncDataManager<
+  { list: Account[]; nonImportedAccountInfos: NonImportedAccountInfo[] },
+  { removed: string[]; added: Account[]; nonImportedAccountInfos: NonImportedAccountInfo[] },
+  typeof schema
+> {
+  return {
+    schema: manager.schema,
+    diffLocalToDistant: (localData, latestState) =>
+      manager.diffLocalToDistant(localData, latestState),
+    applyUpdate: (localData, update) => manager.applyUpdate(localData, update),
+    resolveIncrementalUpdate: (localData, latestState, incomingState) =>
+      manager.resolveIncrementalUpdate(ctx, localData, latestState, incomingState),
+  };
 }
 
 export default manager;

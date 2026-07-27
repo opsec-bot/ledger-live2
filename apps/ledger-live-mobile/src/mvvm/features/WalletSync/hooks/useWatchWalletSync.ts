@@ -1,16 +1,17 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useStore, useSelector, useDispatch } from "~/context/hooks";
 import noop from "lodash/noop";
-import { CloudSyncSDK } from "@ledgerhq/live-wallet/cloudsync/index";
-import walletsync, {
+import { CloudSyncSDK, WalletSyncOutdated } from "@shared/cloud-sync";
+import { createAggregator } from "@shared/wallet-sync";
+import {
+  createWalletSyncWatchLoop,
   liveSlug,
-  DistantState,
-  walletSyncWatchLoop,
-  LocalState,
-  Schema,
   makeSaveNewUpdate,
   makeLocalIncrementalUpdate,
-} from "@ledgerhq/live-wallet/walletsync/index";
+} from "@features/platform-wallet-sync";
+import { accountNamesSyncModule, setAccountNames } from "@domain/entity-account-name";
+import { recentAddressesSyncModule, updateRecentAddresses } from "@domain/entity-recent-addresses";
+import { bindCtx as bindLiveWalletAccountsCtx } from "@ledgerhq/live-wallet/walletsync/modules/accounts";
 import { getAccountBridge } from "@ledgerhq/live-common/bridge/index";
 import {
   memberCredentialsSelector,
@@ -18,13 +19,10 @@ import {
   trustchainSelector,
 } from "@ledgerhq/ledger-key-ring-protocol/store";
 import {
-  setAccountNames,
   setNonImportedAccounts,
-  updateRecentAddresses,
   walletSyncStateSelector,
   walletSyncUpdate,
-  WSState,
-} from "@ledgerhq/live-wallet/store";
+} from "@domain/entity-wallet-sync";
 import { useTrustchainSdk } from "./useTrustchainSdk";
 import { useOnTrustchainRefreshNeeded } from "./useOnTrustchainRefreshNeeded";
 import { Dispatch } from "redux";
@@ -38,15 +36,41 @@ import { bridgeCache } from "~/bridge/cache";
 import { replaceAccounts } from "~/actions/accounts";
 import { useFeature } from "@features/platform-feature-flags";
 import getWalletSyncEnvironmentParams from "@ledgerhq/live-common/walletSync/getEnvironmentParams";
+import { TrustchainEjected, TrustchainOutdated } from "@ledgerhq/ledger-key-ring-protocol/errors";
 
-const latestWalletStateSelector = (s: State): WSState => walletSyncStateSelector(walletSelector(s));
+// TODO: pass blacklistedTokenIdsSelector value here to respect the user's token blacklist
+const accountsSyncModule = bindLiveWalletAccountsCtx({
+  getAccountBridge,
+  bridgeCache,
+  blacklistedTokenIds: [],
+});
 
-function localStateSelector(state: State): LocalState {
-  // READ. connect the redux state to the walletsync modules
+const walletsync = createAggregator({
+  accounts: accountsSyncModule,
+  accountNames: accountNamesSyncModule,
+  recentAddresses: recentAddressesSyncModule,
+});
+
+type Schema = typeof walletsync.schema;
+type DistantState = Schema["_output"];
+type LocalState = ReturnType<typeof walletsync.applyUpdate>;
+
+function parseDistantState(raw: unknown): DistantState | null {
+  const result = walletsync.schema.safeParse(raw);
+  // Return raw (not result.data) to preserve unknown keys for forward compat
+  return result.success ? (raw as DistantState) : null;
+}
+
+const latestWalletStateSelector = (s: State): { data: DistantState | null; version: number } => {
+  const ws = walletSyncStateSelector(walletSelector(s).walletSync);
+  return { data: parseDistantState(ws.data), version: ws.version };
+};
+
+function localStateSelector(state: State) {
   return {
     accounts: {
       list: state.accounts.active,
-      nonImportedAccountInfos: state.wallet.nonImportedAccountInfos,
+      nonImportedAccountInfos: state.wallet.walletSync.nonImportedAccountInfos,
     },
     accountNames: state.wallet.accountNames,
     recentAddresses: state.wallet.recentAddresses,
@@ -59,8 +83,7 @@ async function save(
   newLocalState: LocalState | null,
   dispatch: Dispatch,
 ) {
-  // WRITE. save the state for the walletsync modules
-  dispatch(walletSyncUpdate(data, version));
+  dispatch(walletSyncUpdate({ data, version }));
   if (newLocalState) {
     dispatch(setNonImportedAccounts(newLocalState.accounts.nonImportedAccountInfos));
     dispatch(setAccountNames(newLocalState.accountNames));
@@ -68,8 +91,6 @@ async function save(
     dispatch(replaceAccounts(newLocalState.accounts.list)); // IMPORTANT: keep this one last, it's doing the DB:* trigger to save the data
   }
 }
-
-const ctx = { getAccountBridge, bridgeCache, blacklistedTokenIds: [] };
 
 export function useCloudSyncSDK(): CloudSyncSDK<Schema> {
   const featureWalletSync = useFeature("llmWalletSync");
@@ -87,9 +108,9 @@ export function useCloudSyncSDK(): CloudSyncSDK<Schema> {
   const saveNewUpdate = useMemo(
     () =>
       makeSaveNewUpdate({
-        ctx,
+        walletsync,
         getState,
-        latestDistantStateSelector,
+        latestDistantStateSelector: s => parseDistantState(latestDistantStateSelector(s)),
         latestDistantVersionSelector,
         localStateSelector,
         saveUpdate,
@@ -140,7 +161,7 @@ export function useWatchWalletSync(): WalletSyncUserState {
 
   const resetLedgerSync = useCallback(() => {
     dispatch(resetTrustchainStore());
-    dispatch(walletSyncUpdate(null, 0));
+    dispatch(walletSyncUpdate({ data: null, version: 0 }));
   }, [dispatch]);
 
   useEffect(() => {
@@ -162,14 +183,15 @@ export function useWatchWalletSync(): WalletSyncUserState {
     }
 
     const localIncrementUpdate = makeLocalIncrementalUpdate({
-      ctx,
+      walletsync,
       getState,
       latestWalletStateSelector,
       localStateSelector,
       saveUpdate,
     });
 
-    const { unsubscribe, onUserRefreshIntent } = walletSyncWatchLoop({
+    const { unsubscribe, onUserRefreshIntent } = createWalletSyncWatchLoop({
+      walletsync,
       walletSyncSdk,
       watchConfig: featureWalletSync?.params?.watchConfig,
       localIncrementUpdate,
@@ -178,10 +200,14 @@ export function useWatchWalletSync(): WalletSyncUserState {
       setVisualPending,
       getState,
       localStateSelector,
-      latestDistantStateSelector,
+      latestDistantStateSelector: s => parseDistantState(latestDistantStateSelector(s)),
       onError: e => setWalletSyncError(e && e instanceof Error ? e : new Error(String(e))),
       onStartPolling: () => setWalletSyncError(null),
       onTrustchainRefreshNeeded,
+      isTrustchainRefreshError: (e: unknown) =>
+        e instanceof WalletSyncOutdated ||
+        e instanceof TrustchainEjected ||
+        e instanceof TrustchainOutdated,
     });
 
     onUserRefreshRef.current = onUserRefreshIntent;

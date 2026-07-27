@@ -23,8 +23,7 @@ import { SetCurrentAccountHistDb, safeGetRefValue } from "@ledgerhq/live-common/
 import Wallet from "~/renderer/icons/Wallet";
 import { getDefaultAccountName } from "@ledgerhq/live-wallet/accountName";
 import CryptoCurrencyIcon from "../CryptoCurrencyIcon";
-import { walletSelector } from "~/renderer/reducers/wallet";
-import { accountNameSelector } from "@ledgerhq/live-wallet/store";
+import { walletSelector, accountNameSelector } from "~/renderer/reducers/wallet";
 import { Icons } from "@ledgerhq/react-ui/assets/index";
 import Switch from "~/renderer/components/Switch";
 import { MobileView } from "~/renderer/hooks/useMobileView";

@@ -23,7 +23,7 @@ import { ScreenName } from "~/const";
 import { flattenAccountsSelector } from "~/reducers/accounts";
 import { useInternalAppIds } from "@ledgerhq/live-common/hooks/useInternalAppIds";
 import { INTERNAL_APP_IDS, WALLET_API_VERSION } from "@ledgerhq/live-common/wallet-api/constants";
-import { walletSelector } from "~/reducers/wallet";
+import { walletSelector, toLiveWalletState } from "~/reducers/wallet";
 import useEnv from "@features/platform-env";
 import { counterValueCurrencySelector, discreetModeSelector } from "~/reducers/settings";
 import { useSettings } from "~/hooks";
@@ -79,7 +79,11 @@ export function PtxScreen({ route, config }: Props) {
         const parentAccount = isTokenAccount(account)
           ? getParentAccount(account, flattenedAccounts)
           : undefined;
-        params.account = accountToWalletAPIAccount(walletState, account, parentAccount).id;
+        params.account = accountToWalletAPIAccount(
+          toLiveWalletState(walletState),
+          account,
+          parentAccount,
+        ).id;
       }
     }
 

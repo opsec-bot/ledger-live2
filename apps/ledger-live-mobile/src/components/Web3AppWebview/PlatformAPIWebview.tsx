@@ -50,7 +50,7 @@ import { WebviewAPI, WebviewProps } from "./types";
 import { useWebviewState } from "./helpers";
 import { NetworkError } from "./NetworkError";
 import { currentRouteNameRef } from "~/analytics/screenRefs";
-import { walletSelector } from "~/reducers/wallet";
+import { walletSelector, toLiveWalletState } from "~/reducers/wallet";
 import { WebViewOpenWindowEvent } from "react-native-webview/lib/WebViewTypes";
 import { useModularDrawerController } from "LLM/features/ModularDrawer";
 import { listSupportedCurrencies } from "@ledgerhq/live-common/currencies/index";
@@ -102,6 +102,7 @@ export const PlatformAPIWebview = forwardRef<WebviewAPI, WebviewProps>(
       );
 
     const walletState = useSelector(walletSelector);
+    const walletStateForAPI = useMemo(() => toLiveWalletState(walletState), [walletState]);
 
     const accounts = useSelector(flattenAccountsSelector);
     const navigation =
@@ -109,7 +110,7 @@ export const PlatformAPIWebview = forwardRef<WebviewAPI, WebviewProps>(
         RootNavigationComposite<StackNavigatorNavigation<BaseNavigatorStackParamList>>
       >();
     const [device, setDevice] = useState<Device>();
-    const listAccounts = useListPlatformAccounts(walletState, accounts);
+    const listAccounts = useListPlatformAccounts(walletStateForAPI, accounts);
     const { deactivatedCurrencyIds } = useFeatureFlaggedCurrencies(!!useEnv("MOCK"));
     const deactivatedCurrencyIdsSet = useMemo(
       () => new Set(deactivatedCurrencyIds),
@@ -156,7 +157,7 @@ export const PlatformAPIWebview = forwardRef<WebviewAPI, WebviewProps>(
             tracking.platformRequestAccountSuccess(manifest);
             resolve(
               serializePlatformAccount(
-                accountToPlatformAccount(walletState, account, parentAccount),
+                accountToPlatformAccount(walletStateForAPI, account, parentAccount),
               ),
             );
           };
@@ -173,13 +174,13 @@ export const PlatformAPIWebview = forwardRef<WebviewAPI, WebviewProps>(
                 : (currentRouteNameRef.current ?? "Unknown"),
           });
         }),
-      [tracking, manifest, deactivatedCurrencyIds, walletState, openModularDrawer],
+      [tracking, manifest, deactivatedCurrencyIds, walletStateForAPI, openModularDrawer],
     );
 
     const receiveOnAccount = useCallback(
       ({ accountId }: { accountId: string }) =>
         receiveOnAccountLogic(
-          walletState,
+          walletStateForAPI,
           { manifest, accounts, tracking },
           accountId,
           (account, parentAccount, accountAddress) =>
@@ -203,7 +204,7 @@ export const PlatformAPIWebview = forwardRef<WebviewAPI, WebviewProps>(
               });
             }),
         ),
-      [walletState, manifest, accounts, navigation, tracking],
+      [walletStateForAPI, manifest, accounts, navigation, tracking],
     );
 
     const signTransaction = useCallback(

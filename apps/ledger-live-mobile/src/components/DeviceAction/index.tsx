@@ -22,7 +22,7 @@ import { useTrackSendFlow } from "~/analytics/hooks/useTrackSendFlow";
 import { useTrackSwapFlow } from "~/analytics/hooks/useTrackSwapFlow";
 import { HOOKS_TRACKING_LOCATIONS } from "~/analytics/hooks/variables";
 import { settingsStoreSelector } from "~/reducers/settings";
-import { walletSelector } from "~/reducers/wallet";
+import { walletSelector, WalletState } from "~/reducers/wallet";
 import { LedgerError } from "~/types/error";
 import { PartialNullable } from "~/types/helpers";
 import SkipLock from "../behaviour/SkipLock";
@@ -56,7 +56,6 @@ import {
 } from "./rendering";
 import { useStuckDeviceActionHint } from "../StuckDeviceActionHint/useStuckDeviceActionHint";
 import { ThorSwapIncompatibility } from "./ThorSwapIncompatibility";
-import { WalletState } from "@ledgerhq/live-wallet/store";
 import { DeviceId, identitiesSlice } from "@domain/entity-client-identity";
 import { SettingsState } from "~/reducers/types";
 import { Theme } from "~/colors";

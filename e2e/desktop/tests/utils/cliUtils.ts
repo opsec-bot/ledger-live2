@@ -1,9 +1,19 @@
 import { getSdk } from "@ledgerhq/ledger-key-ring-protocol";
 import { withDevice } from "@ledgerhq/live-common/hw/deviceAccess";
-import { CloudSyncSDK, type UpdateEvent } from "@ledgerhq/live-wallet/cloudsync/sdk";
-import { DistantState as LiveData, liveSlug } from "@ledgerhq/live-wallet/walletsync/index";
-import walletsync from "@ledgerhq/live-wallet/walletsync/root";
+import { z } from "zod";
+import { CloudSyncSDK, type UpdateEvent } from "@shared/cloud-sync";
+import { liveSlug } from "@features/platform-wallet-sync";
+import { accountNamesSyncModule } from "@domain/entity-account-name";
+import { recentAddressesSyncModule } from "@domain/entity-recent-addresses";
+import accountsSyncModule from "@ledgerhq/live-wallet/walletsync/modules/accounts";
 import { getEnv } from "@shared/env";
+
+const walletSyncSchema = z.object({
+  accounts: z.optional(accountsSyncModule.schema),
+  accountNames: z.optional(accountNamesSyncModule.schema),
+  recentAddresses: z.optional(recentAddressesSyncModule.schema),
+});
+type LiveData = z.infer<typeof walletSyncSchema>;
 import {
   DeviceManagementKitTransportSpeculos,
   SpeculosHttpTransportOpts,
@@ -110,7 +120,7 @@ export const CLI = {
     const cloudSyncSDK = new CloudSyncSDK({
       apiBaseUrl: cloudSyncApiBaseUrl,
       slug: liveSlug,
-      schema: walletsync.schema,
+      schema: walletSyncSchema,
       trustchainSdk: ledgerKeyRingProtocolSDK,
       getCurrentVersion: () => version ?? 0,
       saveNewUpdate: async (event: UpdateEvent<LiveData>) => {

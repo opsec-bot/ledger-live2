@@ -13,8 +13,9 @@ import {
 import { getDefaultAccountName, getDefaultAccountNameForCurrencyIndex } from "./accountName";
 import { AddAccountsAction } from "./addAccounts";
 import { getCryptoCurrencyById } from "@domain/entity-currency-crypto";
-import { DistantState } from "./walletsync";
 import { NonImportedAccountInfo } from "./walletsync/modules/accounts";
+
+type DistantState = Record<string, unknown>;
 
 export type WSState = {
   data: DistantState | null;

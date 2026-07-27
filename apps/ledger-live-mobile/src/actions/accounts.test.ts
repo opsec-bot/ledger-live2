@@ -1,4 +1,5 @@
 import type { Account, AccountRaw, AccountUserData, DerivationMode } from "@ledgerhq/types-live";
+import type { UnknownAction } from "redux";
 import { getCryptoCurrencyById } from "@ledgerhq/live-common/currencies/index";
 import accountModel from "../logic/accountModel";
 import { importStore } from "./accounts";
@@ -22,8 +23,28 @@ function fakeTuple(
     derivationMode: derivationMode as DerivationMode,
     name: `name-${id}`,
   } as unknown as Account;
-  const userData = { id, name: `custom-${id}` } as unknown as AccountUserData;
+  const userData = { id, name: `custom-${id}`, starredIds: [] } as unknown as AccountUserData;
   return [account, userData];
+}
+
+async function runImportStore(rawAccounts: { active: { data: AccountRaw }[] }) {
+  const dispatched: UnknownAction[] = [];
+  const dispatch = (action: UnknownAction) => {
+    dispatched.push(action);
+    return action;
+  };
+  const thunk = await importStore(rawAccounts);
+  thunk(dispatch as never);
+  return dispatched;
+}
+
+async function initAction(rawAccounts: { active: { data: AccountRaw }[] }) {
+  const dispatched = await runImportStore(rawAccounts);
+  const action = dispatched.find(a => a.type === "INIT_ACCOUNTS");
+  return action as unknown as {
+    type: string;
+    payload: { accounts: Account[]; accountsUserData: AccountUserData[] };
+  };
 }
 
 describe("importStore", () => {
@@ -37,7 +58,7 @@ describe("importStore", () => {
       .mockResolvedValueOnce(fakeTuple("eos-1", "eos")) // no coin-module loader → unsupported
       .mockResolvedValueOnce(fakeTuple("btc-2", "bitcoin"));
 
-    const action = await importStore({
+    const action = await initAction({
       active: [
         { data: { id: "btc-1" } as AccountRaw },
         { data: { id: "eos-1" } as AccountRaw },
@@ -58,7 +79,7 @@ describe("importStore", () => {
       .mockResolvedValueOnce(fakeTuple("btc-1", "bitcoin"))
       .mockResolvedValueOnce(fakeTuple("eth-1", "ethereum"));
 
-    const action = await importStore({
+    const action = await initAction({
       active: [{ data: { id: "btc-1" } as AccountRaw }, { data: { id: "eth-1" } as AccountRaw }],
     });
 
@@ -70,7 +91,7 @@ describe("importStore", () => {
       .mockResolvedValueOnce(fakeTuple("btc-segwit", "bitcoin", ""))
       .mockResolvedValueOnce(fakeTuple("btc-legacy", "bitcoin", "unsupported_derivation_mode"));
 
-    const action = await importStore({
+    const action = await initAction({
       active: [
         { data: { id: "btc-segwit" } as AccountRaw },
         { data: { id: "btc-legacy" } as AccountRaw },
@@ -78,5 +99,18 @@ describe("importStore", () => {
     });
 
     expect(action.payload.accounts.map((a: Account) => a.id)).toEqual(["btc-segwit"]);
+  });
+
+  it("also dispatches account name and starred initialization", async () => {
+    mockDecode.mockResolvedValueOnce(fakeTuple("btc-1", "bitcoin"));
+
+    const types = (await runImportStore({ active: [{ data: { id: "btc-1" } as AccountRaw }] })).map(
+      a => a.type,
+    );
+    expect(types).toEqual([
+      "INIT_ACCOUNTS",
+      "accountNames/initFromUserData",
+      "starredAccounts/initStarredFromIds",
+    ]);
   });
 });
