@@ -32,14 +32,13 @@ const getMainActions = (args: {
   const accountId = account.id;
   const { lockedBalance } = account.polkadotResources || {};
   // Election status and minimum-bond eligibility are validated on-demand in the
-  // transaction flow (getTransactionStatus) rather than from a preloaded store.
-  const electionOpen = false;
+  // transaction flow (getTransactionStatus), not at the button level.
   const hasBondedBalance = lockedBalance && lockedBalance.gt(0);
   const hasPendingBondOperation = hasPendingOperationType(account, "BOND");
-  const nominationEnabled = !electionOpen && isController(account);
+  const nominationEnabled = isController(account);
   const label = getStakeLabelLocaleBased();
 
-  const earnRewardsEnabled = !electionOpen && !hasBondedBalance && !hasPendingBondOperation;
+  const earnRewardsEnabled = !hasBondedBalance && !hasPendingBondOperation;
 
   if (hasExternalController(account) || hasExternalStash(account)) {
     return null;
@@ -92,20 +91,17 @@ const getSecondaryActions = (args: {
   const accountId = account.id;
   const { unlockedBalance, lockedBalance, nominations } = account.polkadotResources || {};
   // Election status and minimum-bond eligibility are validated on-demand in the
-  // transaction flow (getTransactionStatus) rather than from a preloaded store.
-  const electionOpen = false;
+  // transaction flow (getTransactionStatus), not at the button level.
   const hasUnlockedBalance = unlockedBalance && unlockedBalance.gt(0);
   const hasBondedBalance = lockedBalance && lockedBalance.gt(0);
   const hasPendingBondOperation = hasPendingOperationType(account, "BOND");
   const hasPendingWithdrawUnbondedOperation = hasPendingOperationType(account, "WITHDRAW_UNBONDED");
-  const nominationEnabled = !electionOpen && isController(account);
-  const chillEnabled = !electionOpen && nominations?.length;
+  const nominationEnabled = isController(account);
+  const chillEnabled = nominations?.length;
   const bondingEnabled =
-    !electionOpen &&
-    ((!hasBondedBalance && !hasPendingBondOperation) || (hasBondedBalance && canBond(account)));
-  const unbondingEnabled = !electionOpen && canUnbond(account);
-  const withdrawEnabled =
-    !electionOpen && hasUnlockedBalance && !hasPendingWithdrawUnbondedOperation;
+    (!hasBondedBalance && !hasPendingBondOperation) || (hasBondedBalance && canBond(account));
+  const unbondingEnabled = canUnbond(account);
+  const withdrawEnabled = hasUnlockedBalance && !hasPendingWithdrawUnbondedOperation;
 
   if (hasExternalController(account) || hasExternalStash(account)) {
     return null;
