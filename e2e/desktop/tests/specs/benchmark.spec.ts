@@ -1,3 +1,4 @@
+import { DEVICE_TAGS } from "tests/utils/tagsUtils";
 import { test, expect, Page } from "@playwright/test";
 import { step } from "tests/misc/reporters/step";
 
@@ -32,6 +33,7 @@ test.describe("Hard assert", () => {
   test(
     "should pass",
     {
+      tag: [...DEVICE_TAGS],
       annotation: {
         type: "TMS",
         description: "B2CQA-5532, B2CQA-5533",
@@ -46,6 +48,7 @@ test.describe("Hard assert", () => {
   test(
     "should hard fail and exit",
     {
+      tag: [...DEVICE_TAGS],
       annotation: {
         type: "TMS",
         description: "B2CQA-5532, B2CQA-5533",
@@ -62,6 +65,7 @@ test.describe("Mixed assert", () => {
   test(
     "should pass all expectations",
     {
+      tag: [...DEVICE_TAGS],
       annotation: {
         type: "TMS",
         description: "B2CQA-5532, B2CQA-5533",
@@ -76,6 +80,7 @@ test.describe("Mixed assert", () => {
   test(
     "should soft fail and continue",
     {
+      tag: [...DEVICE_TAGS],
       annotation: {
         type: "TMS",
         description: "B2CQA-5532, B2CQA-5533",
@@ -90,6 +95,7 @@ test.describe("Mixed assert", () => {
   test(
     "should hard fail and exit",
     {
+      tag: [...DEVICE_TAGS],
       annotation: {
         type: "TMS",
         description: "B2CQA-5532, B2CQA-5533",
@@ -104,6 +110,7 @@ test.describe("Mixed assert", () => {
   test(
     "should soft fail multiple times and continue",
     {
+      tag: [...DEVICE_TAGS],
       annotation: {
         type: "TMS",
         description: "B2CQA-5532, B2CQA-5533",
@@ -121,6 +128,7 @@ test.describe("Mixed assert", () => {
   test(
     "should soft fail multiple times and fail and exit eventually",
     {
+      tag: [...DEVICE_TAGS],
       annotation: {
         type: "TMS",
         description: "B2CQA-5532, B2CQA-5533",
