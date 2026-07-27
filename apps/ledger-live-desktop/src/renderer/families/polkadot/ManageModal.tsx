@@ -107,7 +107,7 @@ export type Props = {
 
 const ManageModal = ({ account, source, ...rest }: Props) => {
   const dispatch = useDispatch();
-  const { staking } = usePolkadotPreloadData();
+  const { staking } = usePolkadotPreloadData(account.currency);
   const { polkadotResources } = account;
   invariant(polkadotResources, "polkadot account expected");
   const { unlockedBalance, nominations } = polkadotResources;

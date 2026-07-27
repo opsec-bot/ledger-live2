@@ -65,7 +65,7 @@ export default function Nominations(props: Props) {
 
   const navigation = useNavigation();
 
-  const { staking, validators } = usePolkadotPreloadData();
+  const { staking, validators } = usePolkadotPreloadData(mainAccount.currency);
 
   const { polkadotResources } = mainAccount;
 

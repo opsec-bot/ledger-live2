@@ -71,7 +71,7 @@ const Nomination = ({ account }: { account: PolkadotAccount }) => {
   const locale = useSelector(localeSelector);
   const unit = useAccountUnit(account);
   const dispatch = useDispatch();
-  const { staking, validators } = usePolkadotPreloadData();
+  const { staking, validators } = usePolkadotPreloadData(account.currency);
   const { polkadotResources } = account;
   invariant(polkadotResources, "polkadot account expected");
   const { lockedBalance, unlockedBalance, nominations, unlockings } = polkadotResources;

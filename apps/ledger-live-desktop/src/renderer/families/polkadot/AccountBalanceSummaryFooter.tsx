@@ -65,7 +65,9 @@ type Props = {
 const AccountBalanceSummaryFooter = ({ account }: Props) => {
   const discreet = useDiscreetMode();
   const locale = useSelector(localeSelector);
-  const preloaded = usePolkadotPreloadData();
+  const preloaded = usePolkadotPreloadData(
+    account.type === "Account" ? account.currency : undefined,
+  );
   const unit = useAccountUnit(account);
   if (account.type !== "Account") return null;
   const { spendableBalance: _spendableBalance, polkadotResources } = account;

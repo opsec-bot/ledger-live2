@@ -105,7 +105,7 @@ export default function AccountBalanceFooter({ account }: Props) {
 function useInfo(account: PolkadotAccount): Record<InfoName, ModalInfo[]> {
   const { colors } = useTheme();
   const { t } = useTranslation();
-  const preloaded = usePolkadotPreloadData();
+  const preloaded = usePolkadotPreloadData(account.currency);
   const minimumBondBalance = new BigNumber(preloaded.minimumBondBalance);
   const unit = useAccountUnit(account);
   const minimumBondBalanceStr = formatCurrencyUnit(unit, minimumBondBalance, {

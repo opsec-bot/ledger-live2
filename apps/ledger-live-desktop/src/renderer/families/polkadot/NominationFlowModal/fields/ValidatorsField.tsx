@@ -122,7 +122,7 @@ const ValidatorField = ({
     showCode: true,
     discreet: false,
   };
-  const preloaded = usePolkadotPreloadData();
+  const preloaded = usePolkadotPreloadData(account.currency);
   const { staking, validators: polkadotValidators } = preloaded;
   const maxNominatorRewardedPerValidator = staking?.maxNominatorRewardedPerValidator ?? 0;
 

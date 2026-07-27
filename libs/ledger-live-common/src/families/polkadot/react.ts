@@ -1,4 +1,6 @@
 import { useState, useEffect, useMemo, useRef } from "react";
+import { getCryptoCurrencyById } from "@domain/entity-currency-crypto";
+import type { CryptoCurrency } from "@ledgerhq/types-cryptoassets";
 import type {
   PolkadotValidator,
   PolkadotNomination,
@@ -8,20 +10,54 @@ import type {
 import {
   getCurrentPolkadotPreloadData,
   getPolkadotPreloadDataUpdates,
+  setPolkadotPreloadData,
 } from "@ledgerhq/coin-polkadot/bridge/state";
+import polkadotAPI from "@ledgerhq/coin-polkadot/network";
 import useMemoOnce from "../../hooks/useMemoOnce";
 import { useBridgeSync } from "../../bridge/react";
 
 const SYNC_REFRESH_RATE = 6000; // 6s - block time
 
-export function usePolkadotPreloadData() {
+/**
+ * Fetches Polkadot staking data (validators, staking progress, minimum bond
+ * balance) on demand and caches it in the module-level store so the synchronous
+ * consumers (canNominate, isElectionOpen, hasMinimumBondBalance) can read it.
+ * Replaces the deprecated CurrencyBridge.preload/hydrate mechanism.
+ */
+export function usePolkadotPreloadData(currency?: CryptoCurrency) {
   const [state, setState] = useState(getCurrentPolkadotPreloadData);
+
   useEffect(() => {
-    const sub = getPolkadotPreloadDataUpdates().subscribe(data => {
-      setState(data);
-    });
+    const sub = getPolkadotPreloadDataUpdates().subscribe(setState);
     return () => sub.unsubscribe();
   }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    const cur = currency ?? getCryptoCurrencyById("polkadot");
+    (async () => {
+      const [staking, minimumBondBalance, validators] = await Promise.all([
+        polkadotAPI.getStakingProgress(cur).catch(() => undefined),
+        polkadotAPI.getMinimumBondBalance(cur).catch(() => undefined),
+        polkadotAPI.getValidators("all", cur).catch(() => undefined),
+      ]);
+      if (cancelled) return;
+      // Preserve previously loaded data when a fetch fails (e.g. offline or in
+      // mock mode) instead of clobbering it with empty values.
+      const previous = getCurrentPolkadotPreloadData();
+      setPolkadotPreloadData({
+        validators: validators ?? previous.validators,
+        staking: staking ?? previous.staking,
+        minimumBondBalance: minimumBondBalance
+          ? minimumBondBalance.toString()
+          : previous.minimumBondBalance,
+      });
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [currency]);
+
   return state;
 }
 export const searchFilter: PolkadotSearchFilter = query => validator => {

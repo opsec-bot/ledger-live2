@@ -24,7 +24,7 @@ type FieldProps = {
 };
 
 function PolkadotValidatorsField({ account, transaction, field }: FieldProps) {
-  const { validators: polkadotValidators } = usePolkadotPreloadData();
+  const { validators: polkadotValidators } = usePolkadotPreloadData(account.currency);
   const validators = transaction.validators;
   const mappedValidators = useMemo(
     () =>

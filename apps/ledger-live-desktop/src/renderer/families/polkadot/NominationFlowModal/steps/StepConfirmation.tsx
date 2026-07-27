@@ -27,13 +27,14 @@ const Container = styled(Box).attrs(() => ({
 `;
 function StepConfirmation({
   t,
+  account,
   optimisticOperation,
   error,
   signed,
   transaction,
   source,
 }: StepProps) {
-  const preloaded = usePolkadotPreloadData();
+  const preloaded = usePolkadotPreloadData(account.currency);
   const { validators: allValidators } = preloaded;
 
   const validators = useMemo(() => {

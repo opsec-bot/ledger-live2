@@ -67,7 +67,7 @@ export const OperationDetailsValidators = ({
   isTransactionField,
 }: OperationDetailsValidatorsProps) => {
   const { currency } = account;
-  const { validators: polkadotValidators } = usePolkadotPreloadData();
+  const { validators: polkadotValidators } = usePolkadotPreloadData(currency);
   const mappedValidators = useMemo(
     () =>
       (validators || [])
@@ -113,7 +113,7 @@ export const OperationDetailsRewardFrom = ({
   account,
 }: OperationDetailsRewardFromProps) => {
   const { currency } = account;
-  const { validators: polkadotValidators } = usePolkadotPreloadData();
+  const { validators: polkadotValidators } = usePolkadotPreloadData(currency);
   const validator = useMemo(
     () => polkadotValidators.find(v => v.address === validatorStash),
     [validatorStash, polkadotValidators],

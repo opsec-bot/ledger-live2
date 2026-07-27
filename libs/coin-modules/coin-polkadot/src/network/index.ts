@@ -56,6 +56,17 @@ const getMinimumBondBalance = makeLRUCache(
   (currency: CryptoCurrency | undefined) => currency?.id || "polkadot",
   hours(1, 1),
 );
+const getStakingProgress = makeLRUCache(
+  (currency: CryptoCurrency) => sidecarGetStakingProgress(currency),
+  (currency: CryptoCurrency) => currency.id,
+  minutes(1),
+);
+const getValidators = makeLRUCache(
+  (stashes: Parameters<typeof sidecarGetValidators>[0], currency: CryptoCurrency | undefined) =>
+    sidecarGetValidators(stashes, currency),
+  (stashes, currency) => `${currency?.id || "polkadot"}_${String(stashes)}`,
+  minutes(5),
+);
 const getRegistry = makeLRUCache(
   (currency: CryptoCurrency | undefined) => sidecarGetRegistry(currency),
   (currency: CryptoCurrency | undefined) => currency?.id || "polkadot",
@@ -130,8 +141,8 @@ export default {
   getLastBlock,
   getMinimumBondBalance,
   getRegistry,
-  getStakingProgress: sidecarGetStakingProgress,
-  getValidators: sidecarGetValidators,
+  getStakingProgress,
+  getValidators,
   getTransactionParams: async (
     currency?: CryptoCurrency,
     { force }: CacheOpts = { force: false },
