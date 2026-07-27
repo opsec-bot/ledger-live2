@@ -11,6 +11,7 @@ import {
   buildTransactionStartedEvent,
   buildTransactionSuccessEvent,
   classifyTransactionError,
+  deriveProductFlow,
   getTransactionType,
 } from "./logEvent";
 
@@ -51,6 +52,17 @@ describe("buildTransactionCommonEvent", () => {
       isTestnet: false,
       isSendMax: true,
     });
+  });
+
+  it("derives productFlow from a staking transactionType", () => {
+    const event = buildTransactionCommonEvent({
+      account: mainAccount,
+      mainAccount,
+      flow: TransactionFlow.Send,
+      transactionType: "DELEGATE",
+    });
+    expect(event.transactionType).toBe("DELEGATE");
+    expect(event.productFlow).toBe("stake");
   });
 
   it("adds tokenId for token accounts and omits empty optionals", () => {
@@ -181,6 +193,28 @@ describe("classifyTransactionError", () => {
   ])("maps %s", (_label, partial, expected) => {
     const error = Object.assign(new Error(), partial) as Error;
     expect(classifyTransactionError(error)).toBe(expected);
+  });
+});
+
+describe("deriveProductFlow", () => {
+  it.each([
+    ["delegate", "stake"],
+    ["DELEGATE", "stake"],
+    ["bond", "stake"],
+    ["freeze", "stake"],
+    ["undelegate", "unstake"],
+    ["unbond", "unstake"],
+    ["redelegate", "restake"],
+    ["claimReward", "claim"],
+    ["send", "send"],
+    ["OUT", "send"],
+  ])("maps %s -> %s", (input, expected) => {
+    expect(deriveProductFlow(input)).toBe(expected);
+  });
+
+  it("returns undefined for unrecognised or missing types", () => {
+    expect(deriveProductFlow("approve")).toBeUndefined();
+    expect(deriveProductFlow(undefined)).toBeUndefined();
   });
 });
 

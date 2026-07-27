@@ -61,6 +61,7 @@ export const ConnectEnvsToDatadog = () => {
         event.status === "failure"
           ? {
               flow: event.flow,
+              productFlow: event.productFlow,
               currencyId: event.currencyId,
               transactionType: event.transactionType,
               errorCategory: event.errorCategory,
@@ -68,6 +69,7 @@ export const ConnectEnvsToDatadog = () => {
             }
           : {
               flow: event.flow,
+              productFlow: event.productFlow,
               currencyId: event.currencyId,
               transactionType: event.transactionType,
               manifestId: event.manifestId,

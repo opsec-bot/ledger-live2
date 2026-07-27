@@ -67,9 +67,62 @@ type CommonLogEvent = {
   tokenId?: string;
   /** Family-specific transaction type/mode. Only populated when a rich transaction is available. */
   transactionType?: string;
+  /**
+   * Human product action derived from `transactionType` (stake / unstake / restake / claim / send).
+   * Distinct from `flow` (the technical origin/pathway). Undefined for unrecognised actions.
+   */
+  productFlow?: ProductFlow;
   isTestnet: boolean;
   isSendMax: boolean;
 };
+
+/** Human-facing product action, for funnel analytics. */
+export type ProductFlow = "stake" | "unstake" | "restake" | "claim" | "send";
+
+// Family verb allowlists (lower-cased). Grown from real `transactionType` values
+// (family `mode`, Solana `model.kind`, EVM selector, on-chain operation type).
+const STAKE_VERBS = new Set([
+  "delegate",
+  "bond",
+  "freeze",
+  "lock",
+  "stake",
+  "nominate",
+  "optin",
+  "supply",
+  "deposit",
+]);
+const UNSTAKE_VERBS = new Set([
+  "undelegate",
+  "unbond",
+  "unfreeze",
+  "unlock",
+  "unstake",
+  "redeem",
+  "withdraw",
+  "withdrawunbonded",
+]);
+const RESTAKE_VERBS = new Set(["redelegate", "rebond", "restake"]);
+const CLAIM_VERBS = new Set([
+  "claimreward",
+  "claimrewards",
+  "claimrewardcompound",
+  "claim",
+  "withdrawexpireunfreeze",
+]);
+const SEND_VERBS = new Set(["send", "transfer", "out"]);
+
+/** Map a family-specific `transactionType` to a small, stable product action. */
+export function deriveProductFlow(transactionType?: string): ProductFlow | undefined {
+  if (!transactionType) return undefined;
+  const t = transactionType.toLowerCase();
+  if (RESTAKE_VERBS.has(t)) return "restake";
+  if (STAKE_VERBS.has(t)) return "stake";
+  if (UNSTAKE_VERBS.has(t)) return "unstake";
+  if (CLAIM_VERBS.has(t)) return "claim";
+  if (SEND_VERBS.has(t)) return "send";
+  return undefined;
+}
 
 type FailureLogEvent = {
   status: "failure";
@@ -231,6 +284,7 @@ export function buildTransactionCommonEvent({
   transactionType,
   isSendMax = false,
 }: BuildTransactionCommonEventParams): CommonLogEvent {
+  const productFlow = deriveProductFlow(transactionType);
   return {
     appVersion: getEnv("LEDGER_CLIENT_VERSION"),
     flow,
@@ -241,6 +295,7 @@ export function buildTransactionCommonEvent({
     ...(manifestId ? { manifestId } : {}),
     ...(source ? { source } : {}),
     ...(transactionType ? { transactionType } : {}),
+    ...(productFlow ? { productFlow } : {}),
     ...(account.type === "TokenAccount" ? { tokenId: account.token.id } : {}),
   };
 }
