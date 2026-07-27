@@ -6,7 +6,6 @@ export {
   findCryptoCurrencyById,
   findCryptoCurrencyByScheme,
   findCryptoCurrencyByKeyword,
-  findCryptoCurrencyByTicker,
 } from "@domain/entity-currency-crypto";
 export {
   listFiatCurrencies,
