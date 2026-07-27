@@ -1,6 +1,15 @@
 import { Step } from "jest-allure2-reporter/api";
+import { Account } from "@ledgerhq/live-e2e-shared/enum/Account";
 
 export default class NewSendFlowPage {
+  @Step("Navigate to token send screen")
+  async navigateToTokenSendScreen(parentAccountName: string, tokenAccount: Account) {
+    await app.account.openViaDeeplink();
+    await app.account.goToAccountByName(parentAccountName);
+    await app.account.navigateToTokenInAccount(tokenAccount);
+    await app.account.tapSend();
+  }
+
   recipientInputId = "recipient-input";
   skipMemoLinkId = "new-send-flow-skip-memo-link";
   skipMemoConfirmId = "new-send-flow-skip-memo-confirm";

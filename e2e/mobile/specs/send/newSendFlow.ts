@@ -18,18 +18,18 @@ export function runNewSendFlowTokenTest(
     });
 
     it(`Send ${transaction.amount} ${transaction.accountToDebit.currency.ticker} from ${transaction.accountToDebit.accountName} to ${transaction.accountToCredit.accountName}`, async () => {
-      await app.send.navigateToTokenSendScreen(
+      await app.newSend.navigateToTokenSendScreen(
         transaction.accountToDebit.parentAccount!.accountName,
         transaction.accountToDebit,
       );
-      await app.send.setRecipientAndContinueNewFlow(
+      await app.newSend.setRecipientAndContinueNewFlow(
         transaction.accountToCredit.address,
         transaction.memoTag,
       );
-      await app.send.setAmountAndReviewNewFlow(transaction.amount);
-      await app.send.waitForSignature();
+      await app.newSend.setAmountAndReviewNewFlow(transaction.amount);
+      await app.newSend.waitForSignature();
       await app.speculos.signSendTransaction(transaction);
-      await app.send.waitForSuccessConfirmation();
+      await app.newSend.tapViewTransaction();
       await app.operationDetails.waitForOperationDetails();
       await app.operationDetails.checkAccount(transaction.accountToDebit.currency.name);
       await app.operationDetails.checkRecipientAddress(transaction.accountToCredit);
