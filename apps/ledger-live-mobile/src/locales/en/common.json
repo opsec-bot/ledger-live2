@@ -4505,6 +4505,28 @@
       "hideFullMessage": "Hide full message"
     }
   },
+  "walletApiSignMessage": {
+    "sign": {
+      "title": "Continue on your {{productName}}",
+      "description": "Follow the instructions displayed on your Secure Screen",
+      "cancelled": {
+        "title": "Operation rejected on device",
+        "close": "Close",
+        "retry": "Retry"
+      }
+    }
+  },
+  "walletApiSignTransaction": {
+    "sign": {
+      "title": "Continue on your {{productName}}",
+      "description": "Follow the instructions displayed on your Secure Screen",
+      "cancelled": {
+        "title": "Operation rejected on device",
+        "close": "Close",
+        "retry": "Retry"
+      }
+    }
+  },
   "sync": {
     "error": "Sync Error",
     "loading": "Sync"
@@ -10228,6 +10250,7 @@
     "title": "Contacts",
     "addContact": "Add contact",
     "addAddress": "Add address",
+    "addYourAddress": "Add your address",
     "searchPlaceholder": "Search contact",
     "searchNoResults": "No contact found",
     "addContactDrawer": {
@@ -10246,9 +10269,12 @@
       "addressCount_other": "{{count}} addresses"
     },
     "detail": {
+      "ledgerWalletAddresses": "Ledger Wallet addresses",
+      "myAddresses": "My addresses",
       "emptyState": {
         "title": "No address yet",
-        "meDescription": "Save a wallet address to receive crypto.",
+        "meTitle": "Save your own addresses",
+        "meDescription": "Save the external addresses you own on exchanges or other wallets. Next time you send to yourself, your Ledger device will show the name you chose.",
         "contactDescription": "Save a wallet address to send to {{name}}"
       }
     },
