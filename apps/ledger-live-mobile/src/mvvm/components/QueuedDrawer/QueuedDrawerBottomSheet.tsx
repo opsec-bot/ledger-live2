@@ -49,7 +49,6 @@ export type QueuedDrawerBottomSheetProps = {
   enableHandlePanningGesture?: boolean;
   /** Maximum dynamic content size. */
   maxDynamicContentSize?: BottomSheetProps["maxDynamicContentSize"];
-  backgroundComponent?: BottomSheetProps["backgroundComponent"];
   /** Test ID for end-to-end tests. */
   testID?: string;
   /** Content of the drawer. */
@@ -75,7 +74,6 @@ const QueuedDrawerBottomSheet = ({
   enableBlurKeyboardOnGesture,
   enableHandlePanningGesture,
   maxDynamicContentSize,
-  backgroundComponent: providedBackgroundComponent,
   testID,
 }: QueuedDrawerBottomSheetProps) => {
   const {
@@ -88,7 +86,7 @@ const QueuedDrawerBottomSheet = ({
     onBack: hookOnBack,
     enablePanDownToClose: computedEnablePanDownToClose,
     backgroundContextValue,
-    backgroundComponent: requestedBackgroundComponent,
+    backgroundComponent,
   } = useQueuedDrawerBottomSheet({
     isRequestingToBeOpened,
     isForcingToBeOpened,
@@ -118,7 +116,7 @@ const QueuedDrawerBottomSheet = ({
       onDismiss={handleDismiss}
       backdropPressBehavior={preventBackdropClick || areDrawersLocked ? "none" : "close"}
       onBackdropPress={handleBackdropPress}
-      backgroundComponent={providedBackgroundComponent ?? requestedBackgroundComponent}
+      backgroundComponent={backgroundComponent}
     >
       <BottomSheetBackgroundContext.Provider value={backgroundContextValue}>
         <IsInDrawerProvider>{children}</IsInDrawerProvider>
