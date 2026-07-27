@@ -16,12 +16,12 @@ class MyPage {
     await this.hardExpect(page).toHaveTitle("failmehard");
   }
 
-  @step("Soft expect pass")
+  @step("Passing soft expect")
   async softExpectPass({ page }: { page: Page }) {
     await this.softExpect(page).toHaveTitle("");
   }
 
-  @step("Soft expect fail")
+  @step("Failing soft expect")
   async softExpectFail({ page }: { page: Page }) {
     await this.softExpect(page).toHaveTitle("failmesoft");
   }
