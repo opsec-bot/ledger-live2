@@ -202,7 +202,6 @@ on:
 
 permissions:
   contents: read
-  id-token: write
 
 env:
   cache-bucket: ll-nx-cache
