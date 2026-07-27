@@ -20,6 +20,7 @@ import {
 } from "~/reducers/genericAwarenessModal";
 import { useGenericAwarenessModalLogic } from "./useGenericAwarenessModalLogic";
 import type { FeatureIntroViewModel } from "LLM/components/FeatureIntroLayout/types";
+import { useGenericAwarenessModalBrazeLogging } from "../hooks/useGenericAwarenessModalBrazeLogging";
 import {
   trackGenericAwarenessModalButtonClicked,
   trackGenericAwarenessModalCarouselStepViewed,
@@ -49,6 +50,7 @@ export type PromptViewModel = Readonly<{
 function useFeatureIntroViewModel(
   data: GenericAwarenessModalContentCard | undefined,
   isOpen: boolean,
+  logClick: () => void,
 ): FeatureIntroViewModel | undefined {
   const displayedFeatureIntroIdRef = useRef<string | undefined>(undefined);
 
@@ -76,7 +78,8 @@ function useFeatureIntroViewModel(
       ctaPosition: "primary",
       link: data.primaryButtonLink,
     });
-  }, [data]);
+    logClick();
+  }, [data, logClick]);
 
   const onSecondaryPress = useCallback(() => {
     if (data?.layout !== GenericAwarenessModalLayout.FeatureIntro) {
@@ -87,7 +90,8 @@ function useFeatureIntroViewModel(
       ctaPosition: "secondary",
       link: data.secondaryButtonLink,
     });
-  }, [data]);
+    logClick();
+  }, [data, logClick]);
 
   return useMemo(() => {
     if (data?.layout !== GenericAwarenessModalLayout.FeatureIntro) {
@@ -105,6 +109,7 @@ function useFeatureIntroViewModel(
 function useCarouselViewModel(
   data: GenericAwarenessModalContentCard | undefined,
   isOpen: boolean,
+  logClick: () => void,
 ): CarouselViewModel | undefined {
   const currentSlideIndexRef = useRef(0);
 
@@ -142,8 +147,9 @@ function useCarouselViewModel(
         ctaPosition: "primary",
         slideIndex,
       });
+      logClick();
     },
-    [data],
+    [data, logClick],
   );
 
   const onPrimaryPress = useCallback(
@@ -162,8 +168,9 @@ function useCarouselViewModel(
         slideIndex,
         link: slide.primaryButtonLink,
       });
+      logClick();
     },
-    [data],
+    [data, logClick],
   );
 
   const onMalformedUrl = useCallback(
@@ -203,6 +210,7 @@ function useCarouselViewModel(
 function usePromptViewModel(
   data: GenericAwarenessModalContentCard | undefined,
   isOpen: boolean,
+  logClick: () => void,
 ): PromptViewModel | undefined {
   const displayedPromptIdRef = useRef<string | undefined>(undefined);
 
@@ -229,7 +237,8 @@ function usePromptViewModel(
     trackGenericAwarenessModalButtonClicked(data, "Close", {
       ctaPosition: "primary",
     });
-  }, [data]);
+    logClick();
+  }, [data, logClick]);
 
   const onPrimaryPress = useCallback(() => {
     if (data?.layout !== GenericAwarenessModalLayout.Prompt) {
@@ -240,7 +249,8 @@ function usePromptViewModel(
       ctaPosition: "secondary",
       link: data.primaryButtonLink,
     });
-  }, [data]);
+    logClick();
+  }, [data, logClick]);
 
   const onMalformedUrl = useCallback(() => {
     if (data?.layout !== GenericAwarenessModalLayout.Prompt) {
@@ -289,11 +299,15 @@ export function useGenericAwarenessModalDrawerViewModel() {
     },
   );
 
-  const featureIntroViewModel = useFeatureIntroViewModel(data, isOpen);
-  const carouselViewModel = useCarouselViewModel(data, isOpen);
-  const promptViewModel = usePromptViewModel(data, isOpen);
+  const { logClick, logDismiss } = useGenericAwarenessModalBrazeLogging(data?.id, isOpen);
+
+  const featureIntroViewModel = useFeatureIntroViewModel(data, isOpen, logClick);
+  const carouselViewModel = useCarouselViewModel(data, isOpen, logClick);
+  const promptViewModel = usePromptViewModel(data, isOpen, logClick);
 
   const onClose = useCallback(() => {
+    logDismiss();
+
     if (data) {
       trackGenericAwarenessModalDismissed(data, carouselViewModel?.getCurrentSlideIndex());
     }
@@ -304,7 +318,7 @@ export function useGenericAwarenessModalDrawerViewModel() {
     }
 
     dispatch(closeGenericAwarenessModalDrawer());
-  }, [carouselViewModel, data, dispatch, shouldMarkAsRead]);
+  }, [carouselViewModel, data, dispatch, logDismiss, shouldMarkAsRead]);
 
   return {
     isOpen,

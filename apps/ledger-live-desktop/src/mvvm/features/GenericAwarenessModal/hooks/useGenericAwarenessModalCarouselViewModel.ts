@@ -22,6 +22,7 @@ import {
   trackCarouselStepNavigation,
   trackCarouselTourCompleted,
 } from "../analytics/carouselAnalytics";
+import { useGenericAwarenessModalBrazeLogging } from "./useGenericAwarenessModalBrazeLogging";
 export interface GenericAwarenessModalCarouselViewModel {
   slides: GenericAwarenessModalCarouselSlide[];
   onSlidePrimaryClick: (slide: GenericAwarenessModalCarouselSlide) => void;
@@ -39,6 +40,7 @@ const useGenericAwarenessModalCarouselViewModel = (
   const dispatch = useDispatch();
   const currentIndexRef = useRef(0);
   const hasTrackedOpenRef = useRef(false);
+  const { logClick, logDismiss } = useGenericAwarenessModalBrazeLogging(contentCard?.id, isOpen);
 
   const carousel: GenericAwarenessModalCarousel | undefined =
     contentCard?.layout === GenericAwarenessModalLayout.Carousel ? contentCard : undefined;
@@ -96,9 +98,10 @@ const useGenericAwarenessModalCarouselViewModel = (
       if (actionLink) {
         openURL(actionLink);
       }
+      logClick();
       closeDialog({ dismissAppStart: true });
     },
-    [closeDialog, getContext],
+    [closeDialog, getContext, logClick],
   );
 
   const onContinueClick = useCallback(
@@ -124,16 +127,18 @@ const useGenericAwarenessModalCarouselViewModel = (
     if (context) {
       trackCarouselCloseClick(context);
     }
+    logDismiss();
     closeDialog({ dismissAppStart: true });
-  }, [closeDialog, getContext]);
+  }, [closeDialog, getContext, logDismiss]);
 
   const onDismiss = useCallback(() => {
     const context = getContext(currentIndexRef.current);
     if (context) {
       trackCarouselDismissed(context);
     }
+    logDismiss();
     closeDialog({ dismissAppStart: true });
-  }, [closeDialog, getContext]);
+  }, [closeDialog, getContext, logDismiss]);
 
   const onCompleteClose = useCallback(() => {
     closeDialog({ dismissAppStart: true });

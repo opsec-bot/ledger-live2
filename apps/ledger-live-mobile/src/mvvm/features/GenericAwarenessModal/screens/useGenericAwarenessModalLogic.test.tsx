@@ -97,4 +97,40 @@ describe("useGenericAwarenessModalLogic", () => {
 
     expect(open).not.toHaveBeenCalled();
   });
+
+  it("should not auto-open a second app-start card after dismissing the first one in the same session", async () => {
+    const secondAppStartContentCard = {
+      ...featureIntroMockData,
+      id: "app_start-feature-intro-2",
+    };
+    const open = jest.fn();
+    const props = {
+      cards: [appStartContentCard, secondAppStartContentCard],
+      isOpen: false,
+    };
+
+    const { rerender } = renderHook(() =>
+      useGenericAwarenessModalLogic(
+        { cards: props.cards },
+        {
+          enabled: true,
+          isOpen: props.isOpen,
+          open,
+        },
+      ),
+    );
+
+    await waitFor(() => {
+      expect(open).toHaveBeenCalledTimes(1);
+      expect(open).toHaveBeenCalledWith(appStartContentCard.id);
+    });
+
+    props.cards = [secondAppStartContentCard];
+    props.isOpen = false;
+    rerender(undefined);
+
+    await waitFor(() => {
+      expect(open).toHaveBeenCalledTimes(1);
+    });
+  });
 });

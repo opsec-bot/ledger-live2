@@ -21,6 +21,7 @@ import {
   trackFeatureIntroSecondaryClick,
 } from "../analytics/featureIntroAnalytics";
 import type { FeatureIntroContentItem, LumenSymbolName } from "../components/FeatureIntroContent";
+import { useGenericAwarenessModalBrazeLogging } from "./useGenericAwarenessModalBrazeLogging";
 
 export interface GenericAwarenessModalFeatureIntroViewModel {
   title: string;
@@ -56,6 +57,7 @@ const useGenericAwarenessModalFeatureIntroViewModel = (
 ): GenericAwarenessModalFeatureIntroViewModel => {
   const dispatch = useDispatch();
   const hasTrackedOpenRef = useRef(false);
+  const { logClick, logDismiss } = useGenericAwarenessModalBrazeLogging(contentCard?.id, isOpen);
 
   const featureIntro: GenericAwarenessModalFeatureIntro | undefined =
     contentCard?.layout === GenericAwarenessModalLayout.FeatureIntro ? contentCard : undefined;
@@ -101,8 +103,9 @@ const useGenericAwarenessModalFeatureIntroViewModel = (
         openURL(actionLink);
       }
     }
+    logClick();
     closeDialog({ dismissAppStart: true });
-  }, [closeDialog, featureIntro, getContext]);
+  }, [closeDialog, featureIntro, getContext, logClick]);
 
   const onSecondaryClick = useCallback(() => {
     const context = getContext();
@@ -117,24 +120,27 @@ const useGenericAwarenessModalFeatureIntroViewModel = (
         openURL(actionLink);
       }
     }
+    logClick();
     closeDialog({ dismissAppStart: true });
-  }, [closeDialog, featureIntro, getContext]);
+  }, [closeDialog, featureIntro, getContext, logClick]);
 
   const onHeaderClose = useCallback(() => {
     const context = getContext();
     if (context) {
       trackFeatureIntroCloseClick(context);
     }
+    logDismiss();
     closeDialog({ dismissAppStart: true });
-  }, [closeDialog, getContext]);
+  }, [closeDialog, getContext, logDismiss]);
 
   const onDismiss = useCallback(() => {
     const context = getContext();
     if (context) {
       trackFeatureIntroDismissed(context);
     }
+    logDismiss();
     closeDialog({ dismissAppStart: true });
-  }, [closeDialog, getContext]);
+  }, [closeDialog, getContext, logDismiss]);
 
   return useMemo(
     () => ({
