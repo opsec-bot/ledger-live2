@@ -139,10 +139,6 @@ export const coinModuleLoaders: CoinModuleLoader[] = [
     loadBridgeExtensions: () => import("../families/cosmos/bridgeExtensions").then(m => m.default),
     loadLocalApi: () =>
       import("../families/cosmos/coinModuleApi").then(m => m.createLocalCosmosApi),
-    loadValidateAddress: () =>
-      import("@ledgerhq/coin-cosmos/logic/validateAddress").then(
-        ({ validateAddress }): ValidateAddressFn => validateAddress,
-      ),
     loadBridgeApi: () => import("../families/cosmos/bridge/api").then(m => m.default),
   },
   {
