@@ -22,7 +22,11 @@ import {
 import { getMainAccount } from "@ledgerhq/ledger-wallet-framework/account/index";
 import { getSerializedAddressParameters } from "@ledgerhq/ledger-wallet-framework/bridge/jsHelpers";
 import { assignToAccountRaw, assignFromAccountRaw } from "@ledgerhq/coin-polkadot/serialization";
-import { setPolkadotPreloadData } from "@ledgerhq/coin-polkadot/bridge/state";
+import {
+  hydrateValidators,
+  hydrateStakingProgress,
+  hydrateMinimumBondBalance,
+} from "@ledgerhq/coin-polkadot/network";
 import { validateAddress } from "../../../bridge/validateAddress";
 
 const receive = makeAccountBridgeReceive();
@@ -218,11 +222,16 @@ const mockPreloadData: PolkadotPreloadData = {
 };
 
 // The mock bridge keeps preload/hydrate to seed deterministic staking data for
-// mocked E2E tests (the real coin-polkadot bridge fetches this on demand).
+// mocked E2E tests, hydrating the network-layer LRU caches the on-demand path
+// reads from (same mechanism as coin-tron's hydrateSuperRepresentatives).
 const preload = () => Promise.resolve(mockPreloadData);
 const hydrate = (data: unknown) => {
   if (!data || typeof data !== "object") return;
-  setPolkadotPreloadData(data as PolkadotPreloadData);
+  const preloaded = data as PolkadotPreloadData;
+  if (Array.isArray(preloaded.validators)) hydrateValidators(preloaded.validators);
+  if (preloaded.staking) hydrateStakingProgress(preloaded.staking);
+  const minimumBondBalance = new BigNumber(preloaded.minimumBondBalance);
+  if (!minimumBondBalance.isNaN()) hydrateMinimumBondBalance(minimumBondBalance);
 };
 
 const currencyBridge: CurrencyBridge = {

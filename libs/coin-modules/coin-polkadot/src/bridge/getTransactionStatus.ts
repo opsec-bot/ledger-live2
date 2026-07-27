@@ -15,6 +15,7 @@ import { BigNumber } from "bignumber.js";
 import { isValidAddress } from "../common";
 import { loadPolkadotCrypto } from "../logic/polkadot-crypto";
 import polkadotAPI from "../network";
+import { DEFAULT_STAKING_PROGRESS } from "../network/sidecar";
 import type { PolkadotAccount, Transaction, TransactionStatus } from "../types";
 import {
   PolkadotUnauthorizedOperation,
@@ -137,19 +138,12 @@ export const getTransactionStatus: AccountBridge<
     return await getSendTransactionStatus(account, transaction);
   }
 
-  const [staking, minimumBondBalanceValue] = await Promise.all([
+  const [staking, minimumBondBalance] = await Promise.all([
     // Fall back to a safe default (election closed) when staking info is
-    // unavailable (e.g. on networks without staking such as AssetHub),
-    // matching the previous preload behaviour.
-    polkadotAPI.getStakingProgress(currency).catch(() => ({
-      electionClosed: true,
-      activeEra: 0,
-      maxNominatorRewardedPerValidator: 128,
-      bondingDuration: 28,
-    })),
+    // unavailable (e.g. on networks without staking such as AssetHub).
+    polkadotAPI.getStakingProgress(currency).catch(() => DEFAULT_STAKING_PROGRESS),
     polkadotAPI.getMinimumBondBalance(currency).catch(() => new BigNumber(0)),
   ]);
-  const minimumBondBalance = new BigNumber(minimumBondBalanceValue);
 
   if (!staking.electionClosed) {
     errors.staking = new PolkadotElectionClosed();

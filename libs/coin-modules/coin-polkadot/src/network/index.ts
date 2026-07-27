@@ -1,7 +1,14 @@
 import { makeLRUCache, minutes, hours } from "@ledgerhq/live-network/cache";
 import { CryptoCurrency } from "@ledgerhq/ledger-wallet-framework/types";
 import BigNumber from "bignumber.js";
-import { PolkadotAccount, PolkadotNomination, PolkadotUnlocking, Transaction } from "../types";
+import {
+  PolkadotAccount,
+  PolkadotNomination,
+  PolkadotStakingProgress,
+  PolkadotUnlocking,
+  PolkadotValidator,
+  Transaction,
+} from "../types";
 import { getOperations as bisonGetOperations } from "./bisontrails";
 import {
   getAccount as sidecardGetAccount,
@@ -64,9 +71,38 @@ const getStakingProgress = makeLRUCache(
 const getValidators = makeLRUCache(
   (stashes: Parameters<typeof sidecarGetValidators>[0], currency: CryptoCurrency | undefined) =>
     sidecarGetValidators(stashes, currency),
-  (stashes, currency) => `${currency?.id || "polkadot"}_${String(stashes)}`,
+  (stashes, currency) => {
+    // sidecarGetValidators defaults undefined to "elected"; normalize + make the
+    // array case order-independent so equivalent inputs share a cache entry.
+    const normalized = stashes === undefined ? "elected" : stashes;
+    const stashesKey = Array.isArray(normalized)
+      ? [...normalized].sort().join(",")
+      : String(normalized);
+    return `${currency?.id || "polkadot"}_${stashesKey}`;
+  },
   minutes(5),
 );
+
+/**
+ * Seed the on-demand caches with deterministic data (used by the mock bridge in
+ * tests). Mirrors the coin-tron `hydrateSuperRepresentatives` pattern: hydration
+ * is folded into the LRU caches rather than a global store.
+ */
+export const hydrateValidators = (validators: PolkadotValidator[], currency?: CryptoCurrency) => {
+  getValidators.hydrate(`${currency?.id || "polkadot"}_all`, validators);
+};
+export const hydrateStakingProgress = (
+  staking: PolkadotStakingProgress,
+  currency?: CryptoCurrency,
+) => {
+  getStakingProgress.hydrate(currency?.id || "polkadot", staking);
+};
+export const hydrateMinimumBondBalance = (
+  minimumBondBalance: BigNumber,
+  currency?: CryptoCurrency,
+) => {
+  getMinimumBondBalance.hydrate(currency?.id || "polkadot", minimumBondBalance);
+};
 const getRegistry = makeLRUCache(
   (currency: CryptoCurrency | undefined) => sidecarGetRegistry(currency),
   (currency: CryptoCurrency | undefined) => currency?.id || "polkadot",
@@ -115,6 +151,12 @@ const isElectionClosed = makeLRUCache(
   minutes(1),
 );
 
+const verifyValidatorAddresses = makeLRUCache(
+  (validators: string[], currency: CryptoCurrency | undefined) =>
+    sidecarVerifyValidatorAddresses(validators, currency),
+  (validators, currency) => `${currency?.id || "polkadot"}_${[...validators].sort().join(",")}`,
+  minutes(5),
+);
 const isNewAccount = makeLRUCache(
   (addr: string, currency: CryptoCurrency | undefined) => sidecarIsNewAccount(addr, currency),
   address => address,
@@ -157,10 +199,7 @@ export default {
   getMetadata,
   submitExtrinsic: async (extrinsic: string, currency?: CryptoCurrency) =>
     sidecarSubmitExtrinsic(extrinsic, currency),
-  verifyValidatorAddresses: async (
-    validators: string[],
-    currency?: CryptoCurrency,
-  ): Promise<string[]> => sidecarVerifyValidatorAddresses(validators, currency),
+  verifyValidatorAddresses,
   submitExtrinsicDryRun: async (extrinsic: string, currency?: CryptoCurrency) =>
     sidecarSubmitExtrinsicDryRun(extrinsic, currency),
 };
