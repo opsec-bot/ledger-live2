@@ -33,6 +33,7 @@ import {
   buildTransactionCommonEvent,
   buildTransactionFailureEvent,
   buildTransactionSuccessEvent,
+  getStakeTarget,
   getTransactionType,
 } from "../transaction/logEvent";
 import { emitTransactionEvent } from "../transaction/observer";
@@ -238,6 +239,9 @@ export async function wrapAccountBridge<T extends TransactionCommon>(
                 flow: TransactionFlow.Unknown,
                 transactionType: getTransactionType(
                   arg0.transaction as unknown as Parameters<typeof getTransactionType>[0],
+                ),
+                validators: getStakeTarget(
+                  arg0.transaction as unknown as Parameters<typeof getStakeTarget>[0],
                 ),
                 isSendMax: Boolean(arg0.transaction.useAllAmount),
               }),

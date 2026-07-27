@@ -12,6 +12,7 @@ import {
   buildTransactionSuccessEvent,
   classifyTransactionError,
   deriveProductFlow,
+  getStakeTarget,
   getTransactionType,
 } from "./logEvent";
 
@@ -215,6 +216,44 @@ describe("deriveProductFlow", () => {
   it("returns undefined for unrecognised or missing types", () => {
     expect(deriveProductFlow("approve")).toBeUndefined();
     expect(deriveProductFlow(undefined)).toBeUndefined();
+  });
+});
+
+describe("getStakeTarget", () => {
+  it("reads Cardano poolId as a single-element list", () => {
+    const tx = { family: "cardano", mode: "delegate", poolId: "pool123" } as never;
+    expect(getStakeTarget(tx)).toEqual(["pool123"]);
+  });
+
+  it("reads cosmos validators[].address", () => {
+    const tx = {
+      family: "cosmos",
+      validators: [{ address: "cosmosvaloper1", amount: "1" }, { address: "cosmosvaloper2" }],
+    } as never;
+    expect(getStakeTarget(tx)).toEqual(["cosmosvaloper1", "cosmosvaloper2"]);
+  });
+
+  it("reads polkadot validators[] and tron votes[].address", () => {
+    expect(getStakeTarget({ family: "polkadot", validators: ["v1", "v2"] } as never)).toEqual([
+      "v1",
+      "v2",
+    ]);
+    expect(
+      getStakeTarget({ family: "tron", votes: [{ address: "TRX1", voteCount: 1 }] } as never),
+    ).toEqual(["TRX1"]);
+  });
+
+  it("reads solana delegate vote account and hedera staking node id", () => {
+    expect(
+      getStakeTarget({ family: "solana", model: { uiState: { voteAccAddr: "vote1" } } } as never),
+    ).toEqual(["vote1"]);
+    expect(getStakeTarget({ family: "hedera", stakingNodeId: 7 } as never)).toEqual(["7"]);
+  });
+
+  it("returns undefined for recipient-overloading families and non-staking txs", () => {
+    expect(getStakeTarget({ family: "tezos", recipient: "tz1baker" } as never)).toBeUndefined();
+    expect(getStakeTarget({ family: "cardano", mode: "send" } as never)).toBeUndefined();
+    expect(getStakeTarget(undefined)).toBeUndefined();
   });
 });
 

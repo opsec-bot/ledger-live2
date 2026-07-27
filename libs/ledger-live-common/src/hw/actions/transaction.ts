@@ -9,6 +9,7 @@ import {
   buildTransactionCommonEvent,
   buildTransactionStartedEvent,
   buildTransactionAbandonedEvent,
+  getStakeTarget,
   getTransactionType,
 } from "../../transaction/logEvent";
 import type { Transaction, TransactionStatus } from "../../coin-modules/transaction-types";
@@ -174,6 +175,9 @@ export const createAction = (
           manifestId,
           transactionType: getTransactionType(
             transaction as unknown as Parameters<typeof getTransactionType>[0],
+          ),
+          validators: getStakeTarget(
+            transaction as unknown as Parameters<typeof getStakeTarget>[0],
           ),
           isSendMax: Boolean((transaction as { useAllAmount?: boolean }).useAllAmount),
         }),

@@ -72,6 +72,7 @@ export const ConnectEnvsToDatadog = () => {
               productFlow: event.productFlow,
               currencyId: event.currencyId,
               transactionType: event.transactionType,
+              validators: event.validators,
               manifestId: event.manifestId,
             },
       );

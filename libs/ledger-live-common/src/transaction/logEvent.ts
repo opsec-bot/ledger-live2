@@ -72,6 +72,12 @@ type CommonLogEvent = {
    * Distinct from `flow` (the technical origin/pathway). Undefined for unrecognised actions.
    */
   productFlow?: ProductFlow;
+  /**
+   * Delegation target(s) — validator addresses / staking pool id(s) — read from the transaction.
+   * Only available at the sign stage (the transaction is not passed to broadcast). Public ids,
+   * not the human pool name/ticker (that is account-state enrichment, not on the transaction).
+   */
+  validators?: string[];
   isTestnet: boolean;
   isSendMax: boolean;
 };
@@ -196,6 +202,49 @@ export function getTransactionType(
   }
 }
 
+function nonEmptyStrings(list?: (string | undefined | null)[]): string[] | undefined {
+  const filtered = (list ?? []).filter((a): a is string => Boolean(a));
+  return filtered.length ? filtered : undefined;
+}
+
+/**
+ * Extracts the delegation target(s) (validator address(es) / staking pool id) from a transaction,
+ * per family. Available at the sign stage only (the transaction is not passed to broadcast, and
+ * for several families incl. Cardano the target is absent from `operation.extra`).
+ *
+ * Only families with an unambiguous, dedicated target field are handled. Families that overload
+ * the generic `recipient` (near, tezos, multiversx, celo) are intentionally skipped to avoid
+ * capturing plain send payees.
+ */
+export function getStakeTarget(tx: WalletAPITransaction | undefined | null): string[] | undefined {
+  if (!tx) return undefined;
+  const t = tx as unknown as {
+    poolId?: string;
+    validators?: Array<{ address?: string } | string>;
+    votes?: Array<{ address?: string }>;
+    stakingNodeId?: number | null;
+    model?: { uiState?: { voteAccAddr?: string; delegate?: { voteAccAddress?: string } } };
+  };
+  switch (tx.family) {
+    case "cardano":
+      return t.poolId ? [t.poolId] : undefined;
+    case "cosmos":
+      return nonEmptyStrings(t.validators?.map(v => (typeof v === "string" ? v : v?.address)));
+    case "polkadot":
+      return nonEmptyStrings(t.validators as (string | undefined)[] | undefined);
+    case "tron":
+      return nonEmptyStrings(t.votes?.map(v => v?.address));
+    case "hedera":
+      return t.stakingNodeId != null ? [String(t.stakingNodeId)] : undefined;
+    case "solana": {
+      const addr = t.model?.uiState?.voteAccAddr ?? t.model?.uiState?.delegate?.voteAccAddress;
+      return addr ? [addr] : undefined;
+    }
+    default:
+      return undefined;
+  }
+}
+
 /**
  * Maps an arbitrary sign/broadcast error to a normalized {@link ErrorCategory}.
  *
@@ -271,6 +320,7 @@ export type BuildTransactionCommonEventParams = {
   manifestId?: string;
   source?: TransactionSource;
   transactionType?: string;
+  validators?: string[];
   isSendMax?: boolean;
 };
 
@@ -282,6 +332,7 @@ export function buildTransactionCommonEvent({
   manifestId,
   source,
   transactionType,
+  validators,
   isSendMax = false,
 }: BuildTransactionCommonEventParams): CommonLogEvent {
   const productFlow = deriveProductFlow(transactionType);
@@ -296,6 +347,7 @@ export function buildTransactionCommonEvent({
     ...(source ? { source } : {}),
     ...(transactionType ? { transactionType } : {}),
     ...(productFlow ? { productFlow } : {}),
+    ...(validators?.length ? { validators } : {}),
     ...(account.type === "TokenAccount" ? { tokenId: account.token.id } : {}),
   };
 }
