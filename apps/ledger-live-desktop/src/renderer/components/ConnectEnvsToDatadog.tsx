@@ -13,6 +13,7 @@ import { enabledExperimentalFeatures } from "~/renderer/experimental";
 import { sentryLogsSelector } from "~/renderer/reducers/settings";
 import { initDatadog, setTags, isDatadogAvailable } from "~/datadog/renderer";
 import { initDatadogLogs } from "~/datadog/logs";
+import { setTransactionObserver } from "@ledgerhq/live-common/transaction/observer";
 
 const MAX_KEYLEN = 32;
 
@@ -48,6 +49,32 @@ export const ConnectEnvsToDatadog = () => {
   useEffect(() => {
     ipcRenderer.send("lldDatadogChanged", lldDatadog?.enabled === true);
   }, [lldDatadog?.enabled]);
+
+  // Dev-only: log every transaction (sign/broadcast) log event emitted by the bridge seam,
+  // so wide sign/broadcast observability can be verified locally (all staking routes/coins).
+  useEffect(() => {
+    if (process.env.NODE_ENV === "production") return;
+    return setTransactionObserver(event => {
+      // eslint-disable-next-line no-console
+      console.log(
+        `[tx-observability] ${event.stage}/${event.status}`,
+        event.status === "failure"
+          ? {
+              flow: event.flow,
+              currencyId: event.currencyId,
+              transactionType: event.transactionType,
+              errorCategory: event.errorCategory,
+              errorName: event.error.name,
+            }
+          : {
+              flow: event.flow,
+              currencyId: event.currencyId,
+              transactionType: event.transactionType,
+              manifestId: event.manifestId,
+            },
+      );
+    });
+  }, []);
 
   useEffect(() => {
     if (!lldDatadog?.enabled || !sentryLogs || !isDatadogAvailable() || datadogInitialized) return;

@@ -1,0 +1,266 @@
+import type { Transaction as WalletAPITransaction } from "@ledgerhq/wallet-api-core";
+import type {
+  Account,
+  AccountLike,
+  SignedOperation,
+  TransactionSource,
+} from "@ledgerhq/types-live";
+import { getEnv } from "@ledgerhq/live-env";
+import { getTxType } from "../wallet-api/utils/txTrackingHelper";
+
+/**
+ * Identifies which pathway emitted the transaction log event.
+ * This is the granular "where", complementing the live-app `manifestId`.
+ */
+export enum TransactionFlow {
+  /** Native in-app send flow (`useBroadcast`). */
+  Send = "send",
+  WalletApiSignAndBroadcast = "wallet-api/transaction.signAndBroadcast",
+  WalletApiSignRaw = "wallet-api/transaction.signRaw",
+  WalletApiSignPsbt = "wallet-api/bitcoin.signPsbt",
+  Dapp = "dApp/eth_sendTransaction",
+  Acre = "acre/transactionSignAndBroadcast",
+  PlatformLegacy = "platform/broadcast",
+  /** Emitted by the bridge seam when the originating route is not known (e.g. sign-stage). */
+  Unknown = "unknown",
+}
+
+/** Which stage of the transaction lifecycle produced the event. */
+export enum TransactionStage {
+  Sign = "sign",
+  Broadcast = "broadcast",
+}
+
+/**
+ * Normalized, countable error categories spanning the whole sign+broadcast lifecycle.
+ *
+ * Shared taxonomy with the Earn live app's classifier (LIVE-34203). LL can only
+ * classify the categories it observes (device / user / gas / blockchain);
+ * `validation`, `partner`, `geolocation` originate in the app and are classified
+ * app-side using the same string values.
+ */
+export enum ErrorCategory {
+  DeviceDisconnected = "device_disconnected",
+  DeviceWrongAccount = "device_wrong_account",
+  UserModalDismissed = "user_modal_dismissed",
+  UserDeviceRefused = "user_device_refused",
+  GasInsufficientBalance = "gas_insufficient_balance",
+  GasFeeTooLow = "gas_fee_too_low",
+  Geolocation = "geolocation",
+  Partner = "partner",
+  Blockchain = "blockchain",
+  /** Pre-sign checks (mostly app-side). */
+  Validation = "validation",
+  Unknown = "unknown",
+}
+
+type CommonLogEvent = {
+  appVersion: string;
+  /** Which pathway emitted the event. */
+  flow: TransactionFlow;
+  /** Live-app manifest id — the primary "where". Absent for the native send flow. */
+  manifestId?: string;
+  source?: TransactionSource;
+  /** Parent/network currency id (e.g. "ethereum"); token id is reported separately. */
+  currencyId: string;
+  family: string;
+  tokenId?: string;
+  /** Family-specific transaction type/mode. Only populated when a rich transaction is available. */
+  transactionType?: string;
+  isTestnet: boolean;
+  isSendMax: boolean;
+};
+
+type FailureLogEvent = {
+  status: "failure";
+  /** Lifecycle stage that failed. */
+  stage: TransactionStage;
+  error: Error;
+  errorCategory: ErrorCategory;
+  /** Present only when signing succeeded (i.e. broadcast-stage failures). */
+  txPayload?: {
+    signature: string;
+    rawData?: Record<string, unknown>;
+  };
+} & CommonLogEvent;
+
+type SuccessLogEvent = {
+  status: "success";
+  stage: TransactionStage.Broadcast;
+} & CommonLogEvent;
+
+export type LogEvent = SuccessLogEvent | FailureLogEvent;
+
+/** A function that consumes a transaction {@link LogEvent}, injected by each host app (e.g. to forward to Datadog). */
+export type TransactionLogger = (event: LogEvent) => void;
+
+export function toError(err: unknown): Error {
+  if (err instanceof Error) return err;
+  if (typeof err === "string") return new Error(err);
+  try {
+    return new Error(JSON.stringify(err));
+  } catch {
+    return new Error(String(err));
+  }
+}
+
+/**
+ * Derives a family-specific transaction type from a wallet-api transaction.
+ *
+ * - EVM: the call-data function selector (e.g. "approve", "swap", "withdraw"), "transfer" as fallback.
+ * - Families with an operation `mode`: the mode string (e.g. "delegate", "freeze", "bond").
+ * - Solana: the model kind.
+ * - Ton: the payload type.
+ * - Families with no discriminator (e.g. bitcoin, stellar): "send".
+ *
+ * Returns `undefined` when no rich transaction is available (signRaw / signPsbt / ACRE / legacy platform).
+ */
+export function getTransactionType(
+  tx: WalletAPITransaction | undefined | null,
+): string | undefined {
+  if (!tx) return undefined;
+
+  switch (tx.family) {
+    case "ethereum":
+      // getTxType only reads `tx.data` (a Buffer), which the wallet-api ethereum tx also carries.
+      return getTxType(tx as unknown as Parameters<typeof getTxType>[0]);
+    case "solana":
+      return tx.model?.kind;
+    case "ton":
+      return tx.payload?.type ?? "send";
+    case "bitcoin":
+    case "stellar":
+      return "send";
+    default:
+      // Most remaining families (cosmos, tron, polkadot, cardano, algorand, near, …) expose a `mode`.
+      return (tx as { mode?: string }).mode;
+  }
+}
+
+/**
+ * Maps an arbitrary sign/broadcast error to a normalized {@link ErrorCategory}.
+ *
+ * Pure string-matching (no coin-module imports): matches stable error `name`s
+ * first (Ledger custom errors + device/transport errors), then falls back to
+ * stable substrings in `error.message`. Covers what LL can observe across the
+ * sign and broadcast stages; app-only categories (`validation`, `partner`,
+ * `geolocation`) fall through to `Unknown` here and are classified app-side.
+ */
+export function classifyTransactionError(error: Error): ErrorCategory {
+  const name = error.name ?? "";
+  const message = (error.message ?? "").toUpperCase();
+
+  // 1. Stable error names.
+  switch (name) {
+    case "WrongDeviceForAccount":
+      return ErrorCategory.DeviceWrongAccount;
+    case "UserRefusedOnDevice":
+    case "UserRefusedAllowManager":
+      return ErrorCategory.UserDeviceRefused;
+    case "InsufficientFunds":
+    case "NotEnoughBalance":
+      return ErrorCategory.GasInsufficientBalance;
+    case "InvalidTransactionError":
+    case "GasEstimationError":
+    case "SequenceNumberError":
+    case "TronTransactionExpired":
+    case "UnsupportedRpcMethodError":
+    case "NetworkError":
+    case "NetworkDown":
+    case "SendTransactionError":
+      return ErrorCategory.Blockchain;
+  }
+  if (
+    name.startsWith("DisconnectedDevice") ||
+    name === "CantOpenDevice" ||
+    name === "TransportError" ||
+    name === "TransportRaceCondition" ||
+    name === "TransportStatusError"
+  ) {
+    return ErrorCategory.DeviceDisconnected;
+  }
+
+  // 2. Stable message substrings.
+  if (message.includes("SIGNATURE INTERRUPTED BY USER") || message.includes("CANCELED BY USER"))
+    return ErrorCategory.UserModalDismissed;
+  if (message.includes("INSUFFICIENT_FUNDS")) return ErrorCategory.GasInsufficientBalance;
+  if (message.includes("REPLACEMENT_UNDERPRICED") || message.includes("TRANSACTION_UNDERPRICED"))
+    return ErrorCategory.GasFeeTooLow;
+  if (
+    message.includes("NONCE_EXPIRED") ||
+    message.includes("NONCE TOO LOW") ||
+    message.includes("UNPREDICTABLE_GAS_LIMIT")
+  )
+    return ErrorCategory.Blockchain;
+
+  return ErrorCategory.Unknown;
+}
+
+export type BuildTransactionCommonEventParams = {
+  /** The signing account (used to read the token id). */
+  account: AccountLike;
+  /** The resolved main account (used to read currency/family/testnet). */
+  mainAccount: Account;
+  flow: TransactionFlow;
+  manifestId?: string;
+  source?: TransactionSource;
+  transactionType?: string;
+  isSendMax?: boolean;
+};
+
+/** Builds the shared part of a transaction log event. */
+export function buildTransactionCommonEvent({
+  account,
+  mainAccount,
+  flow,
+  manifestId,
+  source,
+  transactionType,
+  isSendMax = false,
+}: BuildTransactionCommonEventParams): CommonLogEvent {
+  return {
+    appVersion: getEnv("LEDGER_CLIENT_VERSION"),
+    flow,
+    currencyId: mainAccount.currency.id,
+    family: mainAccount.currency.family,
+    isTestnet: Boolean(mainAccount.currency.isTestnetFor),
+    isSendMax,
+    ...(manifestId ? { manifestId } : {}),
+    ...(source ? { source } : {}),
+    ...(transactionType ? { transactionType } : {}),
+    ...(account.type === "TokenAccount" ? { tokenId: account.token.id } : {}),
+  };
+}
+
+export function buildTransactionSuccessEvent(common: CommonLogEvent): SuccessLogEvent {
+  return { status: "success", stage: TransactionStage.Broadcast, ...common };
+}
+
+export type BuildTransactionFailureParams = {
+  stage: TransactionStage;
+  error: unknown;
+  /** Only available when signing succeeded (broadcast-stage failures). */
+  signedOperation?: SignedOperation;
+};
+
+export function buildTransactionFailureEvent(
+  common: CommonLogEvent,
+  { stage, error, signedOperation }: BuildTransactionFailureParams,
+): FailureLogEvent {
+  const err = toError(error);
+  return {
+    status: "failure",
+    stage,
+    error: err,
+    errorCategory: classifyTransactionError(err),
+    ...(signedOperation
+      ? {
+          txPayload: {
+            signature: signedOperation.signature,
+            ...(signedOperation.rawData ? { rawData: signedOperation.rawData } : {}),
+          },
+        }
+      : {}),
+    ...common,
+  };
+}
