@@ -197,6 +197,9 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJson(needs.prepare-devices.outputs.e2e_matrix) }}
     timeout-minutes: 40
+    permissions:
+      id-token: write
+      contents: read
     env:
       NODE_OPTIONS: "--max-old-space-size=14336"
       INSTRUMENT_BUILD: true
@@ -226,6 +229,7 @@ jobs:
           repositories: |
             ledger-live
             coin-apps
+          permission-contents: read
 
       - name: Checkout ledger-live monorepo (shallow clone)
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
@@ -604,6 +608,8 @@ jobs:
           DEVICE_2: ${{ needs.prepare-devices.outputs.device_2 }}
           EXPORT_TO_XRAY: ${{ inputs.export_to_xray }}
           TEST_EXECUTION: ${{ github.event.inputs.test_execution }}
+          TRIGGERED_REF: ${{ inputs.ref || github.ref_name }}
+          SMOKE_TESTS: ${{ inputs.smoke_tests }}
         with:
           script: |
             const fs = require("fs");
@@ -617,7 +623,7 @@ jobs:
                   "type": "header",
                   "text": {
                     "type": "plain_text",
-                    "text": `:ledger-logo: Ledger Live Desktop E2E tests results on ${{ inputs.ref || github.ref_name }} - ${device1} + ${device2}${{ inputs.smoke_tests && ' (Smoke Tests)' || '' }}`,
+                    "text": `:ledger-logo: Ledger Live Desktop E2E tests results on ${process.env.TRIGGERED_REF} - ${device1} + ${device2}${process.env.SMOKE_TESTS === 'true' ? ' (Smoke Tests)' : ''}`,
                     "emoji": true
                   }
                 },
@@ -661,7 +667,7 @@ jobs:
                   "type": "header",
                   "text": {
                     "type": "plain_text",
-                    "text": `:ledger-logo: Ledger Live Desktop E2E tests results on ${{ inputs.ref || github.ref_name }} - ${device1}${{ inputs.smoke_tests && ' (Smoke Tests)' || '' }}`,
+                    "text": `:ledger-logo: Ledger Live Desktop E2E tests results on ${process.env.TRIGGERED_REF} - ${device1}${process.env.SMOKE_TESTS === 'true' ? ' (Smoke Tests)' : ''}`,
                     "emoji": true
                   }
                 },
@@ -710,7 +716,7 @@ jobs:
               "attachments": [
                 {
                   "color": color,
-                  "fallback": `Ledger Live Desktop E2E tests results on ${{ inputs.ref || github.ref_name }}${{ inputs.smoke_tests && ' (Smoke Tests)' || '' }}`,
+                  "fallback": `Ledger Live Desktop E2E tests results on ${process.env.TRIGGERED_REF}${process.env.SMOKE_TESTS === 'true' ? ' (Smoke Tests)' : ''}`,
                   blocks
                 }
               ]
