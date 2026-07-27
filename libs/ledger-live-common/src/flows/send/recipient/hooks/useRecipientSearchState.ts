@@ -53,6 +53,7 @@ export function useRecipientSearchState({
 
   const showMatchedAddress =
     showSearchResults &&
+    !isLoading &&
     (hasAnyMatches ||
       (isAddressComplete && result.status === "valid" && !result.error) ||
       (isAddressComplete && (hasBridgeRecipientError || hasBridgeRecipientWarning))) &&
@@ -65,6 +66,7 @@ export function useRecipientSearchState({
 
   const showAddressValidationError =
     showSearchResults &&
+    !isLoading &&
     !showSanctionedBanner &&
     !hasAnyMatches &&
     (!!result.error || isBridgeInvalidAddress);
@@ -93,6 +95,7 @@ export function useRecipientSearchState({
 
   const showEmptyState =
     showSearchResults &&
+    !isLoading &&
     (!isAddressComplete || !hasAnyMatches) &&
     !showMatchedAddress &&
     !showSanctionedBanner &&
