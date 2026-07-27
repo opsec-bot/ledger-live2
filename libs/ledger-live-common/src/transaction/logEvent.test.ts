@@ -6,7 +6,9 @@ import {
   TransactionFlow,
   TransactionStage,
   buildTransactionCommonEvent,
+  buildTransactionAbandonedEvent,
   buildTransactionFailureEvent,
+  buildTransactionStartedEvent,
   buildTransactionSuccessEvent,
   classifyTransactionError,
   getTransactionType,
@@ -111,6 +113,21 @@ describe("buildTransactionSuccessEvent / buildTransactionFailureEvent", () => {
     expect(event.error).toBeInstanceOf(Error);
     expect(event.error.message).toBe("boom");
   });
+
+  it("builds a started (funnel-top) event", () => {
+    const event = buildTransactionStartedEvent(common, TransactionStage.Sign);
+    expect(event.status).toBe("started");
+    expect(event.stage).toBe(TransactionStage.Sign);
+    expect(event.currencyId).toBe("ethereum");
+  });
+
+  it("builds an abandoned event as a UserModalDismissed sign failure", () => {
+    const event = buildTransactionAbandonedEvent(common);
+    expect(event.status).toBe("failure");
+    expect(event.stage).toBe(TransactionStage.Sign);
+    expect(event.errorCategory).toBe(ErrorCategory.UserModalDismissed);
+    expect(event.txPayload).toBeUndefined();
+  });
 });
 
 describe("classifyTransactionError", () => {
@@ -124,6 +141,21 @@ describe("classifyTransactionError", () => {
     ],
     ["WrongDeviceForAccount", { name: "WrongDeviceForAccount" }, ErrorCategory.DeviceWrongAccount],
     ["UserRefusedOnDevice", { name: "UserRefusedOnDevice" }, ErrorCategory.UserDeviceRefused],
+    [
+      "TransactionRefusedOnDevice",
+      { name: "TransactionRefusedOnDevice" },
+      ErrorCategory.UserDeviceRefused,
+    ],
+    [
+      "DeviceStatusError user-decline (0x6985)",
+      { name: "DeviceStatusError", statusCode: 0x6985 },
+      ErrorCategory.UserDeviceRefused,
+    ],
+    [
+      "DeviceStatusError other status",
+      { name: "DeviceStatusError", statusCode: 0x6a80 },
+      ErrorCategory.DeviceDisconnected,
+    ],
     [
       "Signature interrupted (message)",
       { message: "Signature interrupted by user" },

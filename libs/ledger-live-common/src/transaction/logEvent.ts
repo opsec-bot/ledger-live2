@@ -89,7 +89,13 @@ type SuccessLogEvent = {
   stage: TransactionStage.Broadcast;
 } & CommonLogEvent;
 
-export type LogEvent = SuccessLogEvent | FailureLogEvent;
+/** A transaction attempt reached a lifecycle stage (funnel top, e.g. the device sign prompt). */
+type StartedLogEvent = {
+  status: "started";
+  stage: TransactionStage;
+} & CommonLogEvent;
+
+export type LogEvent = SuccessLogEvent | FailureLogEvent | StartedLogEvent;
 
 /** A function that consumes a transaction {@link LogEvent}, injected by each host app (e.g. to forward to Datadog). */
 export type TransactionLogger = (event: LogEvent) => void;
@@ -156,6 +162,7 @@ export function classifyTransactionError(error: Error): ErrorCategory {
       return ErrorCategory.DeviceWrongAccount;
     case "UserRefusedOnDevice":
     case "UserRefusedAllowManager":
+    case "TransactionRefusedOnDevice":
       return ErrorCategory.UserDeviceRefused;
     case "InsufficientFunds":
     case "NotEnoughBalance":
@@ -170,12 +177,18 @@ export function classifyTransactionError(error: Error): ErrorCategory {
     case "SendTransactionError":
       return ErrorCategory.Blockchain;
   }
+  // Device/transport status errors: the status code distinguishes a user decline
+  // (CONDITIONS_OF_USE_NOT_SATISFIED / 0x6985, 0x5501) from other device faults.
+  if (name === "DeviceStatusError" || name === "TransportStatusError") {
+    const statusCode = (error as { statusCode?: number }).statusCode;
+    if (statusCode === 0x6985 || statusCode === 0x5501) return ErrorCategory.UserDeviceRefused;
+    return ErrorCategory.DeviceDisconnected;
+  }
   if (
     name.startsWith("DisconnectedDevice") ||
     name === "CantOpenDevice" ||
     name === "TransportError" ||
-    name === "TransportRaceCondition" ||
-    name === "TransportStatusError"
+    name === "TransportRaceCondition"
   ) {
     return ErrorCategory.DeviceDisconnected;
   }
@@ -234,6 +247,28 @@ export function buildTransactionCommonEvent({
 
 export function buildTransactionSuccessEvent(common: CommonLogEvent): SuccessLogEvent {
   return { status: "success", stage: TransactionStage.Broadcast, ...common };
+}
+
+/** Funnel-top event: an attempt reached a lifecycle stage (e.g. the device sign prompt appeared). */
+export function buildTransactionStartedEvent(
+  common: CommonLogEvent,
+  stage: TransactionStage,
+): StartedLogEvent {
+  return { status: "started", stage, ...common };
+}
+
+/**
+ * Drop-off event: the user dismissed the sign prompt without confirming or erroring
+ * (an unsubscribe, invisible to the bridge — emitted from the device-action layer).
+ */
+export function buildTransactionAbandonedEvent(common: CommonLogEvent): FailureLogEvent {
+  return {
+    status: "failure",
+    stage: TransactionStage.Sign,
+    error: new Error("Sign prompt dismissed"),
+    errorCategory: ErrorCategory.UserModalDismissed,
+    ...common,
+  };
 }
 
 export type BuildTransactionFailureParams = {

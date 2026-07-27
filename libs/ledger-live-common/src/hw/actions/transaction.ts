@@ -1,7 +1,16 @@
 import { of, Observable } from "rxjs";
 import { scan, catchError, tap } from "rxjs/operators";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { log } from "@ledgerhq/logs";
+import { emitTransactionEvent } from "../../transaction/observer";
+import {
+  TransactionFlow,
+  TransactionStage,
+  buildTransactionCommonEvent,
+  buildTransactionStartedEvent,
+  buildTransactionAbandonedEvent,
+  getTransactionType,
+} from "../../transaction/logEvent";
 import type { Transaction, TransactionStatus } from "../../coin-modules/transaction-types";
 import { TransactionRefusedOnDevice } from "../../errors";
 import { getMainAccount } from "../../account";
@@ -149,6 +158,51 @@ export const createAction = (
     });
     const { device, opened, inWrongDeviceForAccount, error } = appState;
     const [state, setState] = useState(initialState);
+
+    // Transaction observability: funnel-top "started" (device sign prompt shown) and
+    // "abandoned" (prompt dismissed without confirming/erroring). Errors and broadcast
+    // success are captured wide by the bridge seam; this layer adds the two UI signals
+    // the bridge cannot see (an abandonment is an unsubscribe, not an error).
+    const startedRef = useRef(false);
+    const terminalRef = useRef(false);
+    const buildCommon = useCallback(
+      () =>
+        buildTransactionCommonEvent({
+          account: mainAccount,
+          mainAccount,
+          flow: manifestId ? TransactionFlow.WalletApiSignAndBroadcast : TransactionFlow.Send,
+          manifestId,
+          transactionType: getTransactionType(
+            transaction as unknown as Parameters<typeof getTransactionType>[0],
+          ),
+          isSendMax: Boolean((transaction as { useAllAmount?: boolean }).useAllAmount),
+        }),
+      [mainAccount, manifestId, transaction],
+    );
+    const buildCommonRef = useRef(buildCommon);
+    buildCommonRef.current = buildCommon;
+
+    useEffect(() => {
+      if (state.deviceSignatureRequested && !startedRef.current) {
+        startedRef.current = true;
+        emitTransactionEvent(buildTransactionStartedEvent(buildCommon(), TransactionStage.Sign));
+      }
+    }, [state.deviceSignatureRequested, buildCommon]);
+
+    useEffect(() => {
+      if (state.signedOperation || state.transactionSignError) terminalRef.current = true;
+    }, [state.signedOperation, state.transactionSignError]);
+
+    // Unmount-only (empty deps): distinguishes a real close from an effect re-run.
+    useEffect(
+      () => () => {
+        if (startedRef.current && !terminalRef.current) {
+          emitTransactionEvent(buildTransactionAbandonedEvent(buildCommonRef.current()));
+        }
+      },
+      [],
+    );
+
     useEffect(() => {
       if (!device || !opened || inWrongDeviceForAccount || error) {
         setState(initialState);
