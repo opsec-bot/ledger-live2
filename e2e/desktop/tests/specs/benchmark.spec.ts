@@ -6,22 +6,22 @@ class MyPage {
   private readonly hardExpect = expect.configure({ timeout: 1_000, soft: false });
   private readonly softExpect = expect.configure({ timeout: 1_000, soft: true });
 
-  @step("Passing hard expect")
+  @step("Hard pass")
   async hardExpectPass({ page }: { page: Page }) {
     await this.hardExpect(page).toHaveTitle("");
   }
 
-  @step("Failing hard expect")
+  @step("Hard fail")
   async hardExpectFail({ page }: { page: Page }) {
     await this.hardExpect(page).toHaveTitle("failmehard");
   }
 
-  @step("Passing soft expect")
+  @step("Soft pass")
   async softExpectPass({ page }: { page: Page }) {
     await this.softExpect(page).toHaveTitle("");
   }
 
-  @step("Failing soft expect")
+  @step("Soft fail")
   async softExpectFail({ page }: { page: Page }) {
     await this.softExpect(page).toHaveTitle("failmesoft");
   }
