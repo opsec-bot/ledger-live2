@@ -4,6 +4,7 @@ import { getRedelegations } from "./getRedelegations";
 const mockGetRedelegationsWithQueued = jest.fn();
 jest.mock("../../network/Cosmos", () => ({
   CosmosAPI: jest.fn().mockImplementation(() => ({
+    getCurrency: () => ({ id: "cosmos", units: [{}, { code: "uatom" }] }),
     getRedelegationsWithQueued: mockGetRedelegationsWithQueued,
   })),
 }));

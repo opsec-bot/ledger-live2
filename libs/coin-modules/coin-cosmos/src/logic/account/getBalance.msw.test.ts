@@ -35,7 +35,7 @@ describe("getBalance via MSW", () => {
       ...emptyStaking,
     );
 
-    const [native] = await getBalance(api, ADDR, "cosmos");
+    const [native] = await getBalance(api, ADDR);
 
     expect(native.asset).toMatchObject({ type: "native" });
     expect(native.value).toBe(5_000_000n);
@@ -48,7 +48,7 @@ describe("getBalance via MSW", () => {
       ...emptyStaking,
     );
 
-    const [native] = await getBalance(api, ADDR, "cosmos");
+    const [native] = await getBalance(api, ADDR);
 
     expect(native.value).toBe(0n);
   });
@@ -60,6 +60,6 @@ describe("getBalance via MSW", () => {
       ...emptyStaking,
     );
 
-    await expect(getBalance(api, ADDR, "cosmos")).rejects.toThrow();
+    await expect(getBalance(api, ADDR)).rejects.toThrow();
   });
 });

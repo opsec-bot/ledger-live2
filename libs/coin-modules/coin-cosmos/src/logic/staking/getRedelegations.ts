@@ -1,4 +1,3 @@
-import { getCryptoCurrencyById } from "@ledgerhq/ledger-wallet-framework/currencies";
 import { CosmosAPI } from "../../network/Cosmos";
 import { CosmosRedelegation } from "../../types";
 
@@ -13,5 +12,5 @@ export async function getRedelegations(
   address: string,
 ): Promise<CosmosRedelegation[]> {
   const api = new CosmosAPI(currencyId);
-  return api.getRedelegationsWithQueued(address, getCryptoCurrencyById(currencyId));
+  return api.getRedelegationsWithQueued(address, api.getCurrency());
 }
