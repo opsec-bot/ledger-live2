@@ -10,7 +10,7 @@ import {
   FF_LWD_WALLET_40_Q2_NO_ANALYTICS_CONSENT,
 } from "tests/utils/featureFlagUtils";
 import { buildTags } from "tests/utils/tagsUtils";
-import { resetLoanState } from "@ledgerhq/live-e2e-shared/borrow/borrowSetup";
+import { resetLoanState, ensureLoanOpen } from "@ledgerhq/live-e2e-shared/borrow/borrowSetup";
 
 test.describe.configure({ mode: "serial" });
 
@@ -140,6 +140,149 @@ test.describe("Borrow open loan", () => {
       await app.borrow.expectBorrowStepCompleted();
 
       await app.borrow.expectLoanSuccess();
+    },
+  );
+});
+
+test.describe("Borrow repay", () => {
+  test.skip(
+    process.env.DISABLE_TRANSACTION_BROADCAST !== "0",
+    "Repay flow requires broadcast to be enabled — run on manual Desktop E2E with enable_broadcast",
+  );
+
+  test.use({
+    teamOwner: Team.EARN,
+    env: {
+      SWAP_DISABLE_APPS_INSTALL: "true",
+    },
+    userdata: "skip-onboarding-with-last-seen-device",
+    speculosApp: openLoanAccount.currency.speculosApp,
+    cliCommandsOnApp: [
+      [
+        {
+          app: openLoanAccount.currency.speculosApp,
+          cmd: liveDataWithAddressCommand(openLoanAccount),
+        },
+      ],
+      { scope: "test" },
+    ],
+    featureFlags: {
+      ...FF_LWD_WALLET_40_Q2_NO_ANALYTICS_CONSENT,
+      ...FF_BORROW_DESKTOP,
+    },
+  });
+
+  test.beforeAll(async () => {
+    test.setTimeout(600_000);
+    await ensureLoanOpen({ nanoAppCatalogPath: NANO_APP_CATALOG });
+  });
+
+  test(
+    "Hot start opens repay modal and completes full repay execution",
+    {
+      tag: buildTags({ currencyId: openLoanAccount.currency.id }),
+      annotation: { type: "TMS", description: "B2CQA-6073" },
+    },
+    async ({ app }) => {
+      test.setTimeout(480_000);
+      await addTmsLink(getDescription(test.info().annotations, "TMS").split(", "));
+
+      await app.mainNavigation.openTargetFromMainNavigation("home");
+      await app.portfolio.expectBorrowEntryPointVisible();
+
+      await app.borrow.goAndWaitForBorrowHotStart(async () =>
+        app.portfolio.clickBorrowEntryPoint(),
+      );
+
+      await app.borrow.clickFirstLoanDashboardRow();
+      await app.borrow.expectLoanOverviewVisible();
+      await app.borrow.clickRepay();
+      await app.borrow.submitRepayInFull();
+
+      if (await app.borrow.isRepayGiveApprovalRequired()) {
+        await app.borrow.clickGiveApproval();
+        await app.borrow.clickSignSummaryContinue();
+        await app.borrow.waitForHostDeviceValidation();
+        await app.speculos.signTokenApproval();
+        await app.borrow.waitForHostSignModalClosed();
+        await app.borrow.expectRepayApprovalStepCompleted();
+      }
+
+      await app.borrow.clickAuthorizeRepay();
+      await app.borrow.clickSignSummaryContinue();
+      await app.speculos.acceptEnableTransactionCheck();
+      await app.borrow.waitForHostDeviceValidation();
+      await app.speculos.signEvmContractTransaction();
+      await app.borrow.waitForHostSignModalClosed();
+      await app.borrow.expectRepayExecutionCompleted();
+      await app.borrow.expectRepaySuccess();
+    },
+  );
+});
+
+test.describe("Borrow withdraw collateral", () => {
+  test.skip(
+    process.env.DISABLE_TRANSACTION_BROADCAST !== "0",
+    "Withdraw flow requires broadcast to be enabled — run on manual Desktop E2E with enable_broadcast",
+  );
+
+  test.use({
+    teamOwner: Team.EARN,
+    env: {
+      SWAP_DISABLE_APPS_INSTALL: "true",
+    },
+    userdata: "skip-onboarding-with-last-seen-device",
+    speculosApp: openLoanAccount.currency.speculosApp,
+    cliCommandsOnApp: [
+      [
+        {
+          app: openLoanAccount.currency.speculosApp,
+          cmd: liveDataWithAddressCommand(openLoanAccount),
+        },
+      ],
+      { scope: "test" },
+    ],
+    featureFlags: {
+      ...FF_LWD_WALLET_40_Q2_NO_ANALYTICS_CONSENT,
+      ...FF_BORROW_DESKTOP,
+    },
+  });
+
+  test.afterAll(async () => {
+    test.setTimeout(600_000);
+    await resetLoanState({ nanoAppCatalogPath: NANO_APP_CATALOG });
+  });
+
+  test(
+    "Hot start routes a fully-repaid loan to withdraw and completes collateral withdrawal",
+    {
+      tag: buildTags({ currencyId: openLoanAccount.currency.id }),
+      annotation: { type: "TMS", description: "B2CQA-6080" },
+    },
+    async ({ app }) => {
+      test.setTimeout(480_000);
+      await addTmsLink(getDescription(test.info().annotations, "TMS").split(", "));
+
+      await app.mainNavigation.openTargetFromMainNavigation("home");
+      await app.portfolio.expectBorrowEntryPointVisible();
+
+      await app.borrow.goAndWaitForBorrowHotStart(async () =>
+        app.portfolio.clickBorrowEntryPoint(),
+      );
+
+      await app.borrow.clickFirstLoanDashboardRow();
+      await app.borrow.expectWithdrawOverviewVisible();
+      await app.borrow.clickWithdrawCollateral();
+
+      await app.borrow.clickAuthorizeWithdraw();
+      await app.borrow.clickSignSummaryContinue();
+      await app.speculos.acceptEnableTransactionCheck();
+      await app.borrow.waitForHostDeviceValidation();
+      await app.speculos.signEvmContractTransaction();
+      await app.borrow.waitForHostSignModalClosed();
+      await app.borrow.expectWithdrawExecutionCompleted();
+      await app.borrow.expectWithdrawSuccess();
+      await app.borrow.clickBackToMyLoans();
     },
   );
 });
