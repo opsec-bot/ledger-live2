@@ -218,10 +218,12 @@ describe("LNSUpsellBanner", () => {
         },
         opted_in: {
           ...largeScreenUpsellParams.opted_in,
+          enabled: true,
           link: isOptIn ? resolvedCtaLink : "https://example.com/optInCta",
         },
         opted_out: {
           ...largeScreenUpsellParams.opted_out,
+          enabled: true,
           link: isOptIn ? "https://example.com/optOutCta" : resolvedCtaLink,
         },
       };

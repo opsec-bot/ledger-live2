@@ -10,7 +10,7 @@ const lnsUpsellFallbackImageUri = Image.resolveAssetSource(
 ).uri;
 
 export function useLNSUpsellBannerModel(location: LNSBannerLocation): LNSBannerModel {
-  const { isShown, ctaLink, deviceModelId, tracking } = useLNSUpsellBannerState(location);
+  const { isShown, ctaLink, discount, deviceModelId, tracking } = useLNSUpsellBannerState(location);
   const analyticsPage = AnalyticsPageMap[location];
   const deviceModel = deviceModelId
     ? toLargeScreenUpsellDeviceModelAnalyticsValue(deviceModelId)
@@ -31,6 +31,7 @@ export function useLNSUpsellBannerModel(location: LNSBannerLocation): LNSBannerM
   return {
     location,
     isShown,
+    discount,
     tracking,
     handleCTAPress,
     imageUrl: lnsUpsellFallbackImageUri,
