@@ -4,8 +4,9 @@
 //   node shard-tests.mjs [testFilter] [platform] [testRootDir] [shardIndex] [shardTotal]
 import fs from "fs";
 import path from "path";
+import { fileURLToPath } from "url";
 
-const baseDir = path.resolve(path.dirname(new URL(import.meta.url).pathname));
+const baseDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)));
 
 // Cross-platform deterministic string comparison
 function compareStrings(a, b) {
@@ -19,7 +20,7 @@ function compareStrings(a, b) {
   });
 }
 
-function findTestFiles(dir) {
+export function findTestFiles(dir) {
   let results = [];
   try {
     const entries = fs.readdirSync(dir, { withFileTypes: true }).sort((a, b) => {
@@ -45,15 +46,35 @@ function findTestFiles(dir) {
   return results.sort(compareStrings);
 }
 
-function filterTestFiles(files, testFilter) {
+// Extract the tags a spec *declares*, e.g. "@smoke", "@NanoSP", "@family-evm".
+// Detox/jest-allure2 tags are always authored as quoted string literals starting
+// with "@" — via `$Tag("@x")`, `tags: ["@x", ...]`, or arrays passed to helpers
+// like `runSwapTest(..., ["@ethereum", ...])`. Matching only these (instead of the
+// whole file text) prevents a spec from being selected just because the filter word
+// appears in a comment, a describe/it title, or a page-object method name
+// (e.g. `pressQuickActionSwapButton`).
+function extractDeclaredTags(fileContent) {
+  const literals = fileContent.match(/['"`]@[\w-]+['"`]/g) ?? [];
+  // Strip the surrounding quotes/backticks, keep the leading "@".
+  return literals.map(literal => literal.slice(1, -1));
+}
+
+export function filterTestFiles(files, testFilter) {
   if (!testFilter) return files;
   const filters = testFilter.trim().split(/\s+/).filter(Boolean);
   const filterRegex = new RegExp(filters.join("|"), "i");
 
   const filtered = files.filter(filePath => {
+    // 1. Path match: lets you target a single spec file or a whole folder by
+    //    name/path (e.g. "swapETH_BTC.spec.ts", "specs/swap", "wallet40Q2/portfolio").
     if (filterRegex.test(filePath)) return true;
+    // 2. Tag match: select a spec only when one of its *declared tags* matches the
+    //    filter (e.g. "@smoke", "@family-evm"). This mirrors the desktop behaviour
+    //    (Playwright --grep over titles + tags) at the file-selection granularity
+    //    Detox requires, without the false positives of a raw file-content scan.
     try {
-      return filterRegex.test(fs.readFileSync(filePath, "utf8"));
+      const tags = extractDeclaredTags(fs.readFileSync(filePath, "utf8"));
+      return tags.some(tag => filterRegex.test(tag));
     } catch {
       return false;
     }
@@ -162,7 +183,7 @@ function distributeFilesByTiming(files, timingData, shardIndex, shardTotal) {
  * 4. If sharding parameters provided, distributes files by timing
  * 5. Outputs the final list of files as a space-separated string
  */
-function main() {
+export function main() {
   const args = process.argv.slice(2);
 
   if (args.length >= 4) {
@@ -191,4 +212,8 @@ function main() {
   }
 }
 
-main();
+// Only run when invoked directly (e.g. `node shard-tests.mjs ...`), so the module
+// can be imported by unit tests without executing.
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  main();
+}
