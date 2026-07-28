@@ -16,7 +16,9 @@ function makeCardStore() {
     middleware: getDefaultMiddleware =>
       getDefaultMiddleware({
         thunk: {
-          extraArgument: payCardApiExtra({ payCardApiMocksEnabled: true }),
+          extraArgument: payCardApiExtra({
+            payCardApiBaseUrl: "https://card.test",
+          }),
         },
       }).concat(payCardApi.middleware),
   });

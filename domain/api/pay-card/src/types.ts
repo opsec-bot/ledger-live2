@@ -2,13 +2,12 @@ import type { PayCardProvider } from "@domain/entity-pay-card";
 import type { z } from "zod";
 import {
   PayCardAuthResponseSchema,
-  PayCardLogoutResponseSchema,
   PayCardPreAuthResponseSchema,
   PayCardUserResponseSchema,
 } from "./schema";
 
 export type PayCardPreAuthRequest = {
-  readonly provider?: PayCardProvider;
+  readonly provider: PayCardProvider;
 };
 
 export type PayCardPreAuthResponse = Readonly<
@@ -23,10 +22,6 @@ export type PayCardAuthRequest = {
 export type PayCardAuthResponse = Readonly<z.infer<typeof PayCardAuthResponseSchema>>;
 
 export type PayCardUserResponse = Readonly<z.infer<typeof PayCardUserResponseSchema>>;
-
-export type PayCardLogoutResponse = Readonly<
-  z.infer<typeof PayCardLogoutResponseSchema>
->;
 
 export type PayCardApiErrorCode =
   | "invalid_provider"
