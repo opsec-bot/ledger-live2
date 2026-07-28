@@ -27,10 +27,10 @@ jobs:
           fetch-depth: 0
 
       - name: Setup git user
-        uses: LedgerHQ/ledger-live/tools/actions/composites/setup-git-user@ci/workflows-zizmor-actionlint
+        uses: LedgerHQ/ledger-live/tools/actions/composites/setup-git-user@@ci/workflows-zizmor-high-severity
 
       - name: Setup the caches
-        uses: LedgerHQ/ledger-live/tools/actions/composites/setup-caches@ci/workflows-zizmor-actionlint
+        uses: LedgerHQ/ledger-live/tools/actions/composites/setup-caches@@ci/workflows-zizmor-high-severity
         id: caches
         with:
           use-mise: true

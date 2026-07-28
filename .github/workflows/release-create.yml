@@ -22,12 +22,12 @@ jobs:
           ref: develop
           token: ${{ steps.generate-token.outputs.token }}
       - name: Setup git user
-        uses: LedgerHQ/ledger-live/tools/actions/composites/setup-git-user@ci/workflows-zizmor-actionlint
+        uses: LedgerHQ/ledger-live/tools/actions/composites/setup-git-user@@ci/workflows-zizmor-high-severity
       - name: create release branch
         run: |
           git checkout -b $RELEASE_BRANCH
       - name: Setup the caches
-        uses: LedgerHQ/ledger-live/tools/actions/composites/setup-caches@ci/workflows-zizmor-actionlint
+        uses: LedgerHQ/ledger-live/tools/actions/composites/setup-caches@@ci/workflows-zizmor-high-severity
         id: setup-caches
         with:
           use-mise: true
@@ -38,7 +38,7 @@ jobs:
       - name: Move patch updates to minor
         # For more info about why we do this, see this doc:
         # https://ledgerhq.atlassian.net/wiki/spaces/WALLETCO/pages/4710989838/LL+Incident+Recovery+-+Hotfix+in+all+cases
-        uses: LedgerHQ/ledger-live/tools/actions/composites/adjust-changeset-level@ci/workflows-zizmor-actionlint
+        uses: LedgerHQ/ledger-live/tools/actions/composites/adjust-changeset-level@@ci/workflows-zizmor-high-severity
         with:
           from_level: patch
           to_level: minor

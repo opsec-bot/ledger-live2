@@ -58,7 +58,7 @@ jobs:
           ref: ${{ inputs.ref || github.sha }}
           fetch-depth: 2
       - name: Setup the caches
-        uses: LedgerHQ/ledger-live/tools/actions/composites/setup-caches@ci/workflows-zizmor-actionlint
+        uses: LedgerHQ/ledger-live/tools/actions/composites/setup-caches@@ci/workflows-zizmor-high-severity
         id: setup-caches
         with:
           use-mise: true

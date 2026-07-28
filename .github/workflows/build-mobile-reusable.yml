@@ -51,9 +51,9 @@ jobs:
         with:
           ref: ${{ inputs.ref || github.sha }}
       - name: Setup git user
-        uses: LedgerHQ/ledger-live/tools/actions/composites/setup-git-user@ci/workflows-zizmor-actionlint
+        uses: LedgerHQ/ledger-live/tools/actions/composites/setup-git-user@@ci/workflows-zizmor-high-severity
       - name: Setup the caches
-        uses: LedgerHQ/ledger-live/tools/actions/composites/setup-caches@ci/workflows-zizmor-actionlint
+        uses: LedgerHQ/ledger-live/tools/actions/composites/setup-caches@@ci/workflows-zizmor-high-severity
         id: caches
         with:
           use-mise: true
@@ -70,12 +70,12 @@ jobs:
           registry: ${{ vars.ARTIFACTORY_URL }}
       - name: install dependencies
         run: pnpm i --filter="live-mobile..." --filter="ledger-live" --no-frozen-lockfile --unsafe-perm
-      - uses: LedgerHQ/ledger-live/tools/actions/get-package-infos@ci/workflows-zizmor-actionlint
+      - uses: LedgerHQ/ledger-live/tools/actions/get-package-infos@@ci/workflows-zizmor-high-severity
         id: version
         with:
           path: ${{ github.workspace }}/apps/ledger-live-mobile
       - name: set beta name
-        uses: LedgerHQ/ledger-live/tools/actions/change-product-name@ci/workflows-zizmor-actionlint
+        uses: LedgerHQ/ledger-live/tools/actions/change-product-name@@ci/workflows-zizmor-high-severity
         with:
           path: ${{ github.workspace }}/apps/ledger-live-mobile
       - name: Get short SHA
@@ -93,7 +93,7 @@ jobs:
           NODE_OPTIONS: "--max-old-space-size=7168"
           ANDROID_KEYSTORE_FILE: ${{ github.workspace }}/apps/ledger-live-mobile/android/app/staging.kstr
         run: pnpm build-ci:llm:android
-      - uses: LedgerHQ/ledger-live/tools/actions/get-package-infos@ci/workflows-zizmor-actionlint
+      - uses: LedgerHQ/ledger-live/tools/actions/get-package-infos@@ci/workflows-zizmor-high-severity
         id: post-version
         with:
           path: ${{ github.workspace }}/apps/ledger-live-mobile

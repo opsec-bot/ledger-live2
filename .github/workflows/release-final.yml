@@ -61,10 +61,10 @@ jobs:
           token: ${{ steps.generate-token.outputs.token }}
 
       - name: Setup git user
-        uses: LedgerHQ/ledger-live/tools/actions/composites/setup-git-user@ci/workflows-zizmor-actionlint
+        uses: LedgerHQ/ledger-live/tools/actions/composites/setup-git-user@@ci/workflows-zizmor-high-severity
 
       - name: Setup the caches
-        uses: LedgerHQ/ledger-live/tools/actions/composites/setup-caches@ci/workflows-zizmor-actionlint
+        uses: LedgerHQ/ledger-live/tools/actions/composites/setup-caches@@ci/workflows-zizmor-high-severity
         id: setup-caches
         with:
           use-mise: true
@@ -103,19 +103,19 @@ jobs:
         run: |
           echo "status=$(git diff HEAD HEAD~1 ./apps/ledger-live-mobile/package.json | grep '"version": "' | wc -l)" >> $GITHUB_OUTPUT
 
-      - uses: LedgerHQ/ledger-live/tools/actions/get-package-infos@ci/workflows-zizmor-actionlint
+      - uses: LedgerHQ/ledger-live/tools/actions/get-package-infos@@ci/workflows-zizmor-high-severity
         id: desktop-version
         with:
           path: ${{ github.workspace }}/apps/ledger-live-desktop
 
-      - uses: LedgerHQ/ledger-live/tools/actions/get-package-infos@ci/workflows-zizmor-actionlint
+      - uses: LedgerHQ/ledger-live/tools/actions/get-package-infos@@ci/workflows-zizmor-high-severity
         id: mobile-version
         with:
           path: ${{ github.workspace }}/apps/ledger-live-mobile
 
       - name: generate desktop changelog
         if: ${{ steps.desktop-changed.outputs.status != 0 || github.event_name == 'workflow_dispatch' && contains(fromJson('["LLD", "ALL"]'), inputs.app) }}
-        uses: LedgerHQ/ledger-live/tools/actions/generate-release-message@ci/workflows-zizmor-actionlint
+        uses: LedgerHQ/ledger-live/tools/actions/generate-release-message@@ci/workflows-zizmor-high-severity
         id: desktop-changelog
         with:
           package-path: ${{ github.workspace }}/apps/ledger-live-desktop/package.json
@@ -132,7 +132,7 @@ jobs:
 
       - name: generate mobile changelog
         if: ${{ steps.mobile-changed.outputs.status != 0 || github.event_name == 'workflow_dispatch' && contains(fromJson('["LLM", "ALL"]'), inputs.app) }}
-        uses: LedgerHQ/ledger-live/tools/actions/generate-release-message@ci/workflows-zizmor-actionlint
+        uses: LedgerHQ/ledger-live/tools/actions/generate-release-message@@ci/workflows-zizmor-high-severity
         id: mobile-changelog
         with:
           package-path: ${{ github.workspace }}/apps/ledger-live-mobile/package.json

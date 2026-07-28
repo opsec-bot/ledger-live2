@@ -68,11 +68,11 @@ jobs:
         run: gh pr checkout "$PR_NUMBER"
 
       - name: Setup git user
-        uses: LedgerHQ/ledger-live/tools/actions/composites/setup-git-user@ci/workflows-zizmor-actionlint
+        uses: LedgerHQ/ledger-live/tools/actions/composites/setup-git-user@@ci/workflows-zizmor-high-severity
 
       - name: Setup the toolchain
         id: caches
-        uses: LedgerHQ/ledger-live/tools/actions/composites/setup-caches@ci/workflows-zizmor-actionlint
+        uses: LedgerHQ/ledger-live/tools/actions/composites/setup-caches@@ci/workflows-zizmor-high-severity
         with:
           use-mise: true
           gh-token: ${{ secrets.GITHUB_TOKEN }}
@@ -84,17 +84,17 @@ jobs:
           region: ${{ secrets.AWS_CACHE_REGION }}
 
       - name: JFrog npm auth
-        uses: LedgerHQ/ledger-live/tools/actions/composites/jfrog-npm-auth@ci/workflows-zizmor-actionlint
+        uses: LedgerHQ/ledger-live/tools/actions/composites/jfrog-npm-auth@@ci/workflows-zizmor-high-severity
         with:
           registry: ${{ vars.ARTIFACTORY_URL }}
 
-      - uses: LedgerHQ/ledger-live/tools/actions/composites/setup-test-desktop@ci/workflows-zizmor-actionlint
+      - uses: LedgerHQ/ledger-live/tools/actions/composites/setup-test-desktop@@ci/workflows-zizmor-high-severity
         id: setup-test-desktop
         with:
           skip_ruby: true
           install_playwright: true
 
-      - uses: LedgerHQ/ledger-live/tools/actions/composites/update-snapshots-desktop@ci/workflows-zizmor-actionlint
+      - uses: LedgerHQ/ledger-live/tools/actions/composites/update-snapshots-desktop@@ci/workflows-zizmor-high-severity
         id: update-snapshots
         with:
           os: ubuntu-22.04

@@ -247,7 +247,7 @@ jobs:
 
       - name: Setup caches
         id: caches
-        uses: LedgerHQ/ledger-live/tools/actions/composites/setup-caches@ci/workflows-zizmor-actionlint
+        uses: LedgerHQ/ledger-live/tools/actions/composites/setup-caches@@ci/workflows-zizmor-high-severity
         with:
           use-mise: true
           gh-token: ${{ secrets.GITHUB_TOKEN }}
@@ -268,7 +268,7 @@ jobs:
           registry: ${{ vars.ARTIFACTORY_URL }}
 
       - name: Install dependencies and build LLD
-        uses: LedgerHQ/ledger-live/tools/actions/composites/setup-e2e-test-desktop@ci/workflows-zizmor-actionlint
+        uses: LedgerHQ/ledger-live/tools/actions/composites/setup-e2e-test-desktop@@ci/workflows-zizmor-high-severity
         id: setup-test-desktop
         with:
           build_type: ${{ inputs.build_type || 'testing' }}
@@ -284,7 +284,7 @@ jobs:
         shell: bash
 
       - name: Configure test environment (API endpoints, broadcast settings)
-        uses: LedgerHQ/ledger-live/tools/actions/composites/setup-e2e-env@ci/workflows-zizmor-actionlint
+        uses: LedgerHQ/ledger-live/tools/actions/composites/setup-e2e-env@@ci/workflows-zizmor-high-severity
         with:
           enable_broadcast: ${{ inputs.enable_broadcast }}
           build_type: ${{ inputs.build_type }}
@@ -382,7 +382,7 @@ jobs:
 
       - name: Run Playwright E2E tests
         id: run-playwright
-        uses: LedgerHQ/ledger-live/tools/actions/composites/run-e2e-playwright-tests@ci/workflows-zizmor-actionlint
+        uses: LedgerHQ/ledger-live/tools/actions/composites/run-e2e-playwright-tests@@ci/workflows-zizmor-high-severity
         with:
           speculos_device: ${{ env.SPECULOS_DEVICE }}
           test_filter: ${{ steps.test-filter.outputs.filter }}
@@ -431,7 +431,7 @@ jobs:
       - name: Extract test summary for Slack notification
         if: ${{ !cancelled() }}
         id: summary
-        uses: LedgerHQ/ledger-live/tools/actions/composites/get-allure-summary@ci/workflows-zizmor-actionlint
+        uses: LedgerHQ/ledger-live/tools/actions/composites/get-allure-summary@@ci/workflows-zizmor-high-severity
         with:
           allure-results-path: ${{ env.ALLURE_RESULTS }}
           platform: ${{ needs.prepare-devices.outputs.is_dual == 'true' && format('linux-{0}', needs.prepare-devices.outputs.device_1) || 'linux' }}
@@ -439,7 +439,7 @@ jobs:
       - name: Publish report to Allure Server
         id: allure-server
         if: ${{ !cancelled() }}
-        uses: LedgerHQ/ledger-live/tools/actions/composites/upload-allure-report@ci/workflows-zizmor-actionlint
+        uses: LedgerHQ/ledger-live/tools/actions/composites/upload-allure-report@@ci/workflows-zizmor-high-severity
         with:
           platform: ${{ github.event_name == 'schedule' && 'linux-speculos-nightly' || (inputs.smoke_tests && 'linux-speculos-smoke' || 'linux-speculos') }}
           login: ${{ vars.ALLURE_USERNAME }}
@@ -449,7 +449,7 @@ jobs:
 
       - name: Write failed tests summary
         if: ${{ !cancelled() }}
-        uses: LedgerHQ/ledger-live/tools/actions/composites/get-failed-tests-summary@ci/workflows-zizmor-actionlint
+        uses: LedgerHQ/ledger-live/tools/actions/composites/get-failed-tests-summary@@ci/workflows-zizmor-high-severity
         with:
           results-path: ${{ env.ALLURE_RESULTS }}
           runner: playwright
@@ -475,7 +475,7 @@ jobs:
       - name: Extract test summary for Slack notification
         if: ${{ !cancelled() }}
         id: summary
-        uses: LedgerHQ/ledger-live/tools/actions/composites/get-allure-summary@ci/workflows-zizmor-actionlint
+        uses: LedgerHQ/ledger-live/tools/actions/composites/get-allure-summary@@ci/workflows-zizmor-high-severity
         with:
           allure-results-path: ${{ env.ALLURE_RESULTS }}
           platform: linux-${{ needs.prepare-devices.outputs.device_2 }}
@@ -483,7 +483,7 @@ jobs:
       - name: Publish report to Allure Server
         id: allure-server
         if: ${{ !cancelled() }}
-        uses: LedgerHQ/ledger-live/tools/actions/composites/upload-allure-report@ci/workflows-zizmor-actionlint
+        uses: LedgerHQ/ledger-live/tools/actions/composites/upload-allure-report@@ci/workflows-zizmor-high-severity
         with:
           platform: linux-speculos-${{ needs.prepare-devices.outputs.device_2 }}
           login: ${{ vars.ALLURE_USERNAME }}
@@ -493,7 +493,7 @@ jobs:
 
       - name: Write failed tests summary
         if: ${{ !cancelled() }}
-        uses: LedgerHQ/ledger-live/tools/actions/composites/get-failed-tests-summary@ci/workflows-zizmor-actionlint
+        uses: LedgerHQ/ledger-live/tools/actions/composites/get-failed-tests-summary@@ci/workflows-zizmor-high-severity
         with:
           results-path: ${{ env.ALLURE_RESULTS }}
           runner: playwright
@@ -515,7 +515,7 @@ jobs:
           path: ${{ env.ALLURE_RESULTS }}
 
       - name: Upload to qaa-allure (sandbox)
-        uses: LedgerHQ/ledger-live/tools/actions/composites/upload-allure-report-qaa@ci/workflows-zizmor-actionlint
+        uses: LedgerHQ/ledger-live/tools/actions/composites/upload-allure-report-qaa@@ci/workflows-zizmor-high-severity
         with:
           api_key: ${{ secrets.QAA_ALLURE_API_KEY }}
           path: ${{ env.ALLURE_RESULTS }}
@@ -540,7 +540,7 @@ jobs:
           path: ${{ env.ALLURE_RESULTS }}
 
       - name: Upload to qaa-allure (sandbox)
-        uses: LedgerHQ/ledger-live/tools/actions/composites/upload-allure-report-qaa@ci/workflows-zizmor-actionlint
+        uses: LedgerHQ/ledger-live/tools/actions/composites/upload-allure-report-qaa@@ci/workflows-zizmor-high-severity
         with:
           api_key: ${{ secrets.QAA_ALLURE_API_KEY }}
           path: ${{ env.ALLURE_RESULTS }}
