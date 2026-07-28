@@ -18,7 +18,7 @@ import type { FinishOnboardingState, FinishOnboardingStep } from "./types";
 
 const getIsFeatureEnabled = (
   action: PostOnboardingAction | undefined,
-  getFeature: (id: FeatureId) => Feature | null,
+  getFeature: (id: string) => Feature | null,
 ) => {
   if (!action) return false;
   if (!action.featureFlagId) return true;
@@ -79,7 +79,11 @@ export function useFinishOnboardingState(): FinishOnboardingState {
   const { getPostOnboardingAction } = usePostOnboardingContext();
   const completionContext = usePostOnboardingHubCompletionContext();
   const flags = useFeatureFlags();
-  const getFeature = useCallback((id: FeatureId): Feature | null => flags[id] ?? null, [flags]);
+  const getFeature = useCallback(
+    (id: string): Feature | null =>
+      Object.hasOwn(flags, id) ? (flags[id as FeatureId] ?? null) : null,
+    [flags],
+  );
 
   const optionalItems = useMemo(() => {
     if (!getPostOnboardingAction) {

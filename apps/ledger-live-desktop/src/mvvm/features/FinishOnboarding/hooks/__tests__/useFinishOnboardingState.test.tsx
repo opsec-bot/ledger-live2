@@ -1,9 +1,11 @@
 import React from "react";
 import { initialState as postOnboardingInitialState } from "@ledgerhq/live-common/postOnboarding/reducer";
+import { PostOnboardingProvider } from "@ledgerhq/live-common/postOnboarding/PostOnboardingProvider";
 import { DeviceModelId } from "@ledgerhq/types-devices";
 import { PostOnboardingActionId } from "@ledgerhq/types-live";
 import { renderHook, withFlagOverrides } from "tests/testSetup";
 import PostOnboardingProviderWrapped from "~/renderer/components/PostOnboardingHub/logic/PostOnboardingProviderWrapped";
+import { getPostOnboardingAction } from "~/renderer/components/PostOnboardingHub/logic";
 import { getLumenSymbolForActionId } from "LLD/features/FinishOnboarding/FinishOnboardingDialog/hooks/utils";
 import { useFinishOnboardingState } from "../useFinishOnboardingState";
 
@@ -14,6 +16,24 @@ jest.mock("~/renderer/store", () => ({
 
 const providerWrapper = ({ children }: { children: React.ReactNode }) => (
   <PostOnboardingProviderWrapped>{children}</PostOnboardingProviderWrapped>
+);
+
+const legacyFeatureFlagProviderWrapper = ({ children }: { children: React.ReactNode }) => (
+  <PostOnboardingProvider
+    navigateToPostOnboardingHub={() => {}}
+    getPostOnboardingActionsForDevice={() => []}
+    getPostOnboardingAction={id => {
+      const action = getPostOnboardingAction(id);
+      return action
+        ? {
+            ...action,
+            featureFlagId: "llmNanoSUpsellBanners",
+          }
+        : undefined;
+    }}
+  >
+    {children}
+  </PostOnboardingProvider>
 );
 
 const withSyncAccountsEnabled = withFlagOverrides({
@@ -74,6 +94,25 @@ describe("useFinishOnboardingState", () => {
     for (const step of result.current.steps) {
       expect(step.lumenSymbol).toBe(getLumenSymbolForActionId(step.id));
     }
+  });
+
+  it("should exclude an optional step whose legacy feature flag has been removed", () => {
+    const { result } = renderHook(() => useFinishOnboardingState(), {
+      wrapper: legacyFeatureFlagProviderWrapper,
+      initialState: {
+        postOnboarding: {
+          ...postOnboardingInitialState,
+          deviceModelId: DeviceModelId.nanoX,
+          actionsToComplete: [PostOnboardingActionId.personalizeMock],
+          actionsCompleted: { [PostOnboardingActionId.personalizeMock]: false },
+          postOnboardingInProgress: true,
+        },
+      },
+    });
+
+    expect(result.current.steps.map(step => step.id)).toEqual([
+      PostOnboardingActionId.deviceOnboarded,
+    ]);
   });
 
   it("should map known action titles to postOnboarding.dialog.actions keys", () => {

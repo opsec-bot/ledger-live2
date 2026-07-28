@@ -17,13 +17,15 @@ export function useLNSUpsellBannerModel(location: LNSBannerLocation): LNSBannerM
     : undefined;
 
   const handleCTAPress = () => {
+    if (!ctaLink) return;
+
     track("button_clicked", {
       button: "Level up wallet",
       ...(deviceModel ? { deviceModel } : {}),
       link: ctaLink,
       page: analyticsPage,
     });
-    if (ctaLink) Linking.openURL(ctaLink);
+    Linking.openURL(ctaLink);
   };
 
   return {

@@ -47,6 +47,29 @@ describe("LNSUpsellBanner", () => {
       expect(screen.getByText(t(`lnsUpsell.opted_in.cta`))).toBeVisible();
     });
 
+    it("should not render when the tracking params are missing", () => {
+      renderBanner({ hasTrackingParams: false });
+      expect(screen.queryByText(t(`lnsUpsell.opted_in.cta`))).toBeNull();
+    });
+
+    it.each(["", "   "])("should not render when the CTA link is %j", ctaLink => {
+      renderBanner({ ctaLink });
+      expect(screen.queryByText(t(`lnsUpsell.opted_in.cta`))).toBeNull();
+    });
+
+    it("should trim the CTA link before tracking and opening it", () => {
+      renderBanner({ ctaLink: "  https://example.com/trimmedCta  " });
+      fireEvent.press(screen.getByText(t(`lnsUpsell.opted_in.cta`)));
+
+      expect(Linking.openURL).toHaveBeenCalledWith("https://example.com/trimmedCta");
+      expect(track).toHaveBeenCalledWith("button_clicked", {
+        button: "Level up wallet",
+        deviceModel: "lns",
+        link: "https://example.com/trimmedCta",
+        page,
+      });
+    });
+
     it.each([DeviceModelId.nanoSP, DeviceModelId.nanoX])(
       "should respect the cooldown for %s",
       deviceModelId => {
@@ -170,6 +193,8 @@ describe("LNSUpsellBanner", () => {
       brazePlacement = false,
       largeScreenPlacementEnabled = true,
       hasLargeScreenBannersParam = true,
+      hasTrackingParams = true,
+      ctaLink = undefined as string | undefined,
     }) {
       const largeScreenUpsellParams = FEATURE_FLAGS_DEFAULTS.largeScreenUpsell.params;
 
@@ -177,6 +202,8 @@ describe("LNSUpsellBanner", () => {
         throw new Error("Expected large-screen upsell default params");
       }
 
+      const resolvedCtaLink =
+        ctaLink ?? (isOptIn ? "https://example.com/optInCta" : "https://example.com/optOutCta");
       const configuredParams = {
         ...largeScreenUpsellParams,
         audience: {
@@ -191,18 +218,22 @@ describe("LNSUpsellBanner", () => {
         },
         opted_in: {
           ...largeScreenUpsellParams.opted_in,
-          link: "https://example.com/optInCta",
+          link: isOptIn ? resolvedCtaLink : "https://example.com/optInCta",
         },
         opted_out: {
           ...largeScreenUpsellParams.opted_out,
-          link: "https://example.com/optOutCta",
+          link: isOptIn ? "https://example.com/optOutCta" : resolvedCtaLink,
         },
       };
       const { banners: _banners, ...legacyLargeScreenUpsellParams } = configuredParams;
+      const tracking = isOptIn ? "opted_in" : "opted_out";
+      const paramsWithTracking = hasTrackingParams
+        ? configuredParams
+        : { ...configuredParams, [tracking]: null };
       const largeScreenUpsell = {
         ...FEATURE_FLAGS_DEFAULTS.largeScreenUpsell,
         enabled: largeScreenUpsellEnabled,
-        params: hasLargeScreenBannersParam ? configuredParams : legacyLargeScreenUpsellParams,
+        params: hasLargeScreenBannersParam ? paramsWithTracking : legacyLargeScreenUpsellParams,
       };
 
       render(<LNSUpsellBanner location={location} />, {

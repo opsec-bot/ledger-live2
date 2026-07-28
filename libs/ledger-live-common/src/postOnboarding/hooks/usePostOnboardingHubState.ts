@@ -33,7 +33,8 @@ export function usePostOnboardingHubState(): PostOnboardingHubState {
   const { getPostOnboardingAction } = postOnboardingContext;
   const flags = useFeatureFlags();
   const getFeature = useCallback(
-    (id: string): Feature | null => flags[id as FeatureId] ?? null,
+    (id: string): Feature | null =>
+      Object.hasOwn(flags, id) ? (flags[id as FeatureId] ?? null) : null,
     [flags],
   );
   return useMemo(() => {

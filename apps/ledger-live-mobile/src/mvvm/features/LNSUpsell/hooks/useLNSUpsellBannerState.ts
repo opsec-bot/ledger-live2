@@ -33,14 +33,14 @@ export function useLNSUpsellBannerState(location: LNSBannerLocation): LNSUpsellB
   const largeScreenUpsell = useFeature("largeScreenUpsell");
   const eligibility = useLargeScreenUpsellEligibility();
   const tracking = isOptIn ? "opted_in" : "opted_out";
-  const ctaLink = largeScreenUpsell?.params?.[tracking].link;
+  const ctaLink = largeScreenUpsell?.params?.[tracking]?.link?.trim() || undefined;
   const placement = LARGE_SCREEN_UPSELL_BANNER_PLACEMENT_BY_LOCATION[location];
   const isPlacementEnabled = largeScreenUpsell?.params?.banners?.[placement] ?? true;
 
   const { mobileCards } = useDynamicContent();
   const isExcluded = isOptIn && mobileCards.some(c => c.extras.campaign === LNS_UPSELL_HIGH_TIER);
 
-  const isShown = eligibility.isEligible && isPlacementEnabled && !isExcluded;
+  const isShown = eligibility.isEligible && isPlacementEnabled && !isExcluded && Boolean(ctaLink);
   const deviceModelId = eligibility.isEligible ? eligibility.deviceModelId : undefined;
 
   return { isShown, ctaLink, deviceModelId, tracking };
