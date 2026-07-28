@@ -18,7 +18,7 @@ In future we may also use it to give PR authors extra information on failing che
 ## How is it setup?
 
 1. **package** – `danger` is installed as an npm dev-dependency
-2. **workflow** – [danger.yml](../../.github/workflows/danger.yml) defines how it is run in GitHub
+2. **workflow** – the `danger` job in [build-and-test-pr.yml](../../.github/workflows/build-and-test-pr.yml) defines how it is run in GitHub
 3. **config** –  [dangerfile.ts](./dangerfile.ts) is the entry point targeted by the workflow
 
 ## Testing locally
