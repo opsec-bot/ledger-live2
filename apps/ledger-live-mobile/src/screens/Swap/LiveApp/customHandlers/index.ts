@@ -106,16 +106,23 @@ export function useSwapCustomHandlers(
 
   const navigateToSwapHistory = useCallback(
     ({ params }: { params?: SwapHistoryParams } = {}) => {
-      navigation.navigate(NavigatorName.SwapSubScreens, {
+      const historyScreen = {
         screen: ScreenName.SwapHistory,
         ...(params?.swapId ? { params: { swapId: params.swapId } } : {}),
-      });
+      };
 
-      // Remount the webview while the History screen is on top so that pressing
-      // "<" (which pops back to SwapTab) lands on a clean swap form instead of
-      // the multi-step success screen still mounted underneath. Mirrors
-      // navigateToSwapPendingOperation. See LIVE-34563.
-      resetWebview();
+      // Use replace (not navigate) so SwapNavigator is removed from the BaseNavigator
+      // stack. The WebView is physically unmounted, guaranteeing the user sees a clean
+      // swap form when they return — a background navigate + resetWebview() is not
+      // sufficient because the detached native WebView does not reload until reattached,
+      // resuming the success screen. Mirrors navigateToSwapPendingOperation. LIVE-34563.
+      const baseNavigation = navigation.getParent(BASE_NAVIGATOR_ID);
+      if (baseNavigation) {
+        baseNavigation.dispatch(StackActions.replace(NavigatorName.SwapSubScreens, historyScreen));
+      } else {
+        navigation.navigate(NavigatorName.SwapSubScreens, historyScreen);
+        resetWebview();
+      }
     },
     [navigation, resetWebview],
   );

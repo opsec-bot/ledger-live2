@@ -198,7 +198,29 @@ describe("useSwapCustomHandlers", () => {
   });
 
   describe("navigateToSwapHistory", () => {
-    it("navigates to SwapHistory when swapRedirectToHistory handler is called", () => {
+    it("dispatches StackActions.replace to parent when parent navigator is found", () => {
+      mockGetParent.mockReturnValue({ dispatch: mockParentDispatch });
+
+      const { result } = render();
+
+      const handler = (result.current as Record<string, unknown>)["custom.swapRedirectToHistory"];
+      expect(typeof handler).toBe("function");
+
+      (handler as () => void)();
+
+      expect(mockGetParent).toHaveBeenCalledWith(BASE_NAVIGATOR_ID);
+      expect(mockParentDispatch).toHaveBeenCalledWith(
+        StackActions.replace(NavigatorName.SwapSubScreens, {
+          screen: ScreenName.SwapHistory,
+        }),
+      );
+      expect(mockNavigate).not.toHaveBeenCalled();
+      expect(mockResetWebview).not.toHaveBeenCalled();
+    });
+
+    it("calls navigation.navigate and resetWebview when parent navigator is not found", () => {
+      mockGetParent.mockReturnValue(undefined);
+
       const { result } = render();
 
       const handler = (result.current as Record<string, unknown>)["custom.swapRedirectToHistory"];
@@ -209,20 +231,12 @@ describe("useSwapCustomHandlers", () => {
       expect(mockNavigate).toHaveBeenCalledWith(NavigatorName.SwapSubScreens, {
         screen: ScreenName.SwapHistory,
       });
-    });
-
-    it("resets the webview when swapRedirectToHistory handler is called", () => {
-      const { result } = render();
-
-      const handler = (result.current as Record<string, unknown>)["custom.swapRedirectToHistory"];
-      expect(typeof handler).toBe("function");
-
-      (handler as () => void)();
-
       expect(mockResetWebview).toHaveBeenCalledTimes(1);
     });
 
     it("passes swapId to SwapHistory when swapRedirectToHistory handler is called with params", () => {
+      mockGetParent.mockReturnValue({ dispatch: mockParentDispatch });
+
       const { result } = render();
 
       const handler = (result.current as Record<string, unknown>)["custom.swapRedirectToHistory"];
@@ -234,12 +248,14 @@ describe("useSwapCustomHandlers", () => {
         },
       });
 
-      expect(mockNavigate).toHaveBeenCalledWith(NavigatorName.SwapSubScreens, {
-        screen: ScreenName.SwapHistory,
-        params: {
-          swapId: "swap-123",
-        },
-      });
+      expect(mockParentDispatch).toHaveBeenCalledWith(
+        StackActions.replace(NavigatorName.SwapSubScreens, {
+          screen: ScreenName.SwapHistory,
+          params: {
+            swapId: "swap-123",
+          },
+        }),
+      );
     });
   });
 
