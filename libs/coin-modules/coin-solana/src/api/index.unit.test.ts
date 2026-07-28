@@ -1,4 +1,3 @@
-import { InvalidParameterError } from "@ledgerhq/ledger-wallet-framework/errors";
 import type {
   CoinModuleApi,
   Balance,
@@ -349,7 +348,7 @@ describe("createApi", () => {
       const api = createApi(mockConfig, "solana");
       await expect(
         api.getBalance("random address", {} as unknown as BalanceOptions),
-      ).rejects.toThrow(InvalidParameterError);
+      ).rejects.toMatchObject({ name: "InvalidParameterError" });
     });
   });
 });

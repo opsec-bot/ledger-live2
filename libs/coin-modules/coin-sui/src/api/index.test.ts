@@ -1,4 +1,3 @@
-import { InvalidParameterError } from "@ledgerhq/ledger-wallet-framework/errors";
 import { BalanceOptions, Page, Reward, Stake } from "@ledgerhq/coin-module-framework/api/types";
 import type { SuiCoinConfig } from "../config";
 import * as logic from "../logic";
@@ -174,7 +173,7 @@ describe("api/index", () => {
     it("should throw an exception when options is provided", async () => {
       await expect(
         api.getBalance("random address", {} as unknown as BalanceOptions),
-      ).rejects.toThrow(InvalidParameterError);
+      ).rejects.toMatchObject({ name: "InvalidParameterError" });
     });
   });
 });

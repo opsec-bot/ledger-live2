@@ -1,4 +1,3 @@
-import { InvalidParameterError } from "@ledgerhq/ledger-wallet-framework/errors";
 import { BalanceOptions, TransactionIntent } from "@ledgerhq/coin-module-framework/api/types";
 import BigNumber from "bignumber.js";
 import coinConfig from "../config";
@@ -182,7 +181,7 @@ describe("createApi", () => {
     it("should throw an exception when options is provided", async () => {
       await expect(
         api.getBalance("random address", {} as unknown as BalanceOptions),
-      ).rejects.toThrow(InvalidParameterError);
+      ).rejects.toMatchObject({ name: "InvalidParameterError" });
     });
   });
 

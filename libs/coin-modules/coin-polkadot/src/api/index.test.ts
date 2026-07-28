@@ -1,4 +1,3 @@
-import { InvalidParameterError } from "@ledgerhq/ledger-wallet-framework/errors";
 import type {
   AssetInfo,
   BalanceOptions,
