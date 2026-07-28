@@ -81,17 +81,20 @@ account to `ETH_4`, read the RPC from `EVM_RPC_URL`, and **no-op when broadcast 
 (`DISABLE_TRANSACTION_BROADCAST !== "0"`), so a hook can't try to broadcast in a run where the
 test itself is skipped:
 
-- `ensureLoanOpen()` — `beforeAll` precondition for **withdraw / close-loan** specs (signs a real
-  open so the UI has a position to act on). Idempotent: no-op if a loan is already open.
+- `ensureLoanOpen()` — `beforeAll` precondition for **repay** specs (signs a real open so the UI has
+  debt to repay). Idempotent: no-op if a loan is already open.
+- `ensureLoanRepaid()` — `beforeAll` precondition for **withdraw** specs (open if needed, then repay
+  all debt so collateral remains supplied). Idempotent when the position is already repaid.
 - `resetLoanState()` — `before` / `after` reset for the **open-loan** spec (repays + withdraws
   everything → account back to zero). Idempotent: no-op if nothing is open.
 
 Per-test roles:
 
-| Spec             | Hook                        | Why                                          |
-| ---------------- | --------------------------- | -------------------------------------------- |
-| open-loan        | `beforeAll(resetLoanState)` | start from zero so the UI opens a fresh loan |
-| withdraw / close | `beforeAll(ensureLoanOpen)` | precondition a loan for the UI to act on     |
+| Spec      | Hook                         | Why                                                    |
+| --------- | ---------------------------- | ------------------------------------------------------ |
+| open-loan | `beforeAll(resetLoanState)`  | start from zero so the UI opens a fresh loan           |
+| repay     | `beforeAll(ensureLoanOpen)`  | precondition debt for the UI repay flow                |
+| withdraw  | `beforeAll(ensureLoanRepaid)` | precondition a fully-repaid loan for collateral withdraw |
 
 ```ts
 import { resetLoanState } from "@ledgerhq/live-e2e-shared/borrow/borrowSetup";

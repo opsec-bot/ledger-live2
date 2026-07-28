@@ -10,7 +10,11 @@ import {
   FF_LWD_WALLET_40_Q2_NO_ANALYTICS_CONSENT,
 } from "tests/utils/featureFlagUtils";
 import { buildTags } from "tests/utils/tagsUtils";
-import { resetLoanState, ensureLoanOpen } from "@ledgerhq/live-e2e-shared/borrow/borrowSetup";
+import {
+  resetLoanState,
+  ensureLoanOpen,
+  ensureLoanRepaid,
+} from "@ledgerhq/live-e2e-shared/borrow/borrowSetup";
 
 test.describe.configure({ mode: "serial" });
 
@@ -177,6 +181,11 @@ test.describe("Borrow repay", () => {
     await ensureLoanOpen({ nanoAppCatalogPath: NANO_APP_CATALOG });
   });
 
+  test.afterAll(async () => {
+    test.setTimeout(600_000);
+    await resetLoanState({ nanoAppCatalogPath: NANO_APP_CATALOG });
+  });
+
   test(
     "Hot start opens repay modal and completes full repay execution",
     {
@@ -246,6 +255,11 @@ test.describe("Borrow withdraw collateral", () => {
       ...FF_LWD_WALLET_40_Q2_NO_ANALYTICS_CONSENT,
       ...FF_BORROW_DESKTOP,
     },
+  });
+
+  test.beforeAll(async () => {
+    test.setTimeout(600_000);
+    await ensureLoanRepaid({ nanoAppCatalogPath: NANO_APP_CATALOG });
   });
 
   test.afterAll(async () => {

@@ -39,7 +39,6 @@ export class BorrowPage extends WebViewAppPage {
   private readonly loanOverviewScreenId = "borrow-loan-overview-screen";
   private readonly loanDashboardRowId = "borrow-loan-dashboard-row";
   private readonly repayModalId = "borrow-repay-modal";
-  private readonly repayAmountInputId = "borrow-repay-amount-input";
   private readonly repayInFullButtonId = "borrow-repay-in-full-button";
   private readonly repayContinueButtonId = "borrow-repay-continue-button";
   private readonly repayExecutionScreenId = "borrow-repay-execution-screen";

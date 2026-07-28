@@ -1,4 +1,9 @@
-import { openBorrowPosition, closeBorrowPosition, DEFAULT_RPC_URL } from "./borrowFlow";
+import {
+  openBorrowPosition,
+  closeBorrowPosition,
+  repayBorrowPosition,
+  DEFAULT_RPC_URL,
+} from "./borrowFlow";
 
 const DEFAULT_ACCOUNT = "ETH_4";
 const DEFAULT_COLLATERAL = "0.0002"; // wBTC
@@ -19,8 +24,8 @@ const resolveRpc = (rpcUrl?: string): string =>
   rpcUrl ?? process.env.EVM_RPC_URL ?? DEFAULT_RPC_URL;
 
 /**
- * `beforeAll` precondition for withdraw / close-loan specs: signs a real loan open on Speculos so
- * the UI has a position to act on. No-op if a loan is already open, or if broadcast is disabled.
+ * `beforeAll` precondition for repay specs: signs a real loan open on Speculos so the UI has debt
+ * to repay. No-op if a loan is already open, or if broadcast is disabled.
  */
 export async function ensureLoanOpen(options: BorrowSetupOptions = {}): Promise<void> {
   if (!broadcastEnabled()) {
@@ -33,6 +38,24 @@ export async function ensureLoanOpen(options: BorrowSetupOptions = {}): Promise<
     collateralAmount: options.collateralAmount ?? DEFAULT_COLLATERAL,
     loanAmount: options.loanAmount ?? DEFAULT_LOAN,
     marketId: options.marketId,
+    nanoAppCatalogPath: options.nanoAppCatalogPath,
+  });
+}
+
+/**
+ * `beforeAll` precondition for withdraw specs: ensures an open loan with debt fully repaid so the UI
+ * routes to withdraw collateral. Opens a loan when none exists, then repays all debt (collateral
+ * stays supplied). Idempotent when broadcast is disabled or the position is already repaid.
+ */
+export async function ensureLoanRepaid(options: BorrowSetupOptions = {}): Promise<void> {
+  if (!broadcastEnabled()) {
+    console.log("[borrowSetup] DISABLE_TRANSACTION_BROADCAST !== '0' — skipping ensureLoanRepaid");
+    return;
+  }
+  await ensureLoanOpen(options);
+  await repayBorrowPosition({
+    account: options.account ?? DEFAULT_ACCOUNT,
+    rpcUrl: resolveRpc(options.rpcUrl),
     nanoAppCatalogPath: options.nanoAppCatalogPath,
   });
 }

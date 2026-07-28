@@ -263,3 +263,6 @@ export const openBorrowPosition = (options: Omit<BorrowFlowOptions, "flow">): Pr
 
 export const closeBorrowPosition = (options: Omit<BorrowFlowOptions, "flow">): Promise<void> =>
   runBorrow({ ...options, flow: "close" });
+
+export const repayBorrowPosition = (options: Omit<BorrowFlowOptions, "flow">): Promise<void> =>
+  runBorrow({ ...options, flow: "repay" });
