@@ -2,7 +2,6 @@ import { of, Observable } from "rxjs";
 import { scan, catchError, tap } from "rxjs/operators";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { log } from "@ledgerhq/logs";
-import { emitTransactionEvent } from "../../transaction/observer";
 import {
   TransactionFlow,
   TransactionStage,
@@ -11,7 +10,8 @@ import {
   buildTransactionAbandonedEvent,
   getStakeTarget,
   getTransactionType,
-} from "../../transaction/logEvent";
+  emitTransactionEvent,
+} from "@ledgerhq/transaction-observability";
 import type { Transaction, TransactionStatus } from "../../coin-modules/transaction-types";
 import { TransactionRefusedOnDevice } from "../../errors";
 import { getMainAccount } from "../../account";

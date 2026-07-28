@@ -6,7 +6,7 @@ import type {
   TransactionSource,
 } from "@ledgerhq/types-live";
 import { getEnv } from "@ledgerhq/live-env";
-import { getTxType } from "../wallet-api/utils/txTrackingHelper";
+import { DAPP_SELECTORS } from "@ledgerhq/evm-tools/selectors/index";
 
 /**
  * Identifies which pathway emitted the transaction log event.
@@ -169,6 +169,17 @@ export function toError(err: unknown): Error {
   }
 }
 
+// EVM call-data function selector → human name (e.g. "approve", "swap"), "transfer" fallback.
+// Reimplemented here (was ledger-live-common's `getTxType`) so this package stays free of a
+// ledger-live-common dependency; it only reads `tx.data` (a Buffer), which the wallet-api
+// ethereum transaction also carries.
+function evmTxType(tx: { data?: { toString(encoding: "hex"): string } | null }): string {
+  const fallback = "transfer";
+  if (!tx?.data) return fallback;
+  const selector = `0x${tx.data.toString("hex").substring(0, 8)}`;
+  return DAPP_SELECTORS[selector] ?? fallback;
+}
+
 /**
  * Derives a family-specific transaction type from a wallet-api transaction.
  *
@@ -187,8 +198,7 @@ export function getTransactionType(
 
   switch (tx.family) {
     case "ethereum":
-      // getTxType only reads `tx.data` (a Buffer), which the wallet-api ethereum tx also carries.
-      return getTxType(tx as unknown as Parameters<typeof getTxType>[0]);
+      return evmTxType(tx as unknown as { data?: { toString(encoding: "hex"): string } | null });
     case "solana":
       return tx.model?.kind;
     case "ton":

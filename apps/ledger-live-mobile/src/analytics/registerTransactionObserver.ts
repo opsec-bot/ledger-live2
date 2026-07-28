@@ -1,5 +1,4 @@
-import { setTransactionObserver } from "@ledgerhq/live-common/transaction/observer";
-import { toSegmentTrackEvent } from "@ledgerhq/live-common/transaction/segmentEvent";
+import { setTransactionObserver, toSegmentTrackEvent } from "@ledgerhq/transaction-observability";
 import { track } from "./segment";
 
 // Forward every transaction (sign/broadcast) log event from the bridge seam to

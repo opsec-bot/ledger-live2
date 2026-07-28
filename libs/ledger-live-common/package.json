@@ -351,6 +351,7 @@
     "@ledgerhq/live-wallet": "workspace:^",
     "@ledgerhq/logs": "workspace:^",
     "@ledgerhq/speculos-transport": "workspace:^",
+    "@ledgerhq/transaction-observability": "workspace:^",
     "@ledgerhq/wallet-api-acre-module": "workspace:^",
     "@ledgerhq/wallet-api-client": "^1.15.2",
     "@ledgerhq/wallet-api-core": "^1.35.0",

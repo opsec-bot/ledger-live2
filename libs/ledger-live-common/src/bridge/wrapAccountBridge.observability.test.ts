@@ -14,8 +14,10 @@ import {
   setTransactionObserver,
   resetTransactionObservers,
   emitTransactionEvent,
-} from "../transaction/observer";
-import { ErrorCategory, TransactionStage, type LogEvent } from "../transaction/logEvent";
+  ErrorCategory,
+  TransactionStage,
+  type LogEvent,
+} from "@ledgerhq/transaction-observability";
 
 const account = {
   id: "acc",

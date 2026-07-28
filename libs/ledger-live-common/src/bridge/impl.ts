@@ -35,8 +35,8 @@ import {
   buildTransactionSuccessEvent,
   getStakeTarget,
   getTransactionType,
-} from "../transaction/logEvent";
-import { emitTransactionEvent } from "../transaction/observer";
+  emitTransactionEvent,
+} from "@ledgerhq/transaction-observability";
 
 // Rejections stay cached: evicting would hand React.use() a fresh Promise per render and re-suspend forever.
 // Callers that want to retry a transient failure must invalidate via clearBridgeCache(family).

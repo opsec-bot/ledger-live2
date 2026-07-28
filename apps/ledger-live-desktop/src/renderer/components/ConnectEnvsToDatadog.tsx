@@ -13,8 +13,7 @@ import { enabledExperimentalFeatures } from "~/renderer/experimental";
 import { sentryLogsSelector } from "~/renderer/reducers/settings";
 import { initDatadog, setTags, isDatadogAvailable } from "~/datadog/renderer";
 import { initDatadogLogs } from "~/datadog/logs";
-import { setTransactionObserver } from "@ledgerhq/live-common/transaction/observer";
-import { toSegmentTrackEvent } from "@ledgerhq/live-common/transaction/segmentEvent";
+import { setTransactionObserver, toSegmentTrackEvent } from "@ledgerhq/transaction-observability";
 import { track } from "~/renderer/analytics/segment";
 
 const MAX_KEYLEN = 32;
