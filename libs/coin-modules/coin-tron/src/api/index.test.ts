@@ -1,4 +1,4 @@
-import { InvalidParameterError } from "@ledgerhq/ledger-wallet-framework";
+import { InvalidParameterError } from "@ledgerhq/ledger-wallet-framework/errors";
 import {
   CoinModuleApi,
   BalanceOptions,

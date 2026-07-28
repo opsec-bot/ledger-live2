@@ -1,4 +1,4 @@
-import { InvalidParameterError } from "@ledgerhq/ledger-wallet-framework";
+import { InvalidParameterError } from "@ledgerhq/ledger-wallet-framework/errors";
 import { BalanceOptions, TransactionIntent } from "@ledgerhq/coin-module-framework/api/types";
 import BigNumber from "bignumber.js";
 import coinConfig from "../config";

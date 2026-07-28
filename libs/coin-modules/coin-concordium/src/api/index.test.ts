@@ -1,4 +1,4 @@
-import { InvalidParameterError } from "@ledgerhq/ledger-wallet-framework";
+import { InvalidParameterError } from "@ledgerhq/ledger-wallet-framework/errors";
 import { BalanceOptions } from "@ledgerhq/coin-module-framework/api/types";
 import { TESTNET_COIN_CONFIG, VALID_ADDRESS } from "../test/fixtures";
 import { createApi } from ".";

@@ -1,4 +1,4 @@
-import { InvalidParameterError } from "@ledgerhq/ledger-wallet-framework";
+import { InvalidParameterError } from "@ledgerhq/ledger-wallet-framework/errors";
 import { BalanceOptions, Page, Reward, Stake } from "@ledgerhq/coin-module-framework/api/types";
 import type { SuiCoinConfig } from "../config";
 import * as logic from "../logic";

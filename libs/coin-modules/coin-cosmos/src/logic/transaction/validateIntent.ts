@@ -14,7 +14,7 @@ import {
   InvalidAddressBecauseDestinationIsAlsoSource,
   NotEnoughBalance,
   RecipientRequired,
-} from "@ledgerhq/ledger-wallet-framework";
+} from "@ledgerhq/ledger-wallet-framework/errors";
 import cryptoFactory from "../../chain/chain";
 import {
   ClaimRewardsFeesWarning,

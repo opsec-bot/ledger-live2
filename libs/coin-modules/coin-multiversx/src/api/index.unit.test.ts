@@ -4,7 +4,7 @@
  * right arguments, and unsupported methods throw synchronously. Network and
  * logic layers are mocked; no network access.
  */
-import { InvalidParameterError } from "@ledgerhq/ledger-wallet-framework";
+import { InvalidParameterError } from "@ledgerhq/ledger-wallet-framework/errors";
 import type {
   Balance,
   BalanceOptions,

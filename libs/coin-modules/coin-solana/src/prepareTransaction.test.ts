@@ -1,5 +1,5 @@
-import { NotEnoughGas } from "./errors";
 import {
+  NotEnoughGas,
   SolanaMemoIsTooLong,
   SolanaRecipientAccountNotFunded,
   SolanaStakeAccountAmountTooLow,
