@@ -24,6 +24,7 @@ import { decodeOperationId, encodeOperationId } from "@ledgerhq/ledger-wallet-fr
 import { getCryptoAssetsStore } from "@ledgerhq/ledger-wallet-framework/cryptoAssetsStore";
 import { promiseAllBatched } from "@ledgerhq/live-promise";
 import aleoConfig from "../config";
+import { findMockedArc20Token } from "./arc20.mock";
 import {
   BALANCED_PRIVATE_RECORDS_PER_TRANSACTION,
   EXPLORER_TRANSFER_TYPES,
@@ -1145,13 +1146,15 @@ export async function getCalTokens({
   const uniqueProgramNames = [...new Set(programNames)];
 
   await promiseAllBatched(4, uniqueProgramNames, async programName => {
+    const mockToken = findMockedArc20Token(currencyId, programName);
     const token = await getCryptoAssetsStore().findTokenByAddressInCurrency(
       programName,
       currencyId,
     );
+    const resolvedToken = mockToken ?? token;
 
-    if (token) {
-      calTokens.set(programName, token);
+    if (resolvedToken) {
+      calTokens.set(programName, resolvedToken);
     }
   });
 
