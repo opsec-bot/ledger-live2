@@ -1,4 +1,4 @@
-import type { Currency } from "@domain/entity-currency";
+import { Currency } from "@ledgerhq/types-cryptoassets";
 import type { RateGranularity } from "./types";
 
 export const inferCurrencyAPIID = (currency: Currency): string => {

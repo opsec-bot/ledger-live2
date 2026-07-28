@@ -1,16 +1,16 @@
-import { CryptoCurrencyIdSchema, type CryptoCurrency } from "@domain/entity-currency-crypto";
-import type { FiatCurrency } from "@domain/entity-currency-fiat";
+import { CoinType } from "@ledgerhq/types-cryptoassets";
+import type { CryptoCurrency, FiatCurrency } from "@ledgerhq/types-cryptoassets";
 
 // Minimal currency fixtures so tests don't pull the full currency registry.
 // Only the fields consumed by the countervalues logic and the account mocks are populated.
 
 const bitcoin: CryptoCurrency = {
   type: "CryptoCurrency",
-  id: CryptoCurrencyIdSchema.parse("bitcoin"),
+  id: "bitcoin",
   name: "Bitcoin",
   ticker: "BTC",
   managerAppName: "Bitcoin",
-  coinType: 0,
+  coinType: CoinType.BTC,
   scheme: "bitcoin",
   color: "#ffae35",
   family: "bitcoin",
@@ -23,11 +23,11 @@ const bitcoin: CryptoCurrency = {
 
 const ethereum: CryptoCurrency = {
   type: "CryptoCurrency",
-  id: CryptoCurrencyIdSchema.parse("ethereum"),
+  id: "ethereum",
   name: "Ethereum",
   ticker: "ETH",
   managerAppName: "Ethereum",
-  coinType: 60,
+  coinType: CoinType.ETH,
   scheme: "ethereum",
   color: "#0ebdcd",
   family: "evm",

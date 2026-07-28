@@ -11,9 +11,7 @@ import {
 } from "./logic";
 import type { CounterValuesState, TrackingPair } from "./types";
 import { datapointRetention, formatCounterValueDay, formatCounterValueHour } from "./helpers";
-import { CryptoCurrencyIdSchema, type CryptoCurrency } from "@domain/entity-currency-crypto";
-import { TokenCurrencyIdSchema, type TokenCurrency } from "@domain/entity-currency-token";
-import type { Currency } from "@domain/entity-currency";
+import type { CryptoCurrency, Currency, TokenCurrency } from "@ledgerhq/types-cryptoassets";
 
 describe("inferTrackingPairForAccounts", () => {
   const accounts = Array(20)
@@ -48,11 +46,9 @@ describe("filterSupportedTrackingPairs", () => {
   const usd = getFiatCurrencyByTicker("USD");
   const unsupportedToken: TokenCurrency = {
     type: "TokenCurrency",
-    id: TokenCurrencyIdSchema.parse(
-      "ethereum/erc20/lc_staked_shared_eth_0xc4dcb059dd98b45b090da8982234c61d0b9e84f9",
-    ),
+    id: "ethereum/erc20/lc_staked_shared_eth_0xc4dcb059dd98b45b090da8982234c61d0b9e84f9",
     contractAddress: "0xc4dcb059dd98b45b090da8982234c61d0b9e84f9",
-    parentCurrencyId: CryptoCurrencyIdSchema.parse("ethereum"),
+    parentCurrencyId: "ethereum",
     tokenType: "erc20",
     name: "Ledger Staked Shared ETH",
     ticker: "osETH",
@@ -62,7 +58,7 @@ describe("filterSupportedTrackingPairs", () => {
   };
   const assetHubPolkadot: CryptoCurrency = {
     ...ethereum,
-    id: CryptoCurrencyIdSchema.parse("assethub_polkadot"),
+    id: "assethub_polkadot",
     name: "Asset Hub Polkadot",
     ticker: "DOT",
   };

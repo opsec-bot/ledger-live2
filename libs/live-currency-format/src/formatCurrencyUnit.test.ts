@@ -1,7 +1,7 @@
 import { listCryptoCurrencies } from "@domain/entity-currency-crypto";
 import { formatCurrencyUnit, formatCurrencyUnitFragment } from "./formatCurrencyUnit";
 import { BigNumber } from "bignumber.js";
-import type { Unit } from "@domain/entity-currency-unit";
+import { Unit } from "@ledgerhq/types-cryptoassets";
 
 const testCases: { name: string; unit: Unit }[] = listCryptoCurrencies(true).map(currency => ({
   name: currency.name,

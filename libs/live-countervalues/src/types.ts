@@ -1,6 +1,6 @@
 // CountervaluesSettings is user config that drives the countervalues logic.
 
-import type { Currency } from "@domain/entity-currency";
+import type { Currency } from "@ledgerhq/types-cryptoassets";
 
 // we generally will just infer it from Accounts
 export type CountervaluesSettings = {

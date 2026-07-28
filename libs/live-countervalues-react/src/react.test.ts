@@ -12,10 +12,7 @@ import type {
   CounterValuesState,
   TrackingPair,
 } from "@ledgerhq/live-countervalues/types";
-import type { FiatCurrency } from "@domain/entity-currency-fiat";
-import { TokenCurrencyIdSchema, type TokenCurrency } from "@domain/entity-currency-token";
-import { CryptoCurrencyIdSchema } from "@domain/entity-currency-crypto";
-import type { Currency } from "@domain/entity-currency";
+import type { Currency, FiatCurrency, TokenCurrency } from "@ledgerhq/types-cryptoassets";
 
 jest.mock("@ledgerhq/live-countervalues/logic", () => ({
   ...jest.requireActual("@ledgerhq/live-countervalues/logic"),
@@ -150,11 +147,9 @@ describe("CountervaluesProvider", () => {
   const bitcoin = genAccount("bitcoin").currency;
   const unsupportedToken: TokenCurrency = {
     type: "TokenCurrency",
-    id: TokenCurrencyIdSchema.parse(
-      "ethereum/erc20/lc_staked_shared_eth_0xc4dcb059dd98b45b090da8982234c61d0b9e84f9",
-    ),
+    id: "ethereum/erc20/lc_staked_shared_eth_0xc4dcb059dd98b45b090da8982234c61d0b9e84f9",
     contractAddress: "0xc4dcb059dd98b45b090da8982234c61d0b9e84f9",
-    parentCurrencyId: CryptoCurrencyIdSchema.parse("ethereum"),
+    parentCurrencyId: "ethereum",
     tokenType: "erc20",
     name: "Ledger Staked Shared ETH",
     ticker: "osETH",

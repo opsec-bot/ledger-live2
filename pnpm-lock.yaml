@@ -11432,15 +11432,6 @@ importers:
 
   libs/live-countervalues:
     dependencies:
-      '@domain/entity-currency':
-        specifier: workspace:*
-        version: link:../../domain/entity/currency
-      '@domain/entity-currency-crypto':
-        specifier: workspace:*
-        version: link:../../domain/entity/currency-crypto
-      '@domain/entity-currency-token':
-        specifier: workspace:*
-        version: link:../../domain/entity/currency-token
       '@ledgerhq/ledger-wallet-framework':
         specifier: workspace:^
         version: link:../ledger-wallet-framework
@@ -11456,13 +11447,13 @@ importers:
       '@ledgerhq/logs':
         specifier: workspace:*
         version: link:../ledgerjs/packages/logs
+      '@ledgerhq/types-cryptoassets':
+        specifier: workspace:*
+        version: link:../ledgerjs/packages/types-cryptoassets
       '@ledgerhq/types-live':
         specifier: workspace:*
         version: link:../ledgerjs/packages/types-live
     devDependencies:
-      '@domain/entity-currency-fiat':
-        specifier: workspace:*
-        version: link:../../domain/entity/currency-fiat
       '@ledgerhq/wallet-framework-test-setup':
         specifier: workspace:^
         version: link:../wallet-framework-test-setup
@@ -11487,18 +11478,6 @@ importers:
 
   libs/live-countervalues-react:
     dependencies:
-      '@domain/entity-currency':
-        specifier: workspace:*
-        version: link:../../domain/entity/currency
-      '@domain/entity-currency-crypto':
-        specifier: workspace:*
-        version: link:../../domain/entity/currency-crypto
-      '@domain/entity-currency-token':
-        specifier: workspace:*
-        version: link:../../domain/entity/currency-token
-      '@domain/entity-currency-unit':
-        specifier: workspace:*
-        version: link:../../domain/entity/currency-unit
       '@ledgerhq/ledger-wallet-framework':
         specifier: workspace:^
         version: link:../ledger-wallet-framework
@@ -11508,6 +11487,9 @@ importers:
       '@ledgerhq/live-hooks':
         specifier: workspace:*
         version: link:../live-hooks
+      '@ledgerhq/types-cryptoassets':
+        specifier: workspace:*
+        version: link:../ledgerjs/packages/types-cryptoassets
       '@ledgerhq/types-live':
         specifier: workspace:*
         version: link:../ledgerjs/packages/types-live
@@ -11515,9 +11497,6 @@ importers:
         specifier: 9.1.2
         version: 9.1.2
     devDependencies:
-      '@domain/entity-currency-fiat':
-        specifier: workspace:*
-        version: link:../../domain/entity/currency-fiat
       '@ledgerhq/wallet-framework-test-setup':
         specifier: workspace:^
         version: link:../wallet-framework-test-setup
@@ -11557,6 +11536,9 @@ importers:
       '@ledgerhq/live-env':
         specifier: workspace:^
         version: link:../env
+      '@ledgerhq/types-cryptoassets':
+        specifier: workspace:^
+        version: link:../ledgerjs/packages/types-cryptoassets
       bignumber.js:
         specifier: 9.1.2
         version: 9.1.2
@@ -11564,9 +11546,6 @@ importers:
       '@domain/entity-currency-crypto':
         specifier: workspace:*
         version: link:../../domain/entity/currency-crypto
-      '@domain/entity-currency-unit':
-        specifier: workspace:*
-        version: link:../../domain/entity/currency-unit
       '@swc/core':
         specifier: 'catalog:'
         version: 1.15.11
