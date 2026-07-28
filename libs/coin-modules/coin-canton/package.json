@@ -124,7 +124,8 @@
     "@ledgerhq/types-live": "workspace:^",
     "bignumber.js": "^9.1.2",
     "invariant": "^2.2.4",
-    "rxjs": "catalog:"
+    "rxjs": "catalog:",
+    "@ledgerhq/errors": "workspace:^"
   },
   "devDependencies": {
     "@ledgerhq/disable-network-setup": "workspace:^",

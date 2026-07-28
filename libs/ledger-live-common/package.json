@@ -415,7 +415,8 @@
     "xstate": "catalog:",
     "yargs": "^17.0.0",
     "zod": "catalog:",
-    "@shared/env": "workspace:*"
+    "@shared/env": "workspace:*",
+    "@ledgerhq/errors": "workspace:^"
   },
   "devDependencies": {
     "@features/platform-currencies": "workspace:^",

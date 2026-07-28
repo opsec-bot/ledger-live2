@@ -52,7 +52,8 @@
     "@ledgerhq/types-live": "workspace:^",
     "bignumber.js": "^9.1.2",
     "near-api-js": "^3.0.2",
-    "rxjs": "catalog:"
+    "rxjs": "catalog:",
+    "@ledgerhq/errors": "workspace:^"
   },
   "devDependencies": {
     "@ledgerhq/disable-network-setup": "workspace:^",

@@ -93,7 +93,8 @@
     "stylis": "catalog:",
     "typescript": "catalog:",
     "utf-8-validate": "^6.0.6",
-    "uuid": "^9.0.0"
+    "uuid": "^9.0.0",
+    "@ledgerhq/errors": "workspace:^"
   },
   "devDependencies": {
     "@rsbuild/core": "catalog:",

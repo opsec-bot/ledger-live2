@@ -65,7 +65,8 @@
     "invariant": "^2.2.2",
     "lodash": "^4.17.21",
     "protobufjs": "^7.2.6",
-    "rxjs": "catalog:"
+    "rxjs": "catalog:",
+    "@ledgerhq/errors": "workspace:^"
   },
   "devDependencies": {
     "@ledgerhq/disable-network-setup": "workspace:^",

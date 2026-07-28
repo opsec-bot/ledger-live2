@@ -114,7 +114,8 @@
     "graphql": "^16.10.0",
     "invariant": "^2.2.4",
     "lodash": "^4.17.21",
-    "rxjs": "catalog:"
+    "rxjs": "catalog:",
+    "@ledgerhq/errors": "workspace:^"
   },
   "devDependencies": {
     "@ledgerhq/disable-network-setup": "workspace:^",

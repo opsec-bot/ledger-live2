@@ -29,7 +29,8 @@
     "@ledgerhq/hw-transport": "workspace:*",
     "@ledgerhq/hw-transport-mocker": "workspace:^",
     "@ledgerhq/logs": "workspace:^",
-    "@vechain/sdk-core": "2.0.0"
+    "@vechain/sdk-core": "2.0.0",
+    "@ledgerhq/errors": "workspace:^"
   },
   "scripts": {
     "clean": "rimraf lib lib-es",

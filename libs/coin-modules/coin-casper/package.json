@@ -112,7 +112,8 @@
     "casper-js-sdk": "5.0.5",
     "invariant": "^2.2.2",
     "lodash": "^4.17.21",
-    "rxjs": "catalog:"
+    "rxjs": "catalog:",
+    "@ledgerhq/errors": "workspace:^"
   },
   "devDependencies": {
     "@ledgerhq/disable-network-setup": "workspace:^",

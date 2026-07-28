@@ -1,9 +1,6 @@
 /* eslint-disable @typescript-eslint/consistent-type-assertions */
-import {
-  TransportStatusError,
-  UserRefusedAddress,
-  UserRefusedOnDevice,
-} from "@ledgerhq/hw-transport";
+import { TransportStatusError } from "@ledgerhq/hw-transport";
+import { UserRefusedAddress, UserRefusedOnDevice } from "@ledgerhq/ledger-wallet-framework/errors";
 import { getMainAccount } from "../../../account/index";
 import { signMessageExec } from "../../../hw/signMessage/index";
 import type { Result } from "../../../hw/signMessage/types";

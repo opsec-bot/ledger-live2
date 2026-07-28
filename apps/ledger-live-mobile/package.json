@@ -268,7 +268,8 @@
     "styled-system": "catalog:",
     "stylis": "catalog:",
     "text-encoding-polyfill": "0.6.7",
-    "uuid": "8.3.2"
+    "uuid": "8.3.2",
+    "@ledgerhq/errors": "workspace:^"
   },
   "devDependencies": {
     "@babel/core": "7.28.5",
