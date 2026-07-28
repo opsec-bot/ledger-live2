@@ -1,4 +1,4 @@
-import { InvalidParameterError } from "@ledgerhq/errors";
+import { InvalidParameterError } from "@ledgerhq/ledger-wallet-framework";
 import { BalanceOptions } from "@ledgerhq/coin-module-framework/api/types";
 import { createApi } from ".";
 import type { AptosConfig as AptosConfigApi } from "../config";

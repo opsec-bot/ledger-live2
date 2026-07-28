@@ -1,4 +1,4 @@
-import { InvalidParameterError } from "@ledgerhq/errors";
+import { InvalidParameterError } from "@ledgerhq/ledger-wallet-framework";
 import type { BalanceOptions, Operation } from "@ledgerhq/coin-module-framework/api/types";
 import { TransactionIntent } from "@ledgerhq/coin-module-framework/api/types";
 import type { APIAccount } from "../network/types";

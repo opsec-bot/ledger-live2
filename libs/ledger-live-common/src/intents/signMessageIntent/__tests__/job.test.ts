@@ -1,5 +1,9 @@
 /* eslint-disable @typescript-eslint/consistent-type-assertions */
-import { TransportStatusError, UserRefusedAddress, UserRefusedOnDevice } from "@ledgerhq/errors";
+import {
+  TransportStatusError,
+  UserRefusedAddress,
+  UserRefusedOnDevice,
+} from "@ledgerhq/hw-transport";
 import { getMainAccount } from "../../../account/index";
 import { signMessageExec } from "../../../hw/signMessage/index";
 import type { Result } from "../../../hw/signMessage/types";

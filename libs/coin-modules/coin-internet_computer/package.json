@@ -99,7 +99,6 @@
     "@dfinity/principal": "2.4.1",
     "@dfinity/utils": "2.14.0",
     "@ledgerhq/coin-module-framework": "catalog:",
-    "@ledgerhq/errors": "workspace:^",
     "@ledgerhq/ledger-wallet-framework": "workspace:^",
     "@ledgerhq/logs": "workspace:^",
     "@ledgerhq/types-live": "workspace:^",
