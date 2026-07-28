@@ -8,11 +8,16 @@ import Chart, { GraphTrackingScreenName } from "~/renderer/components/Chart";
 import Box, { Card } from "~/renderer/components/Box";
 import FormattedVal from "~/renderer/components/FormattedVal";
 import PlaceholderChart from "~/renderer/components/PlaceholderChart";
-import { discreetModeSelector } from "~/renderer/reducers/settings";
+import {
+  discreetModeSelector,
+  flexModeSelector,
+  flexModeTargetUsdSelector,
+} from "~/renderer/reducers/settings";
 import BalanceInfos from "~/renderer/components/BalanceInfos";
 import { usePortfolio } from "~/renderer/actions/portfolio";
 import { hourFormat, dayFormat, useDateFormatter } from "~/renderer/hooks/useDateFormatter";
 import type { PortfolioBalanceInfo } from "LLD/hooks/usePortfolioBalanceDisplayState";
+import { getFlexModeFiatBaseUnits, buildFlexBalanceHistory } from "LLD/utils/flexMode";
 
 type Props = {
   counterValue: Currency;
@@ -30,13 +35,23 @@ export default function PortfolioBalanceSummary({
 }: Props) {
   const portfolio = usePortfolio();
   const discreetMode = useSelector(discreetModeSelector);
+  const flexMode = useSelector(flexModeSelector);
+  const flexModeTargetUsd = useSelector(flexModeTargetUsdSelector);
   const renderTickY = useCallback(
     (val: number | string) => formatShort(counterValue.units[0], BigNumber(val)),
     [counterValue],
   );
 
+  const flexBalanceHistory = useMemo(
+    () => (flexMode ? buildFlexBalanceHistory(flexModeTargetUsd, counterValue.units[0]) : null),
+    [flexMode, flexModeTargetUsd, counterValue],
+  );
+
+  const balanceHistory = flexBalanceHistory ?? portfolio.balanceHistory;
+  const balanceAvailable = flexMode ? true : portfolio.balanceAvailable;
+
   const suggestedMin = Math.max(
-    portfolio.balanceHistory.reduce((a, b) => (b.value < a ? b.value : a), Infinity),
+    balanceHistory.reduce((a, b) => (b.value < a ? b.value : a), Infinity),
     0,
   );
   const dayFormatter = useDateFormatter(dayFormat);
@@ -52,20 +67,30 @@ export default function PortfolioBalanceSummary({
     ),
     [counterValue, dayFormatter, hourFormatter],
   );
-  const displayBalanceInfo = useMemo(
-    () =>
+  const displayBalanceInfo = useMemo(() => {
+    if (flexMode) {
+      return {
+        totalBalance: getFlexModeFiatBaseUnits(flexModeTargetUsd, counterValue.units[0]).toNumber(),
+        isAvailable: true,
+        valueChange: { percentage: 0.021, value: 0 },
+      };
+    }
+    return (
       balanceInfo ?? {
         totalBalance: portfolio.balanceHistory[portfolio.balanceHistory.length - 1]?.value ?? 0,
         isAvailable: portfolio.balanceAvailable,
         valueChange: portfolio.countervalueChange,
-      },
-    [
-      balanceInfo,
-      portfolio.balanceHistory,
-      portfolio.balanceAvailable,
-      portfolio.countervalueChange,
-    ],
-  );
+      }
+    );
+  }, [
+    flexMode,
+    flexModeTargetUsd,
+    counterValue,
+    balanceInfo,
+    portfolio.balanceHistory,
+    portfolio.balanceAvailable,
+    portfolio.countervalueChange,
+  ]);
 
   const content = (
     <>
@@ -89,12 +114,12 @@ export default function PortfolioBalanceSummary({
           overflow: "visible",
         }}
       >
-        {portfolio.balanceAvailable ? (
+        {balanceAvailable ? (
           <Chart
             magnitude={counterValue.units[0].magnitude}
             color={chartColor}
             // TODO make date non optional
-            data={portfolio.balanceHistory}
+            data={balanceHistory}
             height={250}
             tickXScale={range}
             renderTickY={discreetMode ? () => "" : renderTickY}
@@ -105,7 +130,7 @@ export default function PortfolioBalanceSummary({
         ) : (
           <PlaceholderChart
             magnitude={counterValue.units[0].magnitude}
-            data={portfolio.balanceHistory}
+            data={balanceHistory}
             tickXScale={range}
           />
         )}

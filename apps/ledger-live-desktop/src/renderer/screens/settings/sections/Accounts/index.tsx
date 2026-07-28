@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import TrackPage from "~/renderer/analytics/TrackPage";
 import { SettingsSectionRow as Row, SettingsSectionBody as Body } from "../../SettingsSection";
 import HideEmptyTokenAccountsToggle from "./HideEmptyTokenAccountsToggle";
+import FlexModeToggle from "./FlexModeToggle";
 import FilterTokenOperationsZeroAmount from "./FilterTokenOperationsZeroAmount";
 import SectionExport from "./Export";
 import Currencies from "./Currencies";
@@ -23,6 +24,9 @@ export default function SectionAccounts() {
         desc={t("settings.accounts.hideEmptyTokens.desc")}
       >
         <HideEmptyTokenAccountsToggle />
+      </Row>
+      <Row title={t("settings.flexMode.title")} desc={t("settings.flexMode.desc")}>
+        <FlexModeToggle />
       </Row>
       <FilterTokenOperationsZeroAmount />
       <DoNotAskAgainSkipMemo />
