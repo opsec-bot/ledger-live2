@@ -19,7 +19,9 @@ import type {
   AssetsDistribution,
   ValueChange,
 } from "@ledgerhq/types-live";
-import type { CryptoCurrency, Currency, TokenCurrency } from "@ledgerhq/types-cryptoassets";
+import type { CryptoCurrency } from "@domain/entity-currency-crypto";
+import type { TokenCurrency } from "@domain/entity-currency-token";
+import type { Currency } from "@domain/entity-currency";
 
 export const defaultAssetsDistribution = {
   minShowFirst: 1,

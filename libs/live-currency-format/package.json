@@ -22,15 +22,15 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@ledgerhq/live-env": "workspace:^",
-    "@ledgerhq/types-cryptoassets": "workspace:^",
     "bignumber.js": "^9.1.2"
   },
   "devDependencies": {
     "@domain/entity-currency-crypto": "workspace:*",
-    "@types/node": "catalog:",
+    "@domain/entity-currency-unit": "workspace:*",
     "@swc/core": "catalog:",
     "@swc/jest": "catalog:",
     "@types/jest": "catalog:",
+    "@types/node": "catalog:",
     "jest": "catalog:"
   },
   "scripts": {
