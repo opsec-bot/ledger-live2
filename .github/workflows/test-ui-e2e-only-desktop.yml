@@ -197,9 +197,6 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJson(needs.prepare-devices.outputs.e2e_matrix) }}
     timeout-minutes: 40
-    permissions:
-      id-token: write
-      contents: read
     env:
       NODE_OPTIONS: "--max-old-space-size=14336"
       INSTRUMENT_BUILD: true

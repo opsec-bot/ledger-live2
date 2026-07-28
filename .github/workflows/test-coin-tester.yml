@@ -109,9 +109,6 @@ jobs:
 
   coin-tester:
     name: Coin Tester - ${{ matrix.chain }}
-    permissions:
-      id-token: write
-      contents: read
     needs: is-affected
     if: ${{ needs.is-affected.outputs.is-affected == 'true' }}
     runs-on: public-ledgerhq-shared-small
