@@ -1,6 +1,7 @@
 import React from "react";
 import { ContactDetailView } from "@features/flow-contacts";
 import { TrackScreen } from "~/analytics";
+import { ContactAddressDetailDialogSheet } from "./components/ContactAddressDetailDialogSheet";
 import { useContactDetailScreenViewModel } from "./useContactDetailScreenViewModel";
 
 export function ContactDetailScreen(): React.JSX.Element | null {
@@ -14,6 +15,7 @@ export function ContactDetailScreen(): React.JSX.Element | null {
     <>
       <TrackScreen category="Contacts" />
       <ContactDetailView {...viewModel.pageProps} />
+      <ContactAddressDetailDialogSheet {...viewModel.addressDetailDialog} />
     </>
   );
 }

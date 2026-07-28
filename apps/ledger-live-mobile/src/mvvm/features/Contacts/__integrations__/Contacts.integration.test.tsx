@@ -3,7 +3,7 @@ import { Pressable, Text } from "react-native";
 import type { RouteProp } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { render, screen, withFlagOverrides, waitFor } from "@tests/test-renderer";
-import { mockContact, mockContactAddress, mockMeContact } from "@domain/entity-contact/schema.mock";
+import { mockContact, mockContactAddress, mockMeContact, mockPopulatedContacts } from "@domain/entity-contact/schema.mock";
 import { NavigatorName, ScreenName } from "~/const";
 import type { AccountsNavigatorParamList } from "~/components/RootNavigator/types/AccountsNavigator";
 import { ContactsButton, ContactsScreen } from "LLM/features/Contacts";
@@ -548,5 +548,48 @@ describe("Contacts integration", () => {
       ScreenName.MyWalletContactDetail,
     );
     expect(screen.queryByTestId("accounts-list-screen")).toBeNull();
+  });
+
+  it("should render populated contact detail when a contact with addresses is opened", async () => {
+    const { user } = render(<MyWalletNavigator />, {
+      overrideInitialState: withContactsPageReadyState(
+        { lwmContacts: { enabled: true, params: { newBadge: false } } },
+        state => ({ ...state, contacts: { contacts: mockPopulatedContacts() } }),
+      ),
+    });
+
+    await user.press(screen.getByTestId("my-wallet-contacts-button"));
+    await user.press(await screen.findByTestId("contacts-saved-contact-contact-ben"));
+
+    await waitFor(() => {
+      expect(screen.getByTestId("contacts-detail-screen")).toBeVisible();
+      expect(screen.getByText("2 addresses")).toBeVisible();
+      expect(screen.getByTestId("contacts-detail-address-list")).toBeVisible();
+      expect(screen.getByTestId("contacts-detail-network-group-ethereum")).toBeVisible();
+      expect(screen.getByTestId("contacts-detail-network-group-polygon")).toBeVisible();
+      expect(screen.getByTestId("contacts-detail-address-row-address-ethereum")).toBeVisible();
+      expect(screen.getByTestId("contacts-detail-address-row-address-polygon")).toBeVisible();
+      expect(screen.queryByTestId("contacts-detail-empty-state")).toBeNull();
+    });
+  });
+
+  it("should open the address detail sheet when an address row is pressed", async () => {
+    const { user } = render(<MyWalletNavigator />, {
+      overrideInitialState: withContactsPageReadyState(
+        { lwmContacts: { enabled: true, params: { newBadge: false } } },
+        state => ({ ...state, contacts: { contacts: mockPopulatedContacts() } }),
+      ),
+    });
+
+    await user.press(screen.getByTestId("my-wallet-contacts-button"));
+    await user.press(await screen.findByTestId("contacts-saved-contact-contact-ben"));
+    await user.press(await screen.findByTestId("contacts-detail-address-row-address-ethereum"));
+
+    await waitFor(() => {
+      expect(screen.getByTestId("contacts-address-detail-dialog")).toBeVisible();
+      expect(screen.getByTestId("contacts-address-detail-full-address")).toHaveTextContent(
+        "0x1ad23b2cf8d2e0591ea417eb82f7cd9746c53034",
+      );
+    });
   });
 });
