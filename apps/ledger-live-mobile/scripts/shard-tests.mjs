@@ -46,16 +46,9 @@ export function findTestFiles(dir) {
   return results.sort(compareStrings);
 }
 
-// Extract the tags a spec *declares*, e.g. "@smoke", "@NanoSP", "@family-evm".
-// Detox/jest-allure2 tags are always authored as quoted string literals starting
-// with "@" — via `$Tag("@x")`, `tags: ["@x", ...]`, or arrays passed to helpers
-// like `runSwapTest(..., ["@ethereum", ...])`. Matching only these (instead of the
-// whole file text) prevents a spec from being selected just because the filter word
-// appears in a comment, a describe/it title, or a page-object method name
-// (e.g. `pressQuickActionSwapButton`).
+// Extract a spec's declared `@` tags so filtering matches tags, not arbitrary file text.
 function extractDeclaredTags(fileContent) {
   const literals = fileContent.match(/['"`]@[\w-]+['"`]/g) ?? [];
-  // Strip the surrounding quotes/backticks, keep the leading "@".
   return literals.map(literal => literal.slice(1, -1));
 }
 
@@ -65,13 +58,8 @@ export function filterTestFiles(files, testFilter) {
   const filterRegex = new RegExp(filters.join("|"), "i");
 
   const filtered = files.filter(filePath => {
-    // 1. Path match: lets you target a single spec file or a whole folder by
-    //    name/path (e.g. "swapETH_BTC.spec.ts", "specs/swap", "wallet40Q2/portfolio").
+    // Match by path (target a file/folder) or by a declared tag, never raw file text.
     if (filterRegex.test(filePath)) return true;
-    // 2. Tag match: select a spec only when one of its *declared tags* matches the
-    //    filter (e.g. "@smoke", "@family-evm"). This mirrors the desktop behaviour
-    //    (Playwright --grep over titles + tags) at the file-selection granularity
-    //    Detox requires, without the false positives of a raw file-content scan.
     try {
       const tags = extractDeclaredTags(fs.readFileSync(filePath, "utf8"));
       return tags.some(tag => filterRegex.test(tag));
