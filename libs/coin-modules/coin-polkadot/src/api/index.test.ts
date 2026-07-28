@@ -204,9 +204,9 @@ describe("index", () => {
       },
     ])("should throw an exception when options is provided as $title", async ({ options }) => {
       const api = generateApi();
-      await expect(api.getBalance("random address", options)).rejects.toThrow(
-        InvalidParameterError,
-      );
+      await expect(api.getBalance("random address", options)).rejects.toMatchObject({
+        name: "InvalidParameterError",
+      });
     });
   });
 });

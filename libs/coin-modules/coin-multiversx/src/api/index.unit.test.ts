@@ -167,9 +167,9 @@ describe("createApi", () => {
   it("rejects getBalance when the options parameter is provided", async () => {
     const api = createApi(config, "elrond");
 
-    await expect(api.getBalance("address", {} as unknown as BalanceOptions)).rejects.toThrow(
-      InvalidParameterError,
-    );
+    await expect(api.getBalance("address", {} as unknown as BalanceOptions)).rejects.toMatchObject({
+      name: "InvalidParameterError",
+    });
     expect(getBalance).not.toHaveBeenCalled();
   });
 

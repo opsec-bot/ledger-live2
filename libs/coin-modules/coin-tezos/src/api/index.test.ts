@@ -946,8 +946,8 @@ describe("estimateFees", () => {
 
 describe("getBalance", () => {
   it("should throw an exception when options is provided", async () => {
-    await expect(api.getBalance("random address", {} as unknown as BalanceOptions)).rejects.toThrow(
-      InvalidParameterError,
-    );
+    await expect(
+      api.getBalance("random address", {} as unknown as BalanceOptions),
+    ).rejects.toMatchObject({ name: "InvalidParameterError" });
   });
 });
