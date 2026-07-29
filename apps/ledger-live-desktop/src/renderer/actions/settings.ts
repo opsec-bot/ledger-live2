@@ -13,6 +13,8 @@ import {
   hideSmallValueTokenOperationsSelector,
   filterTokenOperationsZeroAmountSelector,
   selectedTimeRangeSelector,
+  flexModeSelector,
+  flexModeTargetUsdSelector,
   SettingsState,
   VaultSigner,
   CurrencySettings,
@@ -58,6 +60,14 @@ export const setDeveloperMode = (developerMode: boolean) =>
 export const setDiscreetMode = (discreetMode: boolean) =>
   saveSettings({
     discreetMode,
+  });
+export const setFlexMode = (flexMode: boolean) =>
+  saveSettings({
+    flexMode,
+  });
+export const setFlexModeTargetUsd = (flexModeTargetUsd: number) =>
+  saveSettings({
+    flexModeTargetUsd,
   });
 export const setCrashReporting = (crashReporting: boolean) =>
   saveSettings({
@@ -164,6 +174,28 @@ export const setUSBTroubleshootingIndex = (USBTroubleshootingIndex?: number) =>
   saveSettings({
     USBTroubleshootingIndex,
   });
+export function useFlexMode(): [boolean, (flexMode: boolean) => void] {
+  const dispatch = useDispatch();
+  const value = useSelector(flexModeSelector);
+  const setter = useCallback(
+    (flexMode: boolean) => {
+      dispatch(setFlexMode(flexMode));
+    },
+    [dispatch],
+  );
+  return [value, setter];
+}
+export function useFlexModeTargetUsd(): [number, (flexModeTargetUsd: number) => void] {
+  const dispatch = useDispatch();
+  const value = useSelector(flexModeTargetUsdSelector);
+  const setter = useCallback(
+    (flexModeTargetUsd: number) => {
+      dispatch(setFlexModeTargetUsd(flexModeTargetUsd));
+    },
+    [dispatch],
+  );
+  return [value, setter];
+}
 export function useHideEmptyTokenAccounts(): [boolean, (hideEmptyTokenAccounts: boolean) => void] {
   const dispatch = useDispatch();
   const value = useSelector(hideEmptyTokenAccountsSelector);

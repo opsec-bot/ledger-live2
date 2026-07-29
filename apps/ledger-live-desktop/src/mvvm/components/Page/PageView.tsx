@@ -3,6 +3,7 @@ import { PageViewModelResult } from "./usePageViewModel";
 import { Wallet40Layout } from "./components";
 import RightPanel from "LLD/components/RightPanel";
 import Wallet40TopBar from "LLD/components/TopBar";
+import { FlexModeBanner } from "LLD/components/FlexModeBanner";
 
 type PageViewProps = PageViewModelResult & {
   readonly children: React.ReactNode;
@@ -20,6 +21,7 @@ export const PageView = memo(function PageView({
 }: PageViewProps) {
   return (
     <div className="relative flex flex-1 flex-col min-w-0" data-testid={pageTestId}>
+      <FlexModeBanner />
       <Wallet40TopBar />
 
       <Wallet40Layout

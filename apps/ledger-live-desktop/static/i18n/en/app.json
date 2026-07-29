@@ -5021,6 +5021,12 @@
   "settings": {
     "title": "Settings",
     "discreet": "Toggle discreet mode",
+    "flexMode": {
+      "title": "Flex Mode",
+      "desc": "Shows big, made-up portfolio numbers instead of your real balances — just for fun screenshots. Always marked on screen with a banner, and never used for Send, Receive, or Swap.",
+      "banner": "Flex Mode — demo numbers, not real funds",
+      "targetLabel": "Target amount"
+    },
     "helpButton": "Help",
     "tabs": {
       "display": "General",

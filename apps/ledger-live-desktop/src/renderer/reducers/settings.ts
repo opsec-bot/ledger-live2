@@ -103,6 +103,8 @@ export type SettingsState = {
   hideSmallValueTokenOperations: boolean;
   sidebarCollapsed: boolean;
   discreetMode: boolean;
+  flexMode: boolean;
+  flexModeTargetUsd: number;
   starredAccountIds?: string[];
   blacklistedTokenIds: string[];
   deepLinkUrl: string | undefined | null;
@@ -201,6 +203,8 @@ export const INITIAL_STATE: SettingsState = {
   hideSmallValueTokenOperations: false,
   sidebarCollapsed: false,
   discreetMode: false,
+  flexMode: false,
+  flexModeTargetUsd: 1_000_000,
   preferredDeviceModel: DeviceModelId.nanoS,
   hasInstalledApps: true,
   lastSeenDevice: null,
@@ -663,6 +667,9 @@ export function getsupportedCountervalues(fiats: FiatCurrency[]): SupportedCount
 
 export const settingsStoreSelector = (state: State): SettingsState => state.settings;
 export const discreetModeSelector = (state: State): boolean => state.settings.discreetMode === true;
+export const flexModeSelector = (state: State): boolean => state.settings.flexMode === true;
+export const flexModeTargetUsdSelector = (state: State): number =>
+  state.settings.flexModeTargetUsd ?? 1_000_000;
 export const lastSeenCustomImageSelector = (state: State) => state.settings.lastSeenCustomImage;
 export const deepLinkUrlSelector = (state: State) => state.settings.deepLinkUrl;
 export const counterValueCurrencyLocalSelector = (state: SettingsState): Currency => {
