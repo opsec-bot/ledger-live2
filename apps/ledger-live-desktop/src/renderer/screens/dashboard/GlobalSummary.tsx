@@ -18,6 +18,7 @@ import { usePortfolio } from "~/renderer/actions/portfolio";
 import { hourFormat, dayFormat, useDateFormatter } from "~/renderer/hooks/useDateFormatter";
 import type { PortfolioBalanceInfo } from "LLD/hooks/usePortfolioBalanceDisplayState";
 import { getFlexModeFiatBaseUnits, buildFlexBalanceHistory } from "LLD/utils/flexMode";
+import { useAnimatedNumber } from "LLD/hooks/useAnimatedNumber";
 
 type Props = {
   counterValue: Currency;
@@ -67,10 +68,21 @@ export default function PortfolioBalanceSummary({
     ),
     [counterValue, dayFormatter, hourFormatter],
   );
+  const flexTotalTarget = flexMode
+    ? getFlexModeFiatBaseUnits(flexModeTargetUsd, counterValue.units[0]).toNumber()
+    : null;
+  const realTotalBalance =
+    balanceInfo?.totalBalance ??
+    portfolio.balanceHistory[portfolio.balanceHistory.length - 1]?.value ??
+    0;
+  // Eases from the last real/flex total to the new one whenever the target changes
+  // (toggling Flex Mode on/off, or switching target-amount presets) instead of jumping instantly.
+  const animatedFlexTotal = useAnimatedNumber(flexTotalTarget ?? realTotalBalance);
+
   const displayBalanceInfo = useMemo(() => {
     if (flexMode) {
       return {
-        totalBalance: getFlexModeFiatBaseUnits(flexModeTargetUsd, counterValue.units[0]).toNumber(),
+        totalBalance: animatedFlexTotal,
         isAvailable: true,
         valueChange: { percentage: 0.021, value: 0 },
       };
@@ -84,8 +96,7 @@ export default function PortfolioBalanceSummary({
     );
   }, [
     flexMode,
-    flexModeTargetUsd,
-    counterValue,
+    animatedFlexTotal,
     balanceInfo,
     portfolio.balanceHistory,
     portfolio.balanceAvailable,

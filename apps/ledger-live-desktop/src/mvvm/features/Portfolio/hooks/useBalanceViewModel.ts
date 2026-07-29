@@ -8,6 +8,7 @@ import {
   flexModeTargetUsdSelector,
 } from "~/renderer/reducers/settings";
 import { getFlexModeFiatBaseUnits } from "LLD/utils/flexMode";
+import { useAnimatedNumber } from "LLD/hooks/useAnimatedNumber";
 import { themeSelector } from "~/renderer/actions/general";
 import { useAccountStatus } from "LLD/hooks/useAccountStatus";
 import { usePortfolioBalanceDisplayState } from "LLD/hooks/usePortfolioBalanceDisplayState";
@@ -47,9 +48,11 @@ export const useBalanceViewModel = (
 
   const unit = counterValue.units[0];
 
-  const displayedBalance = flexMode
-    ? getFlexModeFiatBaseUnits(flexModeTargetUsd, unit).toNumber()
-    : realDisplayedBalance;
+  const flexFiatTarget = flexMode ? getFlexModeFiatBaseUnits(flexModeTargetUsd, unit).toNumber() : null;
+  // Eases from the last real/flex value to the new one whenever flexFiatTarget changes
+  // (toggling Flex Mode on/off, or switching target-amount presets) instead of jumping instantly.
+  const animatedFlexBalance = useAnimatedNumber(flexFiatTarget ?? realDisplayedBalance);
+  const displayedBalance = flexMode ? animatedFlexBalance : realDisplayedBalance;
   // Flex Mode shows its fake numbers even before any real account has synced.
   const balanceAvailable = flexMode ? true : realBalanceAvailable;
   // Flex Mode always shows a modest fake uptick rather than mirroring the real trend.
