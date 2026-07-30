@@ -8,16 +8,18 @@ import Chart, { GraphTrackingScreenName } from "~/renderer/components/Chart";
 import Box, { Card } from "~/renderer/components/Box";
 import FormattedVal from "~/renderer/components/FormattedVal";
 import PlaceholderChart from "~/renderer/components/PlaceholderChart";
-import {
-  discreetModeSelector,
-  flexModeSelector,
-  flexModeTargetUsdSelector,
-} from "~/renderer/reducers/settings";
+import { discreetModeSelector } from "~/renderer/reducers/settings";
 import BalanceInfos from "~/renderer/components/BalanceInfos";
 import { usePortfolio } from "~/renderer/actions/portfolio";
 import { hourFormat, dayFormat, useDateFormatter } from "~/renderer/hooks/useDateFormatter";
 import type { PortfolioBalanceInfo } from "LLD/hooks/usePortfolioBalanceDisplayState";
-import { getFlexModeFiatBaseUnits, buildFlexBalanceHistory } from "LLD/utils/flexMode";
+import {
+  buildFlexBalanceHistory,
+  projectFlexBalanceHistory,
+  toBaseUnits,
+  FLEX_MODE_VALUE_CHANGE_PERCENTAGE,
+} from "LLD/utils/flexMode";
+import { useFlexPortfolio } from "LLD/hooks/useFlexPortfolio";
 import { useAnimatedNumber } from "LLD/hooks/useAnimatedNumber";
 
 type Props = {
@@ -36,17 +38,21 @@ export default function PortfolioBalanceSummary({
 }: Props) {
   const portfolio = usePortfolio();
   const discreetMode = useSelector(discreetModeSelector);
-  const flexMode = useSelector(flexModeSelector);
-  const flexModeTargetUsd = useSelector(flexModeTargetUsdSelector);
+  const { enabled: flexMode, portfolio: flexPortfolio } = useFlexPortfolio();
   const renderTickY = useCallback(
     (val: number | string) => formatShort(counterValue.units[0], BigNumber(val)),
     [counterValue],
   );
 
-  const flexBalanceHistory = useMemo(
-    () => (flexMode ? buildFlexBalanceHistory(flexModeTargetUsd, counterValue.units[0]) : null),
-    [flexMode, flexModeTargetUsd, counterValue],
-  );
+  // Follows the real history's dates so the chart's x-axis stays correct for the
+  // selected range; only the values are replaced.
+  const flexBalanceHistory = useMemo(() => {
+    if (!flexMode) return null;
+    const fiatUnit = counterValue.units[0];
+    return portfolio.balanceHistory.length
+      ? projectFlexBalanceHistory(flexPortfolio.totalFiat, fiatUnit, portfolio.balanceHistory)
+      : buildFlexBalanceHistory(flexPortfolio.totalFiat, fiatUnit);
+  }, [flexMode, flexPortfolio, counterValue, portfolio.balanceHistory]);
 
   const balanceHistory = flexBalanceHistory ?? portfolio.balanceHistory;
   const balanceAvailable = flexMode ? true : portfolio.balanceAvailable;
@@ -68,23 +74,24 @@ export default function PortfolioBalanceSummary({
     ),
     [counterValue, dayFormatter, hourFormatter],
   );
-  const flexTotalTarget = flexMode
-    ? getFlexModeFiatBaseUnits(flexModeTargetUsd, counterValue.units[0]).toNumber()
+  // The Flex Mode total is always the sum of the per-asset display values the user configured.
+  const flexTotal = flexMode
+    ? toBaseUnits(flexPortfolio.totalFiat, counterValue.units[0]).toNumber()
     : null;
   const realTotalBalance =
     balanceInfo?.totalBalance ??
     portfolio.balanceHistory[portfolio.balanceHistory.length - 1]?.value ??
     0;
-  // Eases from the last real/flex total to the new one whenever the target changes
-  // (toggling Flex Mode on/off, or switching target-amount presets) instead of jumping instantly.
-  const animatedFlexTotal = useAnimatedNumber(flexTotalTarget ?? realTotalBalance);
+  // Eases from the last real/flex total to the new one whenever it changes
+  // (toggling Flex Mode on/off, or editing an asset's amount) instead of jumping instantly.
+  const animatedFlexTotal = useAnimatedNumber(flexTotal ?? realTotalBalance);
 
   const displayBalanceInfo = useMemo(() => {
     if (flexMode) {
       return {
         totalBalance: animatedFlexTotal,
         isAvailable: true,
-        valueChange: { percentage: 0.021, value: 0 },
+        valueChange: { percentage: FLEX_MODE_VALUE_CHANGE_PERCENTAGE, value: 0 },
       };
     }
     return (

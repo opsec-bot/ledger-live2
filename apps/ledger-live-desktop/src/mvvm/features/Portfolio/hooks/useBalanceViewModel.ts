@@ -4,10 +4,9 @@ import {
   hasOnboardedDeviceSelector,
   localeSelector,
   discreetModeSelector,
-  flexModeSelector,
-  flexModeTargetUsdSelector,
 } from "~/renderer/reducers/settings";
-import { getFlexModeFiatBaseUnits } from "LLD/utils/flexMode";
+import { toBaseUnits, FLEX_MODE_VALUE_CHANGE_PERCENTAGE } from "LLD/utils/flexMode";
+import { useFlexPortfolio } from "LLD/hooks/useFlexPortfolio";
 import { useAnimatedNumber } from "LLD/hooks/useAnimatedNumber";
 import { themeSelector } from "~/renderer/actions/general";
 import { useAccountStatus } from "LLD/hooks/useAccountStatus";
@@ -31,8 +30,7 @@ export const useBalanceViewModel = (
   const navigate = useNavigate();
   const locale = useSelector(localeSelector);
   const discreet = useSelector(discreetModeSelector);
-  const flexMode = useSelector(flexModeSelector);
-  const flexModeTargetUsd = useSelector(flexModeTargetUsdSelector);
+  const { enabled: flexMode, portfolio: flexPortfolio } = useFlexPortfolio();
   const hasOnboardedDevice = useSelector(hasOnboardedDeviceSelector);
   const theme = useSelector(themeSelector);
   const { hasAccount } = useAccountStatus();
@@ -48,15 +46,20 @@ export const useBalanceViewModel = (
 
   const unit = counterValue.units[0];
 
-  const flexFiatTarget = flexMode ? getFlexModeFiatBaseUnits(flexModeTargetUsd, unit).toNumber() : null;
-  // Eases from the last real/flex value to the new one whenever flexFiatTarget changes
-  // (toggling Flex Mode on/off, or switching target-amount presets) instead of jumping instantly.
-  const animatedFlexBalance = useAnimatedNumber(flexFiatTarget ?? realDisplayedBalance);
+  // The Flex Mode total is always the sum of the per-asset display values the user configured.
+  const flexFiatTotal = flexMode ? toBaseUnits(flexPortfolio.totalFiat, unit).toNumber() : null;
+  // Eases from the last real/flex value to the new one whenever flexFiatTotal changes
+  // (toggling Flex Mode on/off, or editing an asset's amount) instead of jumping instantly.
+  const animatedFlexBalance = useAnimatedNumber(flexFiatTotal ?? realDisplayedBalance);
   const displayedBalance = flexMode ? animatedFlexBalance : realDisplayedBalance;
   // Flex Mode shows its fake numbers even before any real account has synced.
   const balanceAvailable = flexMode ? true : realBalanceAvailable;
-  // Flex Mode always shows a modest fake uptick rather than mirroring the real trend.
-  const valueChange = flexMode ? { percentage: 0.021, value: displayedBalance * 0.021 } : realValueChange;
+  const valueChange = flexMode
+    ? {
+        percentage: FLEX_MODE_VALUE_CHANGE_PERCENTAGE,
+        value: displayedBalance * FLEX_MODE_VALUE_CHANGE_PERCENTAGE,
+      }
+    : realValueChange;
 
   const navigateToAnalytics = useCallback(() => {
     setTrackingSource(PORTFOLIO_TRACKING_PAGE_NAME);

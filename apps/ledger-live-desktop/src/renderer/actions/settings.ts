@@ -14,7 +14,7 @@ import {
   filterTokenOperationsZeroAmountSelector,
   selectedTimeRangeSelector,
   flexModeSelector,
-  flexModeTargetUsdSelector,
+  flexModeAssetsSelector,
   SettingsState,
   VaultSigner,
   CurrencySettings,
@@ -29,6 +29,7 @@ import {
   TOGGLE_MEV,
   UPDATE_ANONYMOUS_USER_NOTIFICATIONS,
 } from "./constants";
+import type { FlexModeAssetsSettings } from "LLD/utils/flexMode";
 export type SaveSettings = (a: Partial<Settings>) => {
   type: string;
   payload: Partial<Settings>;
@@ -65,9 +66,9 @@ export const setFlexMode = (flexMode: boolean) =>
   saveSettings({
     flexMode,
   });
-export const setFlexModeTargetUsd = (flexModeTargetUsd: number) =>
+export const setFlexModeAssets = (flexModeAssets: FlexModeAssetsSettings) =>
   saveSettings({
-    flexModeTargetUsd,
+    flexModeAssets,
   });
 export const setCrashReporting = (crashReporting: boolean) =>
   saveSettings({
@@ -185,12 +186,15 @@ export function useFlexMode(): [boolean, (flexMode: boolean) => void] {
   );
   return [value, setter];
 }
-export function useFlexModeTargetUsd(): [number, (flexModeTargetUsd: number) => void] {
+export function useFlexModeAssets(): [
+  FlexModeAssetsSettings,
+  (flexModeAssets: FlexModeAssetsSettings) => void,
+] {
   const dispatch = useDispatch();
-  const value = useSelector(flexModeTargetUsdSelector);
+  const value = useSelector(flexModeAssetsSelector);
   const setter = useCallback(
-    (flexModeTargetUsd: number) => {
-      dispatch(setFlexModeTargetUsd(flexModeTargetUsd));
+    (flexModeAssets: FlexModeAssetsSettings) => {
+      dispatch(setFlexModeAssets(flexModeAssets));
     },
     [dispatch],
   );

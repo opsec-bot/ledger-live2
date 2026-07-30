@@ -10,6 +10,14 @@ import { useWalletFeaturesConfig } from "@features/platform-feature-flags";
 import { usePortfolioBalanceDisplayState } from "LLD/hooks/usePortfolioBalanceDisplayState";
 import { useCountervaluesState } from "@ledgerhq/live-countervalues-react";
 import { resolveAnalyticsValueChange } from "@ledgerhq/wallet-analytics";
+import { useFlexPortfolio } from "LLD/hooks/useFlexPortfolio";
+import { useAnimatedNumber } from "LLD/hooks/useAnimatedNumber";
+import {
+  buildFlexBalanceHistory,
+  projectFlexBalanceHistory,
+  toBaseUnits,
+  FLEX_MODE_VALUE_CHANGE_PERCENTAGE,
+} from "LLD/utils/flexMode";
 import type { AnalyticsViewModel } from "./types";
 
 export default function useAnalyticsViewModel(): AnalyticsViewModel {
@@ -22,9 +30,10 @@ export default function useAnalyticsViewModel(): AnalyticsViewModel {
     useWalletFeaturesConfig("desktop");
   const {
     balanceInfo: syncBalanceInfo,
-    portfolio,
+    portfolio: realPortfolio,
     isLoading,
   } = usePortfolioBalanceDisplayState({ legacyRange: true });
+  const { enabled: flexMode, portfolio: flexPortfolio } = useFlexPortfolio();
 
   const shouldDisplayPnl = isPnlFlagOn && accounts.length > 0;
 
@@ -34,19 +43,51 @@ export default function useAnalyticsViewModel(): AnalyticsViewModel {
         selectedTimeRange,
         accounts,
         currentBalance: syncBalanceInfo.totalBalance,
-        portfolio,
+        portfolio: realPortfolio,
         cvState,
         counterValue,
       }),
-    [selectedTimeRange, accounts, syncBalanceInfo.totalBalance, portfolio, cvState, counterValue],
+    [
+      selectedTimeRange,
+      accounts,
+      syncBalanceInfo.totalBalance,
+      realPortfolio,
+      cvState,
+      counterValue,
+    ],
   );
 
+  // The Analytics header and chart read the same display portfolio as the
+  // dashboard, so the two screens can't disagree on the total.
+  const flexTotal = flexMode
+    ? toBaseUnits(flexPortfolio.totalFiat, counterValue.units[0]).toNumber()
+    : null;
+  const animatedFlexTotal = useAnimatedNumber(flexTotal ?? syncBalanceInfo.totalBalance);
+
+  const portfolio = useMemo(() => {
+    if (!flexMode) return realPortfolio;
+    const fiatUnit = counterValue.units[0];
+    return {
+      ...realPortfolio,
+      balanceHistory: realPortfolio.balanceHistory.length
+        ? projectFlexBalanceHistory(flexPortfolio.totalFiat, fiatUnit, realPortfolio.balanceHistory)
+        : buildFlexBalanceHistory(flexPortfolio.totalFiat, fiatUnit),
+    };
+  }, [flexMode, realPortfolio, flexPortfolio, counterValue]);
+
   const balanceInfo = useMemo(
-    () => ({
-      ...syncBalanceInfo,
-      valueChange,
-    }),
-    [syncBalanceInfo, valueChange],
+    () =>
+      flexMode
+        ? {
+            totalBalance: animatedFlexTotal,
+            isAvailable: true,
+            valueChange: {
+              percentage: FLEX_MODE_VALUE_CHANGE_PERCENTAGE,
+              value: animatedFlexTotal * FLEX_MODE_VALUE_CHANGE_PERCENTAGE,
+            },
+          }
+        : { ...syncBalanceInfo, valueChange },
+    [flexMode, animatedFlexTotal, syncBalanceInfo, valueChange],
   );
 
   const navigateToDashboard = useCallback(() => {

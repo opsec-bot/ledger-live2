@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next";
 import { useSelector } from "LLD/hooks/redux";
 import { accountNameWithDefaultSelector } from "@ledgerhq/live-wallet/store";
 import { useWalletFeaturesConfig } from "@features/platform-feature-flags";
-import { useCalculateCountervalueCallback } from "~/renderer/actions/general";
+import { useFlexCalculateCountervalue } from "LLD/hooks/useFlexCalculateCountervalue";
 import { walletSelector } from "~/renderer/reducers/wallet";
 import { blacklistedTokenIdsSelector } from "~/renderer/reducers/settings";
 import type { ColumnDef, Row, SortingState, Updater } from "@tanstack/react-table";
@@ -42,7 +42,9 @@ export function useCryptoDataTable({
   const { shouldDisplayAggregatedAssets } = useWalletFeaturesConfig("desktop");
   const walletState = useSelector(walletSelector);
   const blacklistedTokenIds = useSelector(blacklistedTokenIdsSelector);
-  const calculateCountervalue = useCalculateCountervalueCallback();
+  // Flex-aware, so aggregated account totals and the balance sort order match
+  // the per-row values the cells render.
+  const calculateCountervalue = useFlexCalculateCountervalue();
   const syncPhase = useSyncPhase();
   const isSyncing = syncPhase === "syncing";
 

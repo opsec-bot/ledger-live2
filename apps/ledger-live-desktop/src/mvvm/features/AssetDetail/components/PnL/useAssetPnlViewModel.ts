@@ -7,6 +7,8 @@ import { useSelector } from "LLD/hooks/redux";
 import { counterValueCurrencySelector } from "~/renderer/reducers/settings";
 import { track } from "~/renderer/analytics/segment";
 import { usePnlViewModelBase } from "LLD/features/PnL/hooks/usePnlViewModelBase";
+import { useFlexPortfolio } from "LLD/hooks/useFlexPortfolio";
+import { buildFlexPnl, flexAssetRefFromCurrency, toBaseUnits } from "LLD/utils/flexMode";
 import type { PnlViewModel } from "LLD/features/PnL/types";
 import { ASSET_DETAIL_TRACKING_PAGE_NAME } from "LLD/features/AssetDetail/constants";
 
@@ -20,9 +22,23 @@ export function useAssetPnlViewModel({ distributionItem }: Props): PnlViewModel 
   const fiatCurrency = useSelector(counterValueCurrencySelector);
   const countervalues = useCountervaluesState();
   const currencyId = distributionItem.currency.id;
+  const { findAsset } = useFlexPortfolio();
 
   const groupPnl = useAssetGroupPnL(distributionItem.accounts, countervalues, fiatCurrency);
-  const { averageEntryPrice = ZERO } = groupPnl ?? {};
+
+  // Same reason as the portfolio PnL cards: real cost basis beside a Flex Mode
+  // balance is exactly what gives the screenshot away.
+  const flexAsset = findAsset(flexAssetRefFromCurrency(distributionItem.currency));
+  const flexPnl = flexAsset
+    ? buildFlexPnl(toBaseUnits(flexAsset.fiatValue, fiatCurrency.units[0]))
+    : undefined;
+
+  const pnlData = flexPnl ?? groupPnl;
+  const averageEntryPrice = flexPnl
+    ? flexAsset && flexAsset.amount.isGreaterThan(0)
+      ? flexPnl.costBasis.div(flexAsset.amount)
+      : ZERO
+    : (groupPnl?.averageEntryPrice ?? ZERO);
 
   const onAverageEntryPriceTooltipOpen = useCallback(
     (open: boolean) => {
@@ -40,7 +56,7 @@ export function useAssetPnlViewModel({ distributionItem }: Props): PnlViewModel 
 
   const viewModel = usePnlViewModelBase({
     namespace: "pnl.asset",
-    pnlData: groupPnl,
+    pnlData,
     secondaryCard: {
       id: "averageEntryPrice",
       titleKey: "pnl.asset.entry.title",

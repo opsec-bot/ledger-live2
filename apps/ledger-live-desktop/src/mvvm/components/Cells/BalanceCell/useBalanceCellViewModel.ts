@@ -2,13 +2,9 @@ import type { Currency } from "@domain/entity-currency";
 import { BigNumber } from "bignumber.js";
 import { formatCurrencyUnit } from "@ledgerhq/live-common/currencies/index";
 import { useSelector } from "LLD/hooks/redux";
-import {
-  localeSelector,
-  discreetModeSelector,
-  flexModeSelector,
-  flexModeTargetUsdSelector,
-} from "~/renderer/reducers/settings";
-import { getFlexAssetBaseUnits } from "LLD/utils/flexMode";
+import { localeSelector, discreetModeSelector } from "~/renderer/reducers/settings";
+import { toBaseUnits, flexAssetRefFromCurrency } from "LLD/utils/flexMode";
+import { useFlexPortfolio } from "LLD/hooks/useFlexPortfolio";
 
 export function useBalanceCellViewModel(
   currency: Currency,
@@ -17,14 +13,14 @@ export function useBalanceCellViewModel(
 ) {
   const locale = useSelector(localeSelector);
   const discreet = useSelector(discreetModeSelector);
-  const flexMode = useSelector(flexModeSelector);
-  const flexModeTargetUsd = useSelector(flexModeTargetUsdSelector);
+  const { resolveAsset } = useFlexPortfolio();
 
   const realBigNumberBalance = typeof balance === "number" ? new BigNumber(balance) : balance;
-  const flexBalance = flexMode
-    ? getFlexAssetBaseUnits(currency.units[0].code, flexModeTargetUsd, currency.units[0])
-    : undefined;
-  const bigNumberBalance = flexBalance ?? realBigNumberBalance;
+  // Apportioned, so a per-account row shows its share rather than the whole asset.
+  const flexAsset = resolveAsset(flexAssetRefFromCurrency(currency), realBigNumberBalance);
+  const bigNumberBalance = flexAsset
+    ? toBaseUnits(flexAsset.amount, currency.units[0])
+    : realBigNumberBalance;
 
   const formattedBalance = formatCurrencyUnit(currency.units[0], bigNumberBalance, {
     showCode: true,

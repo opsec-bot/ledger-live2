@@ -48,8 +48,12 @@ import {
   resolveAnalyticsOptInParams,
 } from "@ledgerhq/live-common/analyticsConsent/index";
 import { selectFeature } from "@shared/feature-flags";
+import type { FlexModeAssetsSettings } from "LLD/utils/flexMode";
 
 /* Initial state */
+
+/** Stable identity so `flexModeAssetsSelector` doesn't invalidate memoised consumers. */
+const EMPTY_FLEX_MODE_ASSETS: FlexModeAssetsSettings = Object.freeze({});
 
 export type VaultSigner = {
   enabled: boolean;
@@ -104,7 +108,7 @@ export type SettingsState = {
   sidebarCollapsed: boolean;
   discreetMode: boolean;
   flexMode: boolean;
-  flexModeTargetUsd: number;
+  flexModeAssets: FlexModeAssetsSettings;
   starredAccountIds?: string[];
   blacklistedTokenIds: string[];
   deepLinkUrl: string | undefined | null;
@@ -204,7 +208,8 @@ export const INITIAL_STATE: SettingsState = {
   sidebarCollapsed: false,
   discreetMode: false,
   flexMode: false,
-  flexModeTargetUsd: 1_000_000,
+  // Empty means "use the registry defaults" — see buildFlexPortfolio.
+  flexModeAssets: {},
   preferredDeviceModel: DeviceModelId.nanoS,
   hasInstalledApps: true,
   lastSeenDevice: null,
@@ -668,8 +673,8 @@ export function getsupportedCountervalues(fiats: FiatCurrency[]): SupportedCount
 export const settingsStoreSelector = (state: State): SettingsState => state.settings;
 export const discreetModeSelector = (state: State): boolean => state.settings.discreetMode === true;
 export const flexModeSelector = (state: State): boolean => state.settings.flexMode === true;
-export const flexModeTargetUsdSelector = (state: State): number =>
-  state.settings.flexModeTargetUsd ?? 1_000_000;
+export const flexModeAssetsSelector = (state: State): FlexModeAssetsSettings =>
+  state.settings.flexModeAssets ?? EMPTY_FLEX_MODE_ASSETS;
 export const lastSeenCustomImageSelector = (state: State) => state.settings.lastSeenCustomImage;
 export const deepLinkUrlSelector = (state: State) => state.settings.deepLinkUrl;
 export const counterValueCurrencyLocalSelector = (state: SettingsState): Currency => {

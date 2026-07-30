@@ -15,8 +15,9 @@ import Tooltip from "~/renderer/components/Tooltip";
 import Bar from "./Bar";
 import { HIDE_BAR_THRESHOLD } from "./constants";
 import { setTrackingSource } from "~/renderer/analytics/TrackPage";
-import { localeSelector } from "~/renderer/reducers/settings";
+import { counterValueCurrencySelector, localeSelector } from "~/renderer/reducers/settings";
 import { DistributionItem } from "@ledgerhq/types-live";
+import { useAssetDistributionRowViewModel } from "./useAssetDistributionRowViewModel";
 
 type Props = {
   item: DistributionItem;
@@ -118,12 +119,16 @@ const Value = styled.div`
 
   ${valueResponsiveStyles}
 `;
-const Row = ({ item: { currency, amount, distribution }, isVisible }: Props) => {
+const Row = ({ item, isVisible }: Props) => {
+  const { currency } = item;
   const theme = useTheme();
   const navigate = useNavigate();
   const locale = useSelector(localeSelector);
+  const counterValueCurrency = useSelector(counterValueCurrencySelector);
   const color = useCurrencyColor(currency, theme.colors.background.card);
-  const percentage = Math.floor(distribution * 10000) / 100;
+  // Amount, fiat value and share all come from one source so the row can't mix
+  // Flex Mode display values with real ones.
+  const { amount, fiatBaseUnits, percentage } = useAssetDistributionRowViewModel(item);
   const percentageWording = percentage.toLocaleString(locale, {
     minimumFractionDigits: 0,
     maximumFractionDigits: 2,
@@ -168,13 +173,25 @@ const Row = ({ item: { currency, amount, distribution }, isVisible }: Props) => 
       </Amount>
       <Value>
         <Ellipsis>
-          <CounterValue
-            currency={currency}
-            value={amount}
-            color="neutral.c100"
-            fontSize={3}
-            showCode
-          />
+          {fiatBaseUnits ? (
+            // Rendered directly rather than through CounterValue, which would show
+            // its "unavailable" placeholder when real countervalues aren't loaded.
+            <FormattedVal
+              val={fiatBaseUnits}
+              unit={counterValueCurrency.units[0]}
+              color="neutral.c100"
+              fontSize={3}
+              showCode
+            />
+          ) : (
+            <CounterValue
+              currency={currency}
+              value={amount}
+              color="neutral.c100"
+              fontSize={3}
+              showCode
+            />
+          )}
         </Ellipsis>
       </Value>
     </Wrapper>

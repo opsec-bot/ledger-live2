@@ -8,6 +8,8 @@ import {
   localeSelector,
   discreetModeSelector,
 } from "~/renderer/reducers/settings";
+import { toBaseUnits, flexAssetRefFromCurrency } from "LLD/utils/flexMode";
+import { useFlexPortfolio } from "LLD/hooks/useFlexPortfolio";
 
 export function useCounterValueCellViewModel(
   currency: Currency,
@@ -17,6 +19,7 @@ export function useCounterValueCellViewModel(
   const counterValueCurrency = useSelector(counterValueCurrencySelector);
   const locale = useSelector(localeSelector);
   const discreet = useSelector(discreetModeSelector);
+  const { resolveAsset } = useFlexPortfolio();
 
   const numericValue = typeof value === "number" ? value : value.toNumber();
 
@@ -28,15 +31,36 @@ export function useCounterValueCellViewModel(
     date: options?.date,
   });
 
+  // Keeps the fiat column consistent with the crypto amount BalanceCell renders
+  // for the same row, and with the Flex Mode portfolio total those rows sum to.
+  const flexAsset = resolveAsset(flexAssetRefFromCurrency(currency), numericValue);
+  const fiatUnit = counterValueCurrency.units[0];
+
+  if (flexAsset) {
+    return {
+      formattedCounterValue: formatCurrencyUnit(
+        fiatUnit,
+        toBaseUnits(flexAsset.fiatValue, fiatUnit),
+        {
+          showCode: true,
+          alwaysShowSign: options?.alwaysShowSign,
+          locale,
+          discreet,
+        },
+      ),
+    };
+  }
+
   if (typeof counterValue !== "number") {
     return { formattedCounterValue: "-" };
   }
 
-  const formattedCounterValue = formatCurrencyUnit(
-    counterValueCurrency.units[0],
-    new BigNumber(counterValue),
-    { showCode: true, alwaysShowSign: options?.alwaysShowSign, locale, discreet },
-  );
+  const formattedCounterValue = formatCurrencyUnit(fiatUnit, new BigNumber(counterValue), {
+    showCode: true,
+    alwaysShowSign: options?.alwaysShowSign,
+    locale,
+    discreet,
+  });
 
   return { formattedCounterValue };
 }

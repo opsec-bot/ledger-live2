@@ -8,6 +8,8 @@ import {
 import { useDistribution } from "~/renderer/actions/general";
 import { useWalletFeaturesConfig } from "@features/platform-feature-flags";
 import { setTrackingSource } from "~/renderer/analytics/TrackPage";
+import { useFlexPortfolio } from "LLD/hooks/useFlexPortfolio";
+import { flexAssetRefFromCurrency, flexDistributionPercentage } from "LLD/utils/flexMode";
 import type { AllocationTableItem, AllocationViewProps } from "../types";
 
 const PAGE_SIZE = 6;
@@ -24,21 +26,41 @@ export function useAllocationData(): AllocationViewProps {
   });
 
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const { enabled: flexMode, portfolio: flexPortfolio, findAsset } = useFlexPortfolio();
 
   const allItems: AllocationTableItem[] = useMemo(
     () =>
       distribution.list
         .filter(item => !blacklistedTokenIds.includes(item.currency.id))
-        .map(item => ({
-          currency: item.currency,
-          balance: item.amount,
-          distribution: Math.floor((item.distribution ?? 0) * 10000) / 100,
-        })),
-    [distribution.list, blacklistedTokenIds],
+        .map(item => {
+          // Percentages have to come from the display portfolio too, otherwise the
+          // allocation column reports real weights next to Flex Mode balances.
+          const flexAsset = findAsset(flexAssetRefFromCurrency(item.currency));
+          const distributionPercentage = flexAsset
+            ? flexDistributionPercentage(flexPortfolio, flexAsset)
+            : (item.distribution ?? 0) * 100;
+          return {
+            currency: item.currency,
+            balance: item.amount,
+            distribution: Math.floor(distributionPercentage * 100) / 100,
+          };
+        }),
+    [distribution.list, blacklistedTokenIds, flexPortfolio, findAsset],
   );
 
-  const items = useMemo(() => allItems.slice(0, visibleCount), [allItems, visibleCount]);
-  const hasMore = visibleCount < allItems.length;
+  // Flex Mode's own assets lead the list, ordered by their display value.
+  const orderedItems = useMemo(() => {
+    if (!flexMode) return allItems;
+    const rank = new Map(flexPortfolio.assets.map((asset, index) => [asset.currencyId, index]));
+    return [...allItems].sort(
+      (a, b) =>
+        (rank.get(a.currency.id) ?? Number.MAX_SAFE_INTEGER) -
+        (rank.get(b.currency.id) ?? Number.MAX_SAFE_INTEGER),
+    );
+  }, [allItems, flexMode, flexPortfolio]);
+
+  const items = useMemo(() => orderedItems.slice(0, visibleCount), [orderedItems, visibleCount]);
+  const hasMore = visibleCount < orderedItems.length;
 
   const showMore = useCallback(() => {
     setVisibleCount(prev => prev + PAGE_SIZE);

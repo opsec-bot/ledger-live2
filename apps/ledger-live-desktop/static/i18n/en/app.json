@@ -5025,7 +5025,14 @@
       "title": "Flex Mode",
       "desc": "Shows big, made-up portfolio numbers instead of your real balances — just for fun screenshots. Always marked on screen with a banner, and never used for Send, Receive, or Swap.",
       "banner": "Flex Mode — demo numbers, not real funds",
-      "targetLabel": "Target amount"
+      "configure": "Customise",
+      "enable": "Enable Flex Mode",
+      "enableDesc": "Replaces the balances shown on the dashboard and asset screens with the values below.",
+      "amountLabel": "Amount",
+      "valueLabel": "Value",
+      "autoIncluded": "from your holdings",
+      "portfolioTotal": "Portfolio Total",
+      "reset": "Reset to defaults"
     },
     "helpButton": "Help",
     "tabs": {
